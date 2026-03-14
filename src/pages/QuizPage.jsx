@@ -268,7 +268,9 @@ export function QuizPage() {
                   i === currentIndex
                     ? 'bg-themed-accent text-white shadow-md'
                     : answers[i] !== null
-                      ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300'
+                      ? answers[i] === questions[i].correctIndex
+                        ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300'
                       : 'bg-surface-secondary text-content-secondary hover:bg-themed-accent/10 hover:text-themed-accent'
                 )}
               >
