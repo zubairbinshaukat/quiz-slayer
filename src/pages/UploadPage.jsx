@@ -22,6 +22,7 @@ const EXAMPLE_JSON = `{
         "Clustering similar data points"
       ],
       "correctIndex": 1,
+      "shortExplanation": "Supervised learning trains on labeled input-output pairs.",
       "explanation": "Supervised learning uses labeled training data where each input has a known output, allowing the model to learn the mapping function."
     }
   ],
@@ -31,6 +32,7 @@ const EXAMPLE_JSON = `{
       "text": "Which algorithm is commonly used for classification?",
       "options": ["K-Means", "Decision Tree", "PCA", "DBSCAN"],
       "correctIndex": 1,
+      "shortExplanation": "Decision Trees are widely used for classification tasks.",
       "explanation": "Decision Trees split data based on feature thresholds to classify inputs, making them one of the most widely used classification algorithms."
     }
   ]
@@ -48,7 +50,8 @@ const AI_PROMPT = `Convert the following content into a quiz JSON file. Follow t
       "text": "Question text ending with ?",
       "options": ["Option A", "Option B", "Option C", "Option D"],
       "correctIndex": 0,
-      "explanation": "1-2 sentences explaining why the correct answer is right"
+      "shortExplanation": "One short sentence explaining the correct answer",
+      "explanation": "2-4 sentences explaining why the correct answer is right"
     }
   ]
 }
@@ -56,8 +59,10 @@ const AI_PROMPT = `Convert the following content into a quiz JSON file. Follow t
 RULES:
 - slug: lowercase letters, numbers, hyphens ONLY (e.g. "machine-learning", "data-structures")
 - Each question needs EXACTLY 4 options
+- Each question needs 4 or 5 options
 - correctIndex is 0-indexed: 0 = first option, 1 = second, 2 = third, 3 = fourth
-- Each question should have an "explanation" field (1-2 sentences explaining why the correct answer is right)
+- Each question must have a "shortExplanation" field (1 concise sentence)
+- Each question must have an "explanation" field (2-4 sentences explaining why the correct answer is right)
 - Generate at least 15 questions that test deep understanding, not just memorization
 - Questions should be clear, unambiguous, and exam-style
 - You may add a "guess_questions" array with 20+ additional practice questions in the same format
@@ -80,9 +85,18 @@ function validateSubject(data) {
     data.questions.forEach((q, i) => {
       const n = i + 1
       if (!q.text || typeof q.text !== 'string') errors.push(`Question ${n}: "text" must be a string`)
-      if (!Array.isArray(q.options) || q.options.length < 2) errors.push(`Question ${n}: "options" must have at least 2 items`)
+      const optionCount = q.options?.length ?? 0
+      if (!Array.isArray(q.options) || (optionCount !== 4 && optionCount !== 5)) {
+        errors.push(`Question ${n}: "options" must have 4 or 5 items`)
+      }
       if (typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex >= (q.options?.length ?? 0)) {
         errors.push(`Question ${n}: "correctIndex" must be 0–${(q.options?.length ?? 1) - 1}`)
+      }
+      if (!q.shortExplanation || typeof q.shortExplanation !== 'string') {
+        errors.push(`Question ${n}: "shortExplanation" must be a non-empty string`)
+      }
+      if (!q.explanation || typeof q.explanation !== 'string') {
+        errors.push(`Question ${n}: "explanation" must be a non-empty string`)
       }
     })
   }
@@ -94,9 +108,18 @@ function validateSubject(data) {
       data.guess_questions.forEach((q, i) => {
         const n = i + 1
         if (!q.text || typeof q.text !== 'string') errors.push(`guess_questions[${n}]: "text" must be a string`)
-        if (!Array.isArray(q.options) || q.options.length < 2) errors.push(`guess_questions[${n}]: "options" must have at least 2 items`)
+        const optionCount = q.options?.length ?? 0
+        if (!Array.isArray(q.options) || (optionCount !== 4 && optionCount !== 5)) {
+          errors.push(`guess_questions[${n}]: "options" must have 4 or 5 items`)
+        }
         if (typeof q.correctIndex !== 'number' || q.correctIndex < 0 || q.correctIndex >= (q.options?.length ?? 0)) {
           errors.push(`guess_questions[${n}]: invalid "correctIndex"`)
+        }
+        if (!q.shortExplanation || typeof q.shortExplanation !== 'string') {
+          errors.push(`guess_questions[${n}]: "shortExplanation" must be a non-empty string`)
+        }
+        if (!q.explanation || typeof q.explanation !== 'string') {
+          errors.push(`guess_questions[${n}]: "explanation" must be a non-empty string`)
         }
       })
     }
@@ -261,8 +284,9 @@ export function UploadPage() {
               { label: 'questions', desc: 'Array of professor questions' },
               { label: 'guess_questions', desc: 'Optional AI practice questions' },
               { label: 'correctIndex', desc: '0-indexed position of correct option' },
-              { label: 'options', desc: 'Array of at least 2 answer choices' },
-              { label: 'explanation', desc: 'Optional reason for the correct answer' },
+              { label: 'options', desc: 'Array of 4 or 5 answer choices' },
+              { label: 'shortExplanation', desc: '1-sentence summary of the correct answer' },
+              { label: 'explanation', desc: '2-4 sentence detailed explanation' },
             ].map(({ label, desc }) => (
               <div key={label} className="flex items-start gap-2">
                 <code className="text-xs font-mono bg-themed-accent/10 text-themed-accent px-1.5 py-0.5 rounded flex-shrink-0">{label}</code>

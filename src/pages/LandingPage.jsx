@@ -100,7 +100,7 @@ export function LandingPage() {
         className="mt-16 pt-8 border-t border-themed-border flex items-center justify-center"
       >
         
-         <a href="https://github.com/ZubairBinShaukat"
+         <a href="https://www.zubyr.dev"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-3 px-5 py-3 rounded-full transition-all duration-300 bg-black/5 dark:bg-white/5 cursor-pointer"

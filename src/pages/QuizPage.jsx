@@ -129,6 +129,22 @@ export function QuizPage() {
     }
   }, [showSoundTooltip, tooltipKey]) // re-runs on each new tooltip show
 
+  // Handle arrow key navigation (← previous, → next)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault()
+        prevQuestion()
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault()
+        nextQuestion()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [prevQuestion, nextQuestion])
+
   // Re-hydrate quiz if user refreshed the page
   useEffect(() => {
     if (status === 'idle') {
