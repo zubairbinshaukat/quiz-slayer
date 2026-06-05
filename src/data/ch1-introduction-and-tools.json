@@ -1,6 +1,6 @@
 {
-  "subject": " Ch1: Introduction & Language-Processing Tools (Hard)",
-  "slug": "cc-ch1-introduction-tools-guess",
+  "subject": "  Ch1: Introduction & Language-Processing Tools (Hard)",
+  "slug": "cc-ch1-introduction-tools -guess",
   "description": "Hard-level MCQs on the structure of a compiler, phases vs passes, analysis/synthesis, and the language-processing system: preprocessor, assembler, linker, loader, interpreters, JIT, cross-compilers, and bootstrapping.",
   "questions": [
     {
@@ -8,7 +8,7 @@
       "text": "A compiler for language S is written in language I and produces target code for machine T. For it to RUN, the host machine must already be able to execute:",
       "options": [
         "Any of S, I, or T equally, as all three languages must be natively supported by the host",
-        "I",
+        "I, the implementation language in which the compiler itself is written, because a program can only run where its own implementation language is supported",
         "T, since the machine has to be capable of running the target code that is ultimately emitted",
         "S, because the host must understand every construct of the source language being accepted"
       ],
@@ -33,7 +33,7 @@
       "id": 3,
       "text": "Forward references to labels defined later force a one-pass assembler to fail, which is precisely why a two-pass assembler:",
       "options": [
-        "Builds the symbol table in pass one before emitting code in pass two",
+        "Builds the symbol table of label addresses in pass one before emitting any code in pass two",
         "Repeats the entire lexical analysis stage a second time purely as a redundant safety check",
         "Performs all of its machine-code optimization work exclusively during the second and final pass over the source",
         "Loads the assembled program directly into main memory while it is still executing its first pass"
@@ -49,7 +49,7 @@
         "Bringing the complete program image from secondary storage into main memory before execution begins",
         "Setting the program counter to the entry point so the loaded process can start running immediately",
         "Allocating the run-time stack space that the executing program will use for its activation records",
-        "Resolving references to a symbol defined in another object module"
+        "Resolving references to a symbol that is defined in another, separately compiled object module by combining those modules together into a single program image"
       ],
       "correctIndex": 3,
       "shortExplanation": "Cross-module symbol resolution is linking, not loading.",
@@ -60,8 +60,8 @@
       "text": "An interpreter and a compiler differ MOST fundamentally in that the interpreter:",
       "options": [
         "Always executes the program strictly faster than the equivalent fully compiled native code would",
-        "Does not produce a separate target program that can run on its own",
-        "Cannot detect any kind of semantic error in the program at all, even simple type mismatches",
+        "Does not produce any separate, standalone target program that is itself able to run on its own",
+        "Cannot detect any kind of semantic error in the program at all, not even type mismatches",
         "Never builds an intermediate representation of any kind while processing the source program"
       ],
       "correctIndex": 1,
@@ -88,7 +88,7 @@
         "Run the existing machine-A executable directly on machine B without any modification whatsoever",
         "Rewrite the entire compiler from scratch in the native assembly language of the new machine B",
         "Install an interpreter on machine B whose job is to read and execute machine A's binary code",
-        "Retarget the back-end to emit B code, then cross-compile the compiler on A"
+        "Retarget the back-end so that it emits machine code for B, and then cross-compile the compiler itself on the existing machine A to obtain a compiler that runs on B"
       ],
       "correctIndex": 3,
       "shortExplanation": "Retarget the back-end, then cross-compile on the old host.",
@@ -140,7 +140,7 @@
         "It can be initially created during lexical analysis and then progressively refined during semantic analysis",
         "It stores important attributes such as the type, scope, and storage information of program identifiers",
         "It is consulted by both the analysis and the synthesis phases throughout the entire compilation process",
-        "It is discarded immediately after parsing completes"
+        "It is discarded immediately after parsing completes, so none of the later phases such as semantic analysis or code generation are able to consult it at all"
       ],
       "correctIndex": 3,
       "shortExplanation": "The symbol table persists well beyond parsing.",
@@ -152,7 +152,7 @@
       "options": [
         "Runs exclusively on a machine that is different from the one on which the compiled code will execute",
         "Translates the program's entire source text into machine code well before any execution can begin",
-        "Compiles selected code (often bytecode) to native code during execution, then runs it",
+        "Compiles selected hot code (often bytecode) into native machine code during execution, then runs it",
         "Only ever interprets the program statement by statement and never generates any machine code at all"
       ],
       "correctIndex": 2,
@@ -166,7 +166,7 @@
         "Allocates a fresh activation record on the run-time stack each time the macro name is encountered",
         "Is carried out entirely by the linker while it combines the object modules of the program",
         "Requires full type checking of every argument exactly as an ordinary function call would demand",
-        "Is a purely textual substitution done before compilation, with no runtime call"
+        "Is a purely textual substitution carried out by the preprocessor before compilation begins, incurring no run-time call, stack frame, or call overhead at all"
       ],
       "correctIndex": 3,
       "shortExplanation": "Macros are textual, pre-compilation, no call overhead or type checks.",
@@ -176,7 +176,7 @@
       "id": 14,
       "text": "Relocatable machine code produced by an assembler differs from absolute code in that relocatable code:",
       "options": [
-        "Uses addresses that can be adjusted when modules are combined or loaded",
+        "Uses relative addresses that can later be adjusted by the linker or loader when modules combine",
         "Must always be executed indirectly by an interpreter rather than running on the hardware directly",
         "Can never be linked together with any other separately assembled object modules under any condition",
         "Is in fact identical to the original source code that the programmer originally wrote by hand"
@@ -189,7 +189,7 @@
       "id": 15,
       "text": "Which ordering correctly reflects increasing abstraction from hardware?",
       "options": [
-        "Machine language → assembly → high-level language",
+        "Machine language closest to the bare hardware, then assembly language as a symbolic layer above it, and finally the high-level language as the most abstract",
         "High-level language, then machine language, and finally assembly as the most abstract symbolic layer",
         "High-level language, then assembly language, and finally machine language closest to the bare hardware",
         "Assembly language first, then machine language, and lastly the most abstract high-level language"
@@ -203,7 +203,7 @@
       "text": "Separate compilation of modules is enabled chiefly by the:",
       "options": [
         "Interpreter, which executes each individual module on its own immediately after that module is written",
-        "Linker resolving inter-module references after each is compiled independently",
+        "Linker, which resolves inter-module references after each module has been compiled fully independently",
         "Scanner, which lets all modules share one single global character buffer during lexical analysis",
         "Loader, which interprets the portable bytecode of each module as the program is brought into memory"
       ],
@@ -229,7 +229,7 @@
       "text": "Which is the BEST description of the boundary between front-end and back-end?",
       "options": [
         "The front-end performs target register allocation and the rest of the machine-dependent code generation",
-        "Front-end produces a checked intermediate representation; the back-end maps it to the target",
+        "Front-end produces a semantically checked intermediate representation; back-end maps it to the target",
         "The back-end is responsible for parsing the source and carrying out all of the semantic analysis",
         "The front-end finishes immediately after lexical analysis and produces nothing more than a token stream"
       ],
@@ -242,7 +242,7 @@
       "text": "An absolute loader, compared with a relocating loader, requires that:",
       "options": [
         "The linking step be skipped entirely so that all module combination happens during loading instead",
-        "The program be loaded at a fixed, predetermined address",
+        "The program be loaded at a fixed, predetermined address that was already assumed back at assembly time, since the loader performs no relocation",
         "The machine code of the program be interpreted one line at a time as it is brought into memory",
         "Every symbol in the program be deliberately left unresolved right up until the moment of loading"
       ],
@@ -280,7 +280,7 @@
       "id": 22,
       "text": "A 'hybrid' compiler such as the typical Java toolchain is characterized by:",
       "options": [
-        "Compiling to platform-neutral bytecode that a VM later interprets or JIT-compiles",
+        "Compiling the source to platform-neutral bytecode that a VM later interprets or just-in-time builds",
         "Skipping the compilation stage altogether and simply interpreting the raw source text line by line",
         "Producing only assembly language as its output, which then needs no further processing by any tool",
         "Compiling the source directly down to the native code of one single platform and nothing else at all"
@@ -306,7 +306,7 @@
       "id": 24,
       "text": "Type checking of an expression like `x + y` where one is a string is BEST classified as:",
       "options": [
-        "A static-semantic error detected at compile time",
+        "A static-semantic error detected at compile time, because the rules governing operand types are part of the language's static semantics rather than its grammar",
         "A dynamic error that can only ever be caught while the program is actually running on the machine",
         "A syntactic error that arises directly from a violation of the grammar rules of the language",
         "A lexical error that the scanner reports while it is still grouping characters into individual tokens"
@@ -371,9 +371,9 @@
       "id": 29,
       "text": "A program that translates C++ into C so an existing C compiler can be reused is a:",
       "options": [
-        "Source-to-source compiler (transpiler)",
+        "Source-to-source compiler, also called a transpiler, mapping one high-level language to another",
         "A dynamic linker that resolves references to shared library code at load time or during execution",
-        "A bytecode interpreter that directly executes platform-neutral instructions on a virtual machine",
+        "A bytecode interpreter that directly executes platform-neutral instructions",
         "A cross-assembler that turns symbolic assembly for one machine into the object code of another machine"
       ],
       "correctIndex": 0,

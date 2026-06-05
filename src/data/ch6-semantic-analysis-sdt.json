@@ -1,6 +1,6 @@
 {
-  "subject": " Ch6: Semantic Analysis & Syntax-Directed Translation (Hard)",
-  "slug": "cc-ch6-semantic-sdt-guess",
+  "subject": "  Ch6: Semantic Analysis & Syntax-Directed Translation (Hard)",
+  "slug": "cc-ch6-semantic-sdt -guess",
   "description": "Hard-level MCQs on syntax-directed definitions and translation schemes, synthesized/inherited attributes, S- and L-attributed grammars, dependency graphs and evaluation order, type checking and type equivalence, symbol tables and scope, and intermediate forms (AST, DAG, three-address code).",
   "questions": [
     {
@@ -9,7 +9,7 @@
       "options": [
         "a terminal attribute attached directly to a token produced by the lexical analyzer rather than to a nonterminal",
         "synthesized, because its value is computed by combining the attributes of L's own children further down in the tree",
-        "inherited, passed down from the parent/left sibling T",
+        "inherited, passed down from the parent or a left sibling such as T, since its value originates above or to its left in the production rather than from its own subtree",
         "undefined, since the production assigns no meaningful value to the left-hand nonterminal D in this rule"
       ],
       "correctIndex": 2,
@@ -20,7 +20,7 @@
       "id": 2,
       "text": "A syntax-directed definition is S-attributed if it uses:",
       "options": [
-        "only synthesized attributes",
+        "only synthesized attributes, meaning every attribute value is computed solely from the attributes of a node's children and therefore flows strictly upward during a bottom-up parse",
         "both synthesized and inherited attributes together, with completely arbitrary dependencies allowed among them",
         "only inherited attributes, each one obtaining its value strictly from the parent node and the left siblings in the production",
         "no attributes whatsoever on any of the grammar symbols appearing in the productions"
@@ -33,10 +33,10 @@
       "id": 3,
       "text": "Every S-attributed SDD is also L-attributed because:",
       "options": [
-        "the L-attributed restriction is automatically satisfied when there are no inherited attributes",
+        "the L-attributed restriction, which constrains only inherited attributes, is automatically satisfied when an SDD has no inherited attributes at all",
         "the L-attributed class explicitly forbids any use of synthesized attributes anywhere in the productions",
-        "it necessarily contains inherited attributes whose definitions depend on the synthesized attributes of their right siblings",
-        "synthesized attributes are computed by reading values that are passed downward from their parent node"
+        "it necessarily contains inherited attributes whose definitions depend on the synthesized attributes of their right siblings, which an L-attributed scheme would explicitly require for correctness",
+        "synthesized attributes are computed from values passed downward by the parent"
       ],
       "correctIndex": 0,
       "shortExplanation": "No inherited attrs ⇒ L-attributed condition holds vacuously.",
@@ -46,10 +46,10 @@
       "id": 4,
       "text": "Which inherited-attribute dependency VIOLATES the L-attributed condition?",
       "options": [
-        "B.inh depends on a synthesized attribute belonging to one of the symbols that occur to its left in the production",
-        "C.inh depends on its right sibling D's attribute",
-        "the head of the production synthesizes its own attribute value purely from the attributes of its children",
-        "B.inh depends on the inherited attribute of the parent symbol A appearing on the left-hand side of the production"
+        "B.inh depends on a left symbol's synthesized attribute",
+        "C.inh depends on the attribute of its right sibling D, drawing a value from a symbol that has not yet been processed in a left-to-right traversal",
+        "the head of the production synthesizes its own attribute value purely from the attributes of its children, which is a perfectly ordinary synthesized dependency and not an inherited one at all",
+        "B.inh depends on the inherited attribute of the parent symbol A appearing on the left-hand side of the production, a permitted upward-context dependency in any L-attributed scheme"
       ],
       "correctIndex": 1,
       "shortExplanation": "Depending on a RIGHT sibling breaks L-attributed.",
@@ -62,7 +62,7 @@
         "the underlying context-free grammar can be guaranteed to be unambiguous for every input string it accepts",
         "the FOLLOW sets of all the grammar's nonterminals become well-defined and computable",
         "the resulting parse tree is forced to take a strictly binary shape at every interior node",
-        "a topological order exists in which to evaluate the attributes"
+        "a topological order of the nodes exists in which to evaluate every attribute, guaranteeing that each value is computed only after all the attributes it depends upon are already available"
       ],
       "correctIndex": 3,
       "shortExplanation": "Acyclic ⇒ topological evaluation order exists.",
@@ -72,10 +72,10 @@
       "id": 6,
       "text": "Semantic actions for an S-attributed definition are conventionally placed:",
       "options": [
-        "at the very beginning of each production, before any of the right-hand-side grammar symbols have been parsed",
+        "at the very beginning of each production, before any of the right-hand-side grammar symbols have been parsed, so that the action runs ahead of every child and its subtree",
         "somewhere in the middle of each production, interleaved between the right-hand-side grammar symbols",
-        "at the end of each production (so synthesized values are ready)",
-        "exclusively within the production whose left-hand side is the grammar's designated start symbol"
+        "at the end of each production, so that all of the children's synthesized attribute values have already been computed and are ready for use when the action executes",
+        "exclusively within the start-symbol production"
       ],
       "correctIndex": 2,
       "shortExplanation": "Synthesized values are computed at the right end.",
@@ -85,7 +85,7 @@
       "id": 7,
       "text": "To evaluate an L-attributed SDD during top-down parsing, embedded actions for an inherited attribute of a symbol are placed:",
       "options": [
-        "immediately before that symbol in the production",
+        "immediately before that symbol in the right-hand side of the production, so that the inherited attribute is computed and made available just in time, before the parser begins to expand that symbol and its subtree",
         "in a completely separate traversal pass that walks over the parse tree after the main parse finishes",
         "immediately after that symbol, once it and all of its descendants in the parse tree have been fully processed",
         "at the very end of the production only, after every right-hand-side symbol has already been parsed"
@@ -99,7 +99,7 @@
       "text": "Under STRUCTURAL type equivalence, the types `Point = record{x:int; y:int}` and `Coord = record{x:int; y:int}` are:",
       "options": [
         "equivalent only on the condition that both records happen to be declared inside the very same declaration block",
-        "equivalent (same structure)",
+        "equivalent, because under structural equivalence two types are the same whenever their type expressions have identical shape, and here both records have exactly the same fields x:int and y:int in the same order",
         "never comparable at all, since records with named fields lie outside the type system's equivalence relation",
         "different, because the two record types were introduced under two distinct type names in the program"
       ],
@@ -111,10 +111,10 @@
       "id": 9,
       "text": "Under NAME type equivalence, those same two record types are:",
       "options": [
-        "equivalent, but only after an explicit coercion is applied to convert one record type into the other",
+        "equivalent after a coercion converts one into the other",
         "equivalent, since name equivalence compares the internal field structure of the two records and finds them identical",
-        "equivalent as long as the fields of the two records match in their names, order, and individual types",
-        "distinct because they have different type names"
+        "equivalent as long as the fields of the two records match in their names, order, and individual types, which is precisely what name equivalence is defined to check",
+        "distinct, because name equivalence treats each separately declared type name as its own type, so Point and Coord differ"
       ],
       "correctIndex": 3,
       "shortExplanation": "Different names ⇒ distinct under name equivalence.",
@@ -124,10 +124,10 @@
       "id": 10,
       "text": "A widening coercion inserted for `intVar + floatVar` is recorded by the type checker as:",
       "options": [
-        "an implicit conversion of the int operand to float before the addition",
-        "a reduction step performed by the parser when it collapses the right-hand side of a production into its head",
-        "an entirely new token that the lexical analyzer is expected to splice into the input stream at that point",
-        "a syntax error that the parser should have rejected long before the expression ever reached the type checker"
+        "an implicit widening conversion that promotes the int operand to a float value first, so the addition is then carried out entirely in floating-point arithmetic",
+        "a reduction step the parser performs on the production",
+        "a brand-new token spliced into the input stream",
+        "a syntax error that the parser should have rejected long before the expression ever reached the type checker, since mixed-type arithmetic is forbidden by the grammar's production rules themselves"
       ],
       "correctIndex": 0,
       "shortExplanation": "Type checker inserts int→float widening.",
@@ -137,7 +137,7 @@
       "id": 11,
       "text": "Which intermediate form is BEST for exposing and sharing common subexpressions?",
       "options": [
-        "Directed acyclic graph (DAG)",
+        "A directed acyclic graph (DAG), in which every repeated subexpression is represented by a single shared node that the duplicate occurrences all point to, making the common subexpressions explicit",
         "A regular expression describing the lexical pattern of the identifiers used in the expression",
         "The raw token stream produced by the lexical analyzer before any parsing has taken place",
         "A full parse tree, which faithfully records every derivation step taken by the grammar during parsing"
@@ -150,7 +150,7 @@
       "id": 12,
       "text": "A symbol table for a block-structured language is commonly implemented as a stack of scopes so that:",
       "options": [
-        "an identifier once declared can never be redeclared anywhere else in any block of the whole program",
+        "an identifier, once declared, can never be redeclared",
         "the compiler can avoid tracking any scope information at all while still resolving every name correctly",
         "every identifier lookup is forced to scan the entire program text from beginning to end before it can succeed",
         "entering a block pushes a new scope and leaving it pops, giving correct nested visibility"
@@ -163,10 +163,10 @@
       "id": 13,
       "text": "Three-address code differs from a syntax tree mainly in that three-address code:",
       "options": [
-        "stores only operands and discards every operator that appeared in the original source expression",
-        "is structurally incapable of representing assignment statements of any kind to program variables",
-        "names each intermediate result with a temporary, linearizing the computation",
-        "is exactly the same sequence of symbols as the token stream emitted by the lexical analyzer"
+        "stores only operands and discards every operator",
+        "cannot represent assignment statements at all",
+        "names each intermediate result with an explicit temporary variable, thereby flattening the nested expression into a linear sequence of simple instructions",
+        "is exactly the same sequence of symbols as the token stream emitted by the lexical analyzer, with no further processing applied to it whatsoever beyond scanning"
       ],
       "correctIndex": 2,
       "shortExplanation": "TAC linearizes with explicit temporaries.",
@@ -176,10 +176,10 @@
       "id": 14,
       "text": "In `t1 = b * c; t2 = a + t1`, the use of temporaries reflects that the original expression was:",
       "options": [
-        "a + b + c, with both additions associating from left to right across the three operands",
-        "a * b + c, multiplying the first two operands and then adding the third operand to that product",
-        "a + b * c (with * binding tighter)",
-        "(a + b) * c, where the parentheses force the addition to be evaluated before the multiplication"
+        "a + b + c, associating left to right",
+        "a * b + c, multiplying the first two operands a and b together and then adding the third operand c to that product to obtain the final result",
+        "a + b * c, where the multiplication b*c binds more tightly than the addition and so is computed into the temporary t1 first",
+        "(a + b) * c, where the explicit parentheses force the addition a+b to be evaluated first, before the result is multiplied by the operand c"
       ],
       "correctIndex": 2,
       "shortExplanation": "b*c computed first ⇒ a + b*c.",
@@ -189,10 +189,10 @@
       "id": 15,
       "text": "Why are synthesized attributes naturally evaluated by an LR (bottom-up) parser?",
       "options": [
-        "Because LR parsers are fundamentally unable to carry or compute attribute values of any kind during parsing",
-        "Because each synthesized attribute is defined in terms of the inherited attributes belonging to its parent node",
-        "Because computing them correctly always demands a second, separate traversal over the completed parse tree",
-        "Their values come from children, which are reduced before the parent"
+        "Because LR parsers cannot compute attributes at all",
+        "Because each synthesized attribute is defined using its parent's inherited attributes",
+        "Because computing them correctly always demands a second, completely separate traversal over the finished parse tree once the entire bottom-up parse has already run to completion",
+        "Because their values are derived from the attributes of a node's children, and in bottom-up parsing those children are reduced before the parent node is, so the values are already on hand"
       ],
       "correctIndex": 3,
       "shortExplanation": "Children reduce first, so their synthesized values are ready.",
@@ -215,10 +215,10 @@
       "id": 17,
       "text": "Which is a SEMANTIC (not syntactic) error?",
       "options": [
-        "Assigning a string to an integer variable",
-        "A missing closing brace that leaves a compound statement block unbalanced in the source program",
+        "Assigning a string value to a variable that was declared with integer type, which is well-formed syntactically but violates the language's type-compatibility rules during checking",
+        "A missing closing brace that leaves a compound statement block unbalanced in the source program, so the parser cannot match the opening delimiter and reports a structural grammar violation",
         "A stray '@' character appearing where the lexical rules permit no such symbol at all",
-        "An unterminated string literal that runs to the end of the line without a matching closing quote"
+        "An unterminated string literal that runs to the end of the line without a matching closing quote, which the scanner flags as a malformed token during lexical analysis before parsing even begins"
       ],
       "correctIndex": 0,
       "shortExplanation": "Type mismatch is semantic.",
@@ -229,7 +229,7 @@
       "text": "A type expression for a function from integers to booleans is best written as:",
       "options": [
         "integer × boolean, denoting a Cartesian product of the integer type and the boolean type",
-        "integer → boolean",
+        "integer → boolean, using the arrow type constructor whose left side is the integer domain type and whose right side is the boolean result type returned by the function",
         "pointer(integer), denoting a pointer that refers to a storage cell holding an integer",
         "array(boolean), denoting an array whose elements are each of the boolean type"
       ],
@@ -254,10 +254,10 @@
       "id": 20,
       "text": "An SDD whose attributes can be evaluated in a single left-to-right depth-first traversal corresponds exactly to the class of:",
       "options": [
-        "ambiguous grammars, in which some sentence admits two or more distinct leftmost derivations",
-        "L-attributed definitions",
-        "S-attributed definitions only, which are restricted to purely synthesized attributes flowing upward",
-        "regular grammars, whose productions are limited to the right-linear or left-linear forms"
+        "ambiguous grammars",
+        "L-attributed definitions, whose inherited attributes depend only on the parent and on left siblings, all of which are already computed when a single left-to-right depth-first walk reaches the node",
+        "S-attributed definitions only, which are strictly restricted to purely synthesized attributes that flow upward and thus could never accommodate any inherited attribute at all during such a single depth-first traversal of the tree",
+        "regular grammars, whose productions are limited to the right-linear or left-linear forms and therefore generate only the regular languages that are recognizable by some finite automaton with no auxiliary memory"
       ],
       "correctIndex": 1,
       "shortExplanation": "Single left-to-right pass ⇔ L-attributed.",
@@ -293,10 +293,10 @@
       "id": 23,
       "text": "Which statement about abstract syntax trees (ASTs) versus parse trees is TRUE?",
       "options": [
-        "An AST retains every nonterminal node together with all the punctuation and separator tokens from the source",
-        "A parse tree omits operators, recording only the operands that appear at the leaves of the derivation",
-        "An AST drops grammar-only nodes (like single-child chains and separators), keeping operators and operands",
-        "An AST and a parse tree are always structurally identical for any given input program without exception"
+        "An AST retains every nonterminal node together with all the punctuation and separator tokens from the source, faithfully mirroring every step of the grammar's derivation",
+        "A parse tree omits operators, recording only the operands that appear at the leaves of the derivation, so the structure loses all of the arithmetic and logical operation symbols",
+        "An AST drops grammar-only nodes, keeping operators and operands",
+        "An AST and a parse tree are always structurally identical for any given input program without exception, regardless of how the grammar happens to be written"
       ],
       "correctIndex": 2,
       "shortExplanation": "AST condenses, removing grammar-only nodes.",
@@ -322,7 +322,7 @@
         "the symbol table maintained by the linker while it combines the separately compiled object modules",
         "the chain of procedure calls that happen to be active on the run-time stack at the moment of the reference",
         "the textually enclosing scopes at compile time",
-        "the FOLLOW set computed for the nonterminal that derives the variable reference in the grammar"
+        "the FOLLOW set of the deriving nonterminal"
       ],
       "correctIndex": 2,
       "shortExplanation": "Lexical scope ⇒ search enclosing program text.",
@@ -346,7 +346,7 @@
       "text": "Which evaluation strategy works for ANY non-circular SDD, even one that is neither S- nor L-attributed?",
       "options": [
         "No evaluation is possible at all for such an SDD by any known systematic method whatsoever",
-        "A single bottom-up pass over the parse tree that reduces each production exactly once as it goes",
+        "A single bottom-up pass reducing each production once",
         "A single top-down pass that predicts and expands productions from the start symbol downward only",
         "Build the dependency graph and evaluate in topological order"
       ],
@@ -358,10 +358,10 @@
       "id": 28,
       "text": "A translation scheme differs from a syntax-directed definition in that a translation scheme:",
       "options": [
-        "can only be applied to regular grammars whose productions take the right-linear or left-linear form",
-        "specifies the exact position/order of semantic actions within productions",
-        "carries no semantic rules at all and merely lists the bare context-free productions of the grammar",
-        "is fundamentally prohibited from making any use of synthesized attributes within its embedded actions"
+        "applies only to regular grammars",
+        "specifies the exact position and ordering of the semantic actions embedded among the grammar symbols within each production, thereby fixing precisely when each action executes",
+        "carries no semantic rules and lists only the productions",
+        "is fundamentally prohibited from making any use of synthesized attributes within its embedded actions, restricting it to inherited attributes that are passed strictly downward from parent to child"
       ],
       "correctIndex": 1,
       "shortExplanation": "Schemes fix action ordering inside productions.",
@@ -384,10 +384,10 @@
       "id": 30,
       "text": "Overload resolution (choosing which `+` or which `print` to use based on argument types) is performed during:",
       "options": [
-        "linking only, when the separately compiled object modules are finally resolved against one another",
-        "loading, at the moment the operating system brings the executable image into memory to begin running it",
-        "lexical analysis, while the scanner is still converting the raw character stream into individual tokens",
-        "semantic analysis / type checking"
+        "linking only, when separate object modules are resolved",
+        "loading, when the OS brings the image into memory",
+        "lexical analysis, while the scanner is still converting the raw character stream into individual tokens long before any type information about the operands has been determined",
+        "semantic analysis, specifically the type-checking phase, where operand and argument types are consulted to select the correct overloaded operator or function definition"
       ],
       "correctIndex": 3,
       "shortExplanation": "Overloading is resolved by the type checker.",

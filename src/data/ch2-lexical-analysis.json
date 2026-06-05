@@ -1,6 +1,6 @@
 {
-  "subject": " Ch2: Lexical Analysis (Hard)",
-  "slug": "cc-ch2-lexical-analysis-guess",
+  "subject": "  Ch2: Lexical Analysis (Hard)",
+  "slug": "cc-ch2-lexical-analysis -guess",
   "description": "Hard-level MCQs on tokens/lexemes/patterns, regular expressions and identities, finite automata, RE→NFA→DFA, subset construction, DFA minimization, longest-match/lookahead, and the limits of regular languages.",
   "questions": [
     {
@@ -20,7 +20,7 @@
       "id": 2,
       "text": "The regular expression `(a|b)*abb` denotes the set of strings over {a,b} that:",
       "options": [
-        "End in abb",
+        "End in abb: any string of a's and b's followed by the suffix abb",
         "Have even length and an equal number of a's and b's",
         "Contain exactly one occurrence of the letter b and any number of a's",
         "Start with the fixed prefix abb followed by any number of a's and b's"
@@ -35,7 +35,7 @@
       "options": [
         "r** = r*, since the outer star is idempotent over closure",
         "(r*)* = r*, because repeating closure adds no new strings",
-        "(r|s)* = r*|s*",
+        "(r|s)* = r*|s*, treating union and closure as if they commute",
         "(rs)*r = r(sr)*, by shifting the leading r across the repetition"
       ],
       "correctIndex": 2,
@@ -61,7 +61,7 @@
       "options": [
         "Strings whose total length is exactly divisible by three",
         "Strings containing the substring 'ab' at least once somewhere inside them",
-        "Strings of the form aⁿbⁿ for n ≥ 0",
+        "Strings of the form aⁿbⁿ for n ≥ 0, having n a's then exactly n b's",
         "Strings that contain an even number of a's anywhere in the string"
       ],
       "correctIndex": 2,
@@ -87,7 +87,7 @@
       "options": [
         "Reporting a lexical error since two operators cannot be adjacent",
         "Emitting `=` followed by `<` after reversing the character order",
-        "Emitting a single `<=` token because it is the longest match",
+        "Emitting a single `<=` token because that two-character form is the longest match",
         "Emitting `<` first and then `=` because those single-character tokens are listed earliest in the specification"
       ],
       "correctIndex": 2,
@@ -126,7 +126,7 @@
       "options": [
         "An NFA may be exponentially smaller than the equivalent DFA",
         "Both an NFA and a DFA recognize exactly the class of regular languages",
-        "A DFA can have an ε-transition to reduce its state count",
+        "A DFA can have an ε-transition added to reduce its state count",
         "Every NFA can be converted into an equivalent DFA by subset construction"
       ],
       "correctIndex": 2,
@@ -151,7 +151,7 @@
       "text": "Recognizing the keyword `if` instead of an identifier is usually handled MOST efficiently by:",
       "options": [
         "Forbidding any identifier in the program from starting with the letter 'i'",
-        "Scanning identifiers normally, then checking a reserved-word table",
+        "Scanning identifiers in the usual way, then checking each one against a reserved-word table",
         "Allowing the parser to reclassify the token much later during parsing",
         "Building a completely separate dedicated DFA for each individual keyword in the language"
       ],
@@ -190,7 +190,7 @@
       "text": "Which pair of strings shows that `a*b*` is NOT the language 'equal numbers of a's then b's'?",
       "options": [
         "the empty string '' is rejected by a*b* because it has no symbols",
-        "'aabbb' is accepted by a*b* but has unequal counts",
+        "'aabbb' is accepted by a*b* but plainly has unequal counts",
         "'ab' is accepted by both languages and so proves they are identical",
         "'ba' is accepted by a*b* even though the b precedes the a"
       ],
@@ -218,7 +218,7 @@
         "NFA → regular expression → DFA → minimal DFA, recovering the expression first",
         "DFA → NFA → regular expression → minimal DFA, working backwards from the machine",
         "Regular expression → DFA → NFA → minimal DFA, building the DFA before the NFA",
-        "Regular expression → NFA → DFA → minimal DFA"
+        "Regular expression → NFA → DFA → minimal DFA, i.e. the standard scanner pipeline"
       ],
       "correctIndex": 3,
       "shortExplanation": "RE → NFA (Thompson) → DFA (subset) → minimize.",
@@ -231,7 +231,7 @@
         "An integer constant consisting solely of one or more decimal digits",
         "A string literal enclosed between matching quotation marks",
         "A floating-point literal with a decimal point and fractional digits",
-        "A typical identifier"
+        "A typical identifier, as commonly used in a programming language"
       ],
       "correctIndex": 3,
       "shortExplanation": "Letter/underscore then letters/digits/underscores = identifier.",
@@ -307,7 +307,7 @@
       "text": "The number of accepting states in a minimal DFA for a nonempty regular language is:",
       "options": [
         "Always zero, since minimization removes every accepting state",
-        "At least one, but possibly more",
+        "At least one accepting state, but in general there can be more",
         "Always precisely equal to the number of symbols in the alphabet",
         "Always exactly one, because minimization forces every accepting state to merge into a single one"
       ],
