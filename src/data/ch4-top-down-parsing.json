@@ -1,0 +1,397 @@
+{
+  "subject": " Ch4: Top-Down Parsing (Hard)",
+  "slug": "cc-ch4-top-down-parsing-guess",
+  "description": "Hard-level MCQs on recursive-descent and predictive LL(1) parsing, FIRST and FOLLOW computation, LL(1) table construction and conflicts, error recovery, and grammar conditions for top-down parsing.",
+  "questions": [
+    {
+      "id": 1,
+      "text": "For the grammar S → A a, A → α | ε with FIRST(α)={b}, FOLLOW(A) must contain:",
+      "options": [
+        "ε, since A is nullable and therefore propagates the empty string into its own FOLLOW set",
+        "the end-marker $ only, as A is the rightmost symbol able to terminate the entire derivation",
+        "b, because the symbols that can begin α are always copied directly into FOLLOW(A)",
+        "a"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A is followed by terminal a in S → A a.",
+      "explanation": "Because A is immediately followed by the terminal a in the production S → A a, FOLLOW(A) includes a (so the ε-alternative is chosen on lookahead a)."
+    },
+    {
+      "id": 2,
+      "text": "An LL(1) parsing-table conflict for nonterminal A on terminal t means:",
+      "options": [
+        "FIRST(A) is empty, so the parser can never predict any production for A on lookahead t",
+        "A has no productions and therefore must be removed from the grammar before building the table",
+        "t is a nonterminal that was mistakenly placed in a terminal column of the parsing table",
+        "Two productions of A are both applicable on t, so M[A,t] has multiple entries"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Multiple productions valid on the same lookahead = conflict.",
+      "explanation": "If more than one production for A can be predicted on lookahead t, the table cell M[A,t] holds multiple entries, so the grammar is not LL(1)."
+    },
+    {
+      "id": 3,
+      "text": "A grammar with a production A → A α (left recursion) cannot be LL(1) because:",
+      "options": [
+        "The parser would need to predict A before consuming input, causing infinite recursion",
+        "FIRST(A α) is empty, leaving the parser with no terminal on which to predict the production",
+        "FOLLOW(A) is undefined whenever a nonterminal appears as the first symbol of its own production",
+        "It has too many terminals for a single lookahead symbol to distinguish the alternatives"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Left recursion makes prediction loop with no input consumed.",
+      "explanation": "Predicting A → Aα requires expanding A again on the same lookahead without consuming input, so a top-down predictive parser loops infinitely."
+    },
+    {
+      "id": 4,
+      "text": "If ε ∈ FIRST(α) for production A → α, the LL(1) table places A → α under every terminal in:",
+      "options": [
+        "the whole terminal alphabet, because a nullable production may be predicted on any lookahead at all",
+        "FIRST(α) only, ignoring FOLLOW(A) entirely even though the right side can derive the empty string",
+        "FIRST(α)\\{ε} together with FOLLOW(A)",
+        "FOLLOW(A) only, discarding the terminals that can actually begin the right side α itself"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Use FIRST(α) minus ε, plus FOLLOW(A) when nullable.",
+      "explanation": "When α can derive ε, the production is entered under FIRST(α) (excluding ε) and additionally under each terminal in FOLLOW(A)."
+    },
+    {
+      "id": 5,
+      "text": "Two productions A → α | β satisfy the LL(1) condition only if:",
+      "options": [
+        "FIRST(α) and FIRST(β) overlap on at least one terminal so the parser can share a column",
+        "FIRST(α) ∩ FIRST(β) = ∅, and if β ⇒ ε then FIRST(α) ∩ FOLLOW(A) = ∅",
+        "α and β are identical right-hand sides that simply happen to be written as two separate rules",
+        "Both α and β can derive the empty string, making the nonterminal A nullable in two ways"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Disjoint FIRSTs; the nullable one must avoid FOLLOW clashes.",
+      "explanation": "LL(1) requires the alternatives' FIRST sets be disjoint, and the nullable alternative's selection set (via FOLLOW) must not overlap the other's FIRST."
+    },
+    {
+      "id": 6,
+      "text": "For E → T E', E' → + T E' | ε, T → F T', T' → * F T', F → ( E ) | id, FIRST(E) equals:",
+      "options": [
+        "{ +, * }, the operators that can appear once an expression has already begun",
+        "{ id, +, * }, combining the operand start with the binary operator symbols",
+        "{ ε, ( }, since E is nullable and may also begin with a left parenthesis",
+        "{ (, id }"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "E starts wherever F starts: ( or id.",
+      "explanation": "FIRST(E)=FIRST(T)=FIRST(F)={ (, id } because E ⇒ T ⇒ F and F begins with '(' or 'id'."
+    },
+    {
+      "id": 7,
+      "text": "In the same expression grammar, FOLLOW(E') is:",
+      "options": [
+        "{ id, (, ) }, the symbols that can begin or end a parenthesized factor",
+        "{ *, +, $ }, every operator together with the end-of-input marker",
+        "{ ), $ }",
+        "{ + }, the operator introduced by the recursive E' production itself"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "E' is followed by whatever follows E: ) and $.",
+      "explanation": "Since E → T E' and E' → + T E', E' ends an E, so FOLLOW(E') = FOLLOW(E) = { ), $ }."
+    },
+    {
+      "id": 8,
+      "text": "Recursive-descent WITHOUT backtracking is possible exactly when the grammar is:",
+      "options": [
+        "LL(1)",
+        "Right-linear only, restricting every production to at most one trailing nonterminal symbol",
+        "Left-recursive, so each nonterminal can expand itself without first consuming any input",
+        "Ambiguous, because multiple parse trees give the parser several productions to choose from"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Predictive (no backtrack) recursive descent ⇔ LL(1).",
+      "explanation": "A single lookahead chooses each production deterministically precisely when the grammar is LL(1); otherwise backtracking or more lookahead is needed."
+    },
+    {
+      "id": 9,
+      "text": "During table-driven predictive parsing, the action when the stack top is a terminal that matches the input is to:",
+      "options": [
+        "Replace it using a production drawn from the parsing table cell for that terminal symbol",
+        "Report an error because terminals should never appear on top of the parsing stack",
+        "Pop the terminal and advance the input pointer",
+        "Push the FOLLOW set of the terminal so later reductions can synchronize on those tokens"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Match terminal: pop and advance.",
+      "explanation": "When the top-of-stack terminal equals the current input symbol, the parser pops it and consumes the input, matching one token."
+    },
+    {
+      "id": 10,
+      "text": "Panic-mode recovery in predictive parsing typically uses which set to choose synchronizing tokens for nonterminal A?",
+      "options": [
+        "All nonterminals, treating every grammar symbol as an equally valid synchronization point",
+        "FIRST(A) only, skipping ahead until a token that could legally begin A is encountered",
+        "The empty set, since recovery deliberately ignores all FIRST and FOLLOW information",
+        "FOLLOW(A) (and sometimes FIRST(A))"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Synchronize on FOLLOW(A) (and FIRST(A)).",
+      "explanation": "Tokens in FOLLOW(A) are good synchronization points (pop A and resume); FIRST(A) tokens may be used to skip input until A can begin."
+    },
+    {
+      "id": 11,
+      "text": "A grammar that is left-factored and free of left recursion is:",
+      "options": [
+        "Always ambiguous, because left factoring introduces overlapping alternatives in the process",
+        "Necessary but not sufficient for LL(1)",
+        "Guaranteed to be LL(1), since removing those two defects always eliminates every table conflict",
+        "Never parseable top-down once the original left recursion has been transformed away"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Those conditions are necessary, not sufficient, for LL(1).",
+      "explanation": "Removing left recursion and left factoring are prerequisites, but FIRST/FOLLOW conflicts can still arise, so the grammar may still not be LL(1)."
+    },
+    {
+      "id": 12,
+      "text": "For A → α where α does NOT derive ε, the columns in which A → α appears are exactly:",
+      "options": [
+        "FIRST(α)",
+        "FOLLOW(A), the terminals that may follow A once its production has been fully reduced",
+        "FIRST(A) ∪ FOLLOW(A), combining the start terminals with everything that can follow A",
+        "the whole alphabet, since a non-nullable production may still be predicted on any token"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Non-nullable α ⇒ only FIRST(α) columns.",
+      "explanation": "If α cannot derive ε, the production is predicted only on the terminals that can begin α, i.e., FIRST(α); FOLLOW is not involved."
+    },
+    {
+      "id": 13,
+      "text": "Which grammar fragment causes an UNAVOIDABLE FIRST/FIRST conflict for LL(1)?",
+      "options": [
+        "A → a B | c D, whose two alternatives begin with distinct terminals a and c",
+        "A → a B | a C",
+        "A → ( A ) | id, with one parenthesized alternative and one atomic identifier alternative",
+        "A → b | c, where each alternative starts with its own separate terminal symbol"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Both alternatives start with 'a' → FIRST/FIRST clash.",
+      "explanation": "A → aB | aC have overlapping FIRST sets ({a}), so a single lookahead cannot choose; left factoring is required to fix it."
+    },
+    {
+      "id": 14,
+      "text": "The end-of-input marker $ is introduced into LL(1) parsing so that:",
+      "options": [
+        "Every nonterminal becomes nullable and can therefore be popped on any lookahead token",
+        "FOLLOW(start symbol) contains $, enabling acceptance and reductions at end of input",
+        "FIRST sets become empty once the marker is appended to the right end of the input string",
+        "Left recursion is removed automatically as soon as the marker reaches the parsing stack top"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "$ ∈ FOLLOW(S) marks legitimate end of input.",
+      "explanation": "Appending $ lets the parser recognize the end of input; $ in FOLLOW(S) allows nullable productions and acceptance to be predicted there."
+    },
+    {
+      "id": 15,
+      "text": "A FIRST/FOLLOW conflict (as opposed to FIRST/FIRST) arises when, for A → α | β:",
+      "options": [
+        "α ⇒ ε and FOLLOW(A) intersects FIRST(β)",
+        "α and β are both single terminals that happen to share the same lookahead column",
+        "FIRST(α) and FIRST(β) are disjoint and neither of the two alternatives can derive the empty string",
+        "FOLLOW(A) is empty, so the nullable alternative contributes no terminals to the table at all"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Nullable α plus FOLLOW∩FIRST(β) ≠ ∅ ⇒ conflict.",
+      "explanation": "When one alternative is nullable, its selection set includes FOLLOW(A); if that overlaps the other alternative's FIRST, the table cell conflicts."
+    },
+    {
+      "id": 16,
+      "text": "The predictive parser declares a syntax error when:",
+      "options": [
+        "M[A, a] is empty for the current nonterminal A and input a",
+        "A terminal on the stack is matched against an identical terminal in the remaining input",
+        "The stack still has the start symbol while more input tokens remain to be consumed",
+        "The input pointer advances past a token that was correctly matched by the parser stack"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Empty table cell ⇒ no legal move ⇒ error.",
+      "explanation": "If the table entry for the top nonterminal and current lookahead is empty, there is no valid production to apply, signaling a syntax error."
+    },
+    {
+      "id": 17,
+      "text": "Computing FIRST(X₁X₂…Xₙ): you keep adding FIRST(Xᵢ) (minus ε) while the preceding symbols are all nullable, and add ε only if:",
+      "options": [
+        "X₁ is a terminal, in which case the entire concatenation immediately becomes nullable",
+        "every Xᵢ (i = 1..n) can derive ε",
+        "the last symbol Xₙ is a terminal that already appears inside FOLLOW of the first symbol",
+        "FOLLOW(X₁) contains ε, signalling that the leading symbol may be skipped during prediction"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "ε ∈ FIRST(string) only if all symbols are nullable.",
+      "explanation": "The whole concatenation is nullable exactly when every symbol can derive ε; otherwise FIRST stops at the first non-nullable symbol."
+    },
+    {
+      "id": 18,
+      "text": "Why does eliminating left recursion change the parse tree shape but NOT the language?",
+      "options": [
+        "It rewrites productions to be right-recursive while generating the same strings",
+        "It makes the grammar ambiguous by allowing each string to obtain two distinct derivations",
+        "It deletes some sentences that the original left-recursive grammar was able to generate",
+        "It adds new terminals to the alphabet so the transformed grammar can express more sentences"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Right-recursive rewrite preserves the language.",
+      "explanation": "The transformation produces an equivalent grammar (same language) but with right recursion, so the generated strings are unchanged though tree shapes differ."
+    },
+    {
+      "id": 19,
+      "text": "For T' → * F T' | ε in the expression grammar, FOLLOW(T') is:",
+      "options": [
+        "{ ε, +, ) }, including the empty string since T' is a nullable nonterminal",
+        "{ +, ), $ }",
+        "{ * }, the single operator that introduces the recursive T' production itself",
+        "{ id, (, * }, the operand starters together with the multiplication operator"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "T' is followed by what follows T: +, ), $.",
+      "explanation": "Since T → F T' and T' ends a T, FOLLOW(T') = FOLLOW(T) = FIRST(E') extended with FOLLOW(E) = { +, ), $ }."
+    },
+    {
+      "id": 20,
+      "text": "Predictive parsing is fundamentally limited compared with LR parsing because LL(1):",
+      "options": [
+        "Requires ambiguous grammars in order to have more than one production per table cell",
+        "Cannot use a stack, so it must keep the entire parse state in a fixed set of registers",
+        "Produces a rightmost derivation in reverse the way shift-reduce bottom-up parsers do",
+        "Must decide the production from the top of a rule with only one lookahead, before seeing the full right side"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "LL commits early; LR decides after seeing the handle.",
+      "explanation": "LL(1) must choose a production from a nonterminal's left end using one lookahead, whereas LR delays the decision until a full handle is on the stack, making LR more powerful."
+    },
+    {
+      "id": 21,
+      "text": "If a nonterminal A has productions A → ε | a A, then on lookahead 'b' (where b ∈ FOLLOW(A)) the parser:",
+      "options": [
+        "Applies A → a A, expecting the lookahead b to begin the recursive part of the production",
+        "Applies A → ε",
+        "Reports an error immediately because b does not belong to FIRST of the production a A",
+        "Pushes b onto the parsing stack and waits for a later production to consume that token"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Lookahead in FOLLOW(A) selects the ε-production.",
+      "explanation": "Since 'b' is not in FIRST(aA)={a} but is in FOLLOW(A), the nullable production A → ε is predicted, popping A."
+    },
+    {
+      "id": 22,
+      "text": "Which is TRUE about recursive-descent parsers with backtracking?",
+      "options": [
+        "They require an LR table to be built in advance before any alternative can be attempted",
+        "They are always linear time regardless of how many alternatives each nonterminal provides",
+        "They can handle some non-LL(1) grammars but may take exponential time",
+        "They cannot parse arithmetic expressions because operator precedence defeats backtracking"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Backtracking widens coverage but risks exponential time.",
+      "explanation": "By trying alternatives and backing up, such parsers accept grammars LL(1) cannot, but repeated re-parsing can blow up to exponential time."
+    },
+    {
+      "id": 23,
+      "text": "The selection (predict) set of a production A → α is best described as:",
+      "options": [
+        "FIRST(α), plus FOLLOW(A) if α is nullable",
+        "FIRST(A) only, taking the start terminals of the nonterminal rather than of this right side",
+        "The set of all terminals, since any lookahead might in principle trigger this production",
+        "FOLLOW(A) always, regardless of whether the right side α is able to derive the empty string"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Predict set = FIRST(α) (+ FOLLOW(A) if nullable).",
+      "explanation": "The lookaheads on which A → α is chosen are FIRST(α), augmented by FOLLOW(A) when α can derive ε; disjoint predict sets ⇒ LL(1)."
+    },
+    {
+      "id": 24,
+      "text": "Left factoring A → if E then S | if E then S else S produces:",
+      "options": [
+        "A → E then S else S, dropping the leading keyword from the factored production entirely",
+        "A → if A' ,  A' → E, factoring only the keyword while leaving the rest of the rule unshared",
+        "A → if E | then S, splitting the shared prefix across two unrelated alternatives",
+        "A → if E then S A',  A' → else S | ε"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Factor the common 'if E then S' prefix; tail is optional else.",
+      "explanation": "The shared prefix 'if E then S' is factored out, leaving A' → else S | ε, which exposes (but does not by itself resolve) the dangling-else choice."
+    },
+    {
+      "id": 25,
+      "text": "A grammar can be unambiguous yet still NOT LL(1). This shows that:",
+      "options": [
+        "Ambiguity is required for LL(1) so that each table cell can hold more than one production",
+        "LL(1) is a strictly stronger requirement than mere unambiguity",
+        "LL(1) and unambiguity are equivalent properties that always hold or fail together for a grammar",
+        "All unambiguous grammars are left-recursive and therefore cannot be parsed top-down at all"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "LL(1) ⇒ unambiguous, but not conversely.",
+      "explanation": "Every LL(1) grammar is unambiguous, but many unambiguous grammars fail LL(1) due to FIRST/FIRST or FIRST/FOLLOW conflicts."
+    },
+    {
+      "id": 26,
+      "text": "In the predictive parser, when the top of stack is nonterminal A and lookahead is a, the parser:",
+      "options": [
+        "Skips a token of input and leaves the nonterminal A in place for the next parsing step",
+        "Halts and accepts the input as soon as a nonterminal reaches the top of the stack",
+        "Replaces A on the stack with the right side of M[A,a] (pushed reversed)",
+        "Pops A and advances the input pointer as though A were a matched terminal on the stack"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Expand A by the table-chosen production (RHS reversed).",
+      "explanation": "For a nonterminal on top, the parser consults M[A,a], replacing A with that production's right-hand side (pushed so the leftmost symbol is on top)."
+    },
+    {
+      "id": 27,
+      "text": "Which condition makes FOLLOW relevant when building the LL(1) table?",
+      "options": [
+        "Whenever a production right side is non-nullable and therefore begins with a definite terminal",
+        "For every production unconditionally, since FOLLOW always supplements the FIRST-based columns",
+        "Only for nullable productions (those whose right side can derive ε)",
+        "Never; only FIRST matters when deciding which columns a production should occupy in the table"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "FOLLOW is used only for nullable right sides.",
+      "explanation": "FOLLOW(A) contributes table columns for A → α only when α can derive ε; otherwise FIRST(α) alone determines the columns."
+    },
+    {
+      "id": 28,
+      "text": "Suppose A → B C, B ⇒ ε is possible, and FIRST(C) = { d }. Then FIRST(A) includes:",
+      "options": [
+        "{ ε } only, treating A as purely nullable because its first symbol B can derive the empty string",
+        "FOLLOW(A), since whatever can follow A also determines what may begin its derivations",
+        "only FIRST(B)\\{ε}, ignoring C even though B may vanish and let C supply the first symbol",
+        "FIRST(B)\\{ε} together with d (and ε only if C is also nullable)"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "B nullable ⇒ add FIRST(C) too.",
+      "explanation": "Because B can vanish, the first symbol of A may come from C, so FIRST(A) = (FIRST(B)\\{ε}) ∪ FIRST(C), with ε only if both are nullable."
+    },
+    {
+      "id": 29,
+      "text": "Why is LL(1) parsing called 'predictive'?",
+      "options": [
+        "It guesses the input tokens before they arrive and verifies the guess against the actual stream",
+        "It predicts the target machine code that the front end will eventually have to generate",
+        "It predicts which production to use from the lookahead before expanding the nonterminal",
+        "It predicts the FOLLOW sets at run time instead of computing them ahead of parsing"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "It predicts the production from one lookahead.",
+      "explanation": "The parser uses the single lookahead token to predict (choose) the correct production deterministically, hence 'predictive' parsing."
+    },
+    {
+      "id": 30,
+      "text": "Converting a left-recursive expression grammar for top-down use, the new nonterminal (e.g., E') most commonly has a production ending in:",
+      "options": [
+        "ε (the empty string), giving right recursion",
+        "left recursion again, because the transformation merely relocates the recursive call site",
+        "a terminal only, forcing every alternative of the new nonterminal to consume input first",
+        "the start symbol, so the introduced nonterminal restarts the derivation from the top"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "The tail nonterminal terminates with ε.",
+      "explanation": "After eliminating left recursion, the introduced nonterminal (E' → + T E' | ε) is right-recursive and bottoms out at ε, enabling predictive parsing."
+    }
+  ]
+}

@@ -1,0 +1,397 @@
+{
+  "subject": " Ch2: Lexical Analysis (Hard)",
+  "slug": "cc-ch2-lexical-analysis-guess",
+  "description": "Hard-level MCQs on tokens/lexemes/patterns, regular expressions and identities, finite automata, RE→NFA→DFA, subset construction, DFA minimization, longest-match/lookahead, and the limits of regular languages.",
+  "questions": [
+    {
+      "id": 1,
+      "text": "Applying subset construction to an NFA with n states can, in the worst case, yield a DFA with:",
+      "options": [
+        "At most n^2 states, because pairs of NFA states form the DFA states",
+        "Up to 2^n states",
+        "Exactly the same n states, since each NFA state maps to one DFA state",
+        "Always strictly fewer than n states once unreachable subsets are pruned"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "DFA states are subsets of NFA states → up to 2^n.",
+      "explanation": "Each DFA state corresponds to a set of NFA states, so the number of DFA states can be as large as the number of subsets, 2^n, in the worst case."
+    },
+    {
+      "id": 2,
+      "text": "The regular expression `(a|b)*abb` denotes the set of strings over {a,b} that:",
+      "options": [
+        "End in abb",
+        "Have even length and an equal number of a's and b's",
+        "Contain exactly one occurrence of the letter b and any number of a's",
+        "Start with the fixed prefix abb followed by any number of a's and b's"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Any prefix followed by the fixed suffix abb.",
+      "explanation": "`(a|b)*` matches any string, and the trailing `abb` fixes the ending, so the language is all strings ending in abb."
+    },
+    {
+      "id": 3,
+      "text": "Which identity is INVALID for regular expressions?",
+      "options": [
+        "r** = r*, since the outer star is idempotent over closure",
+        "(r*)* = r*, because repeating closure adds no new strings",
+        "(r|s)* = r*|s*",
+        "(rs)*r = r(sr)*, by shifting the leading r across the repetition"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "(r|s)* ≠ r*|s* in general.",
+      "explanation": "`(r|s)*` allows interleaving of r and s, while `r*|s*` allows only all-r or all-s strings; e.g. 'rs' is in the former but not the latter."
+    },
+    {
+      "id": 4,
+      "text": "The ε-closure of a state q in an NFA is:",
+      "options": [
+        "The set of states reachable from q using only ε-transitions (including q)",
+        "The single state q with no other states ever included in the set",
+        "The complete set of all accepting states found anywhere in the NFA",
+        "The set of states reachable from q after consuming exactly one non-ε input symbol"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "ε-closure = states reachable via ε-moves, including q itself.",
+      "explanation": "ε-closure(q) contains q and every state reachable by following zero or more ε-transitions; it is central to subset construction."
+    },
+    {
+      "id": 5,
+      "text": "Which language over {a,b} is NOT regular?",
+      "options": [
+        "Strings whose total length is exactly divisible by three",
+        "Strings containing the substring 'ab' at least once somewhere inside them",
+        "Strings of the form aⁿbⁿ for n ≥ 0",
+        "Strings that contain an even number of a's anywhere in the string"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "aⁿbⁿ needs counting → not regular.",
+      "explanation": "Matching equal numbers of a's and b's requires unbounded counting, which a finite automaton cannot do; the others are all regular."
+    },
+    {
+      "id": 6,
+      "text": "Two DFA states p and q are distinguishable if:",
+      "options": [
+        "They happen to have exactly the same number of outgoing labelled edges",
+        "They are both accepting states reachable from the start",
+        "They were assigned the same textual label during construction",
+        "Some string leads one to an accepting state and the other to a non-accepting state"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Distinguishable = some string separates accept/reject.",
+      "explanation": "States are distinguishable when there exists an input string after which one ends in an accepting state and the other does not; indistinguishable states merge in minimization."
+    },
+    {
+      "id": 7,
+      "text": "The longest-match rule combined with rule priority resolves the lexing of `<=` in a language with tokens `<`, `=`, and `<=` by:",
+      "options": [
+        "Reporting a lexical error since two operators cannot be adjacent",
+        "Emitting `=` followed by `<` after reversing the character order",
+        "Emitting a single `<=` token because it is the longest match",
+        "Emitting `<` first and then `=` because those single-character tokens are listed earliest in the specification"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Longest match prefers the two-character token.",
+      "explanation": "Maximal munch selects the longest lexeme that matches some pattern, so `<=` is recognized as one token rather than two separate ones."
+    },
+    {
+      "id": 8,
+      "text": "A scanner needs lookahead (and possibly retraction) primarily because:",
+      "options": [
+        "It must read ahead to know whether a longer lexeme matches, then back up if not",
+        "The parser is structurally incapable of accepting any tokens at all",
+        "Every token in the language is guaranteed to be exactly one character long",
+        "Comments in the source are never stripped out by the scanner"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Lookahead decides longest match; retract if overshoot.",
+      "explanation": "To honor longest-match the scanner reads beyond the current lexeme; if the extra characters do not extend a valid token it retracts to the last accepting position."
+    },
+    {
+      "id": 9,
+      "text": "If a regular language L is recognized by a DFA with k states, the Myhill–Nerode view says the minimal DFA has a number of states equal to the number of:",
+      "options": [
+        "Symbols that appear in the input alphabet of the machine",
+        "Equivalence classes of the indistinguishability relation on states",
+        "Distinct labelled transitions present in the original unminimized DFA",
+        "Accepting states retained after the construction finishes"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Minimal DFA states = indistinguishability equivalence classes.",
+      "explanation": "Minimization merges indistinguishable states; the minimal DFA has exactly one state per equivalence class of the indistinguishability relation."
+    },
+    {
+      "id": 10,
+      "text": "Which statement comparing NFA and DFA is FALSE?",
+      "options": [
+        "An NFA may be exponentially smaller than the equivalent DFA",
+        "Both an NFA and a DFA recognize exactly the class of regular languages",
+        "A DFA can have an ε-transition to reduce its state count",
+        "Every NFA can be converted into an equivalent DFA by subset construction"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "DFAs cannot have ε-transitions.",
+      "explanation": "By definition a DFA has no ε-transitions and exactly one move per symbol; the other statements are all true."
+    },
+    {
+      "id": 11,
+      "text": "The token, in the pair returned to the parser, is best thought of as a terminal symbol whose attribute most commonly carries:",
+      "options": [
+        "The grammar production that the parser will eventually apply",
+        "The very next token that the scanner is about to read",
+        "The complete text of the source line on which the token was found",
+        "A pointer/index to additional information such as the symbol-table entry or numeric value"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Attribute = handle to extra info (symbol-table ptr / value).",
+      "explanation": "The token name acts as the parser's terminal; the attribute value supplies extra data, e.g. a symbol-table pointer for ids or the numeric value for constants."
+    },
+    {
+      "id": 12,
+      "text": "Recognizing the keyword `if` instead of an identifier is usually handled MOST efficiently by:",
+      "options": [
+        "Forbidding any identifier in the program from starting with the letter 'i'",
+        "Scanning identifiers normally, then checking a reserved-word table",
+        "Allowing the parser to reclassify the token much later during parsing",
+        "Building a completely separate dedicated DFA for each individual keyword in the language"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Scan as id, then look up in a keyword table.",
+      "explanation": "It is simplest to match the identifier pattern and then consult a fixed table of reserved words, reclassifying the token if it matches a keyword."
+    },
+    {
+      "id": 13,
+      "text": "A DFA that recognizes 'strings over {0,1} with the number of 1s ≡ 0 (mod 3)' needs at least:",
+      "options": [
+        "Only 1 state that loops on every input symbol",
+        "Exactly 2 states, one accepting and one rejecting",
+        "3 states",
+        "Infinitely many states to track the unbounded count of 1s"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Three residues mod 3 → three states.",
+      "explanation": "The DFA must track the count of 1s modulo 3, requiring three distinct states (residues 0,1,2), with state 0 accepting."
+    },
+    {
+      "id": 14,
+      "text": "Thompson's construction is notable because the NFA it builds for a regular expression with size m has:",
+      "options": [
+        "A number of states that grows exponentially in the size m of the expression",
+        "O(m) states and transitions, built compositionally",
+        "Exactly two states no matter how large m becomes",
+        "No ε-transitions of any kind connecting its fragments"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Thompson NFA is linear in regex size, with ε-moves.",
+      "explanation": "Thompson's construction composes small NFA fragments per operator, producing O(m) states/transitions and using ε-transitions to glue them."
+    },
+    {
+      "id": 15,
+      "text": "Which pair of strings shows that `a*b*` is NOT the language 'equal numbers of a's then b's'?",
+      "options": [
+        "the empty string '' is rejected by a*b* because it has no symbols",
+        "'aabbb' is accepted by a*b* but has unequal counts",
+        "'ab' is accepted by both languages and so proves they are identical",
+        "'ba' is accepted by a*b* even though the b precedes the a"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "a*b* allows unequal counts like aabbb.",
+      "explanation": "`a*b*` accepts any a's followed by any b's regardless of counts; 'aabbb' (2 a's, 3 b's) is accepted, so it is not the equal-count language."
+    },
+    {
+      "id": 16,
+      "text": "In a transition table for a DFA, an entry for (state, symbol) being empty/undefined means the scanner should:",
+      "options": [
+        "Dynamically create a brand new state at run time to continue",
+        "Stay and loop in the very same state until a defined transition appears",
+        "Immediately accept the input as a valid complete lexeme",
+        "Treat it as a transition to a dead state and reject (or retract to last accept)"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Missing transition = dead state / reject.",
+      "explanation": "An undefined transition conceptually goes to a non-accepting dead state; the scanner rejects or backs up to the most recent accepting configuration."
+    },
+    {
+      "id": 17,
+      "text": "Which is a correct ordering of the standard scanner-generation pipeline?",
+      "options": [
+        "NFA → regular expression → DFA → minimal DFA, recovering the expression first",
+        "DFA → NFA → regular expression → minimal DFA, working backwards from the machine",
+        "Regular expression → DFA → NFA → minimal DFA, building the DFA before the NFA",
+        "Regular expression → NFA → DFA → minimal DFA"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "RE → NFA (Thompson) → DFA (subset) → minimize.",
+      "explanation": "The classic pipeline converts the RE to an NFA, then to a DFA by subset construction, then minimizes the DFA."
+    },
+    {
+      "id": 18,
+      "text": "The regular expression `[A-Za-z_][A-Za-z0-9_]*` describes:",
+      "options": [
+        "An integer constant consisting solely of one or more decimal digits",
+        "A string literal enclosed between matching quotation marks",
+        "A floating-point literal with a decimal point and fractional digits",
+        "A typical identifier"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Letter/underscore then letters/digits/underscores = identifier.",
+      "explanation": "It requires a leading letter or underscore followed by zero or more letters, digits, or underscores — the usual identifier pattern."
+    },
+    {
+      "id": 19,
+      "text": "Why are regular expressions chosen for tokens but context-free grammars for syntax?",
+      "options": [
+        "Token structure is non-recursive and finite-state, while nested syntax needs the extra power of CFGs",
+        "Context-free grammars are fundamentally unable to describe identifiers",
+        "Finite automata always run more slowly at runtime than table-driven parsers",
+        "Regular expressions simply require fewer keystrokes for a programmer to type out"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Tokens are regular; nesting needs CFG power.",
+      "explanation": "Lexical structure is non-recursive and recognizable by finite automata, whereas nested/balanced constructs require the greater power of context-free grammars."
+    },
+    {
+      "id": 20,
+      "text": "Buffer pairs with sentinels reduce per-character overhead mainly by:",
+      "options": [
+        "Letting one comparison detect both buffer end and end-of-file via a sentinel",
+        "Keeping the entire contents of the source file permanently in CPU registers",
+        "Compressing the source code so that fewer characters must be examined",
+        "Eliminating the DFA so the scanner needs no transition logic at all"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Sentinel merges end-of-buffer and EOF tests into one.",
+      "explanation": "Placing a sentinel (e.g., EOF) at each buffer half lets the inner loop test a single condition instead of two, cutting overhead."
+    },
+    {
+      "id": 21,
+      "text": "Which language is regular?",
+      "options": [
+        "{ w ∈ {a,b}* : w contains 'aba' as a substring }",
+        "{ wwᴿ : w ∈ {a,b}* }, the set of even-length palindromes over the alphabet",
+        "{ w : w has an equal number of a's and of b's anywhere in it }",
+        "{ aⁿbⁿcⁿ : n ≥ 0 }, with three equal-length blocks in order"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Substring search is regular; the others need counting/matching.",
+      "explanation": "Detecting a fixed substring is recognizable by a finite automaton, while palindromes, aⁿbⁿcⁿ, and equal-count languages are not regular."
+    },
+    {
+      "id": 22,
+      "text": "A 'dead state' added to make a DFA total (fully specified) is:",
+      "options": [
+        "An accepting state that happens to have no incoming edges directed into it",
+        "A state that can only ever be reached by following an ε-transition",
+        "A non-accepting trap state from which acceptance is unreachable",
+        "The designated start state of the automaton before any input"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Dead state = non-accepting trap.",
+      "explanation": "Completing a partial DFA routes all missing transitions to a non-accepting trap (dead) state that loops on every symbol."
+    },
+    {
+      "id": 23,
+      "text": "Which best distinguishes a pattern from a lexeme?",
+      "options": [
+        "A lexeme is the token's category while a pattern is merely its attribute value",
+        "A pattern is the concrete matched text, whereas a lexeme is the abstract rule describing it",
+        "The two terms are exact synonyms and may be used interchangeably",
+        "A pattern is the rule describing possible lexemes; a lexeme is a specific matched string"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Pattern = rule; lexeme = actual matched string.",
+      "explanation": "The pattern (often a regular expression) specifies the form of acceptable strings; a lexeme is one concrete string instance that matches it."
+    },
+    {
+      "id": 24,
+      "text": "The number of accepting states in a minimal DFA for a nonempty regular language is:",
+      "options": [
+        "Always zero, since minimization removes every accepting state",
+        "At least one, but possibly more",
+        "Always precisely equal to the number of symbols in the alphabet",
+        "Always exactly one, because minimization forces every accepting state to merge into a single one"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Minimal DFA can have several accepting states.",
+      "explanation": "Minimization does not force a single accepting state; a minimal DFA may retain multiple accepting states if they are mutually distinguishable."
+    },
+    {
+      "id": 25,
+      "text": "Handling nested comments such as `/* ... /* ... */ ... */` correctly is impossible with a pure finite automaton because it requires:",
+      "options": [
+        "Extending the input alphabet with extra comment delimiter symbols",
+        "Simply adding a few more accepting states to the existing transition diagram",
+        "Replacing the transition table with a noticeably faster lookup structure",
+        "Counting nesting depth, which exceeds finite-state memory"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Nesting depth needs unbounded counting.",
+      "explanation": "Arbitrary nesting requires tracking depth without bound, which a finite-state machine cannot do; it needs at least a counter/stack."
+    },
+    {
+      "id": 26,
+      "text": "Given tokens for `relop` like `<`, `>`, `<=`, `>=`, `=`, `<>`, the transition diagram uses a final state with a '*' to indicate that the scanner has:",
+      "options": [
+        "Read one extra character and must retract the input pointer by one",
+        "Consumed the entire remaining contents of the input file",
+        "Returned all the way back to the diagram's start state",
+        "Detected an illegal character and must abort with a reported lexical error"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Starred final state means retract one character.",
+      "explanation": "A starred accepting state in a transition diagram marks that lookahead consumed an extra character which must be pushed back (retracted) after recognizing the token."
+    },
+    {
+      "id": 27,
+      "text": "Closure properties: the regular languages are closed under complement, which can be shown for a DFA by:",
+      "options": [
+        "Deleting the start state so no input is ever accepted",
+        "Swapping accepting and non-accepting states of a complete DFA",
+        "Inserting ε-transitions between every pair of states in the machine",
+        "Reversing the direction of every transition and exchanging start and final roles"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Complement = flip accepting/non-accepting on a total DFA.",
+      "explanation": "For a complete (total) DFA, exchanging accepting and non-accepting states yields a DFA for the complement language, proving closure under complement."
+    },
+    {
+      "id": 28,
+      "text": "Which scenario genuinely requires more than one character of lookahead in classical lexing?",
+      "options": [
+        "Reading a one-digit decimal number that occupies just one character",
+        "Disambiguating constructs like Fortran 'DO 5 I = 1,5' vs 'DO5I = 1.5' where a later character decides the token",
+        "Recognizing a single-character arithmetic operator that stands entirely on its own",
+        "Skipping over a single isolated blank space between two tokens"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Fortran DO-loop needs lookahead past the current lexeme.",
+      "explanation": "The classic Fortran example shows that whether 'DO' begins a loop or an assignment depends on a later comma/period, requiring extended lookahead."
+    },
+    {
+      "id": 29,
+      "text": "If two regular expressions r and s satisfy L(r) = L(s), then their minimal DFAs are:",
+      "options": [
+        "Always different in their total number of states despite recognizing the same language",
+        "Completely unrelated to one another in structure",
+        "Isomorphic (identical up to state renaming)",
+        "Guaranteed to still contain at least one ε-transition apiece"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Minimal DFA is unique up to isomorphism.",
+      "explanation": "For a given regular language the minimal DFA is unique up to renaming of states, so equal languages give isomorphic minimal DFAs."
+    },
+    {
+      "id": 30,
+      "text": "The lexical analyzer typically does NOT:",
+      "options": [
+        "Verify that parentheses are balanced",
+        "Strip white space and comments from the stream before tokens reach the parser",
+        "Enter newly seen identifiers into the symbol table as it scans them",
+        "Attach line-number information to each token for later error reporting"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Balancing parentheses is the parser's job, not the scanner's.",
+      "explanation": "Balanced nesting is a context-free property checked by the parser; the scanner handles white space, symbol-table entry, and bookkeeping like line numbers."
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect } from 'react'
 import { cn } from '../../lib/utils'
 
-export function Modal({ isOpen, onClose, title, children, className }) {
+export function Modal({ isOpen, onClose, title, children, className, contentClassName }) {
   // Close on Escape key
   useEffect(() => {
     if (!isOpen) return
@@ -28,7 +28,7 @@ export function Modal({ isOpen, onClose, title, children, className }) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 overscroll-contain">
           {/* Backdrop */}
           <motion.div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -68,7 +68,7 @@ export function Modal({ isOpen, onClose, title, children, className }) {
             )}
 
             {/* Content */}
-            <div className="p-6">{children}</div>
+            <div className={cn('p-6', contentClassName)}>{children}</div>
           </motion.div>
         </div>
       )}

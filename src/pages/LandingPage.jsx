@@ -7,10 +7,12 @@ import { SubjectCard } from '../components/landing/SubjectCard'
 import { AddSubjectCard } from '../components/landing/AddSubjectCard'
 import { QuizCard } from '../components/landing/QuizCard'
 import { QuizSetupModal } from '../components/quiz/QuizSetupModal'
+import { GuessWarningModal } from '../components/quiz/GuessWarningModal'
 import { useSubjectData } from '../hooks/useSubjectData'
 import { useQuiz } from '../hooks/useQuiz'
 import { shuffleArray } from '../lib/utils'
 import { ROUTES } from '../lib/constants'
+import { isGuessSubject, isGuessWarningDismissed, setGuessWarningDismissed } from '../lib/guessWarning'
 
 export function LandingPage() {
   const { subjects, quizzes, getSubjectBySlug } = useSubjectData()
@@ -18,10 +20,34 @@ export function LandingPage() {
   const navigate = useNavigate()
 
   const [selectedSlug, setSelectedSlug] = useState(null)
+  const [guessWarning, setGuessWarning] = useState(null)
   const selectedSubject = selectedSlug ? getSubjectBySlug(selectedSlug) : null
 
-  function handleCardClick(slug) {
+  function openSubjectSetup(slug) {
     setSelectedSlug(slug)
+  }
+
+  function startQuizDirect(quiz) {
+    const questions = shuffleArray(quiz.questions)
+    startQuiz(quiz, questions)
+    navigate(ROUTES.QUIZ_PATH(quiz.slug))
+  }
+
+  function maybeWarnBeforeGuess(slug, onProceed) {
+    if (isGuessSubject(slug) && !isGuessWarningDismissed()) {
+      const item = getSubjectBySlug(slug)
+      setGuessWarning({
+        slug,
+        subjectName: item?.subject ?? '',
+        onProceed,
+      })
+      return
+    }
+    onProceed()
+  }
+
+  function handleCardClick(slug) {
+    maybeWarnBeforeGuess(slug, () => openSubjectSetup(slug))
   }
 
   function handleModalClose() {
@@ -38,9 +64,18 @@ export function LandingPage() {
   }
 
   function handleQuizCardClick(quiz) {
-    const questions = shuffleArray(quiz.questions)
-    startQuiz(quiz, questions)
-    navigate(ROUTES.QUIZ_PATH(quiz.slug))
+    maybeWarnBeforeGuess(quiz.slug, () => startQuizDirect(quiz))
+  }
+
+  function handleGuessWarningContinue(dismissForever) {
+    if (dismissForever) setGuessWarningDismissed()
+    const pending = guessWarning
+    setGuessWarning(null)
+    pending?.onProceed?.()
+  }
+
+  function handleGuessWarningClose() {
+    setGuessWarning(null)
   }
 
   return (
@@ -84,6 +119,13 @@ export function LandingPage() {
           </div>
         </div>
       )}
+
+      <GuessWarningModal
+        isOpen={!!guessWarning}
+        subjectName={guessWarning?.subjectName}
+        onClose={handleGuessWarningClose}
+        onContinue={handleGuessWarningContinue}
+      />
 
       <QuizSetupModal
         subject={selectedSubject}

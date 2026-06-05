@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils'
 
 const tiltSpring = { damping: 20, stiffness: 200, mass: 0.8 }
 
-export function SubjectCard({ subject, slug, questionCount, guessQuestions, onStart }) {
+export function SubjectCard({ subject, slug, questionCount, guessQuestions, isGuess, onStart }) {
   const color = getSubjectColor(slug)
   const iconKey = getSubjectIconKey(slug)
   const c = getColorClasses(color)
@@ -59,6 +59,13 @@ export function SubjectCard({ subject, slug, questionCount, guessQuestions, onSt
     >
       {/* Top highlight */}
       <div className="absolute inset-x-0 top-0 h-px bg-white/60 dark:bg-white/8" />
+
+      {isGuess && (
+        <span
+          className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_6px_rgba(239,68,68,0.7)]"
+          aria-hidden
+        />
+      )}
 
       <div className="p-4 sm:p-5 flex flex-col flex-1">
         {/* Icon */}

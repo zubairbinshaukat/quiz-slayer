@@ -1,0 +1,1957 @@
+{
+  "subject": "Compiler Construction (Full Syllabus)",
+  "slug": "compiler-construction-guess",
+  "description": "Front-end of the compiler: introduction and language-processing tools, lexical analysis (regular expressions and finite automata), syntax analysis (context-free grammars and top-down/bottom-up parsing), and semantic analysis with syntax-directed translation.",
+  "questions": [
+    {
+      "id": 1,
+      "text": "The main reason for using an intermediate representation in a compiler is to:",
+      "options": [
+        "Replace the symbol table",
+        "Make it possible to reuse the front-end with different target machines",
+        "Detect spelling mistakes",
+        "Speed up scanning"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "IR decouples the front-end from the back-end.",
+      "explanation": "An intermediate representation lets the same front-end be reused with different back-ends, separating machine-independent analysis from machine-dependent code generation."
+    },
+    {
+      "id": 2,
+      "text": "A preprocessor is typically responsible for:",
+      "options": [
+        "Parsing arithmetic expressions",
+        "Allocating registers to variables in the program",
+        "Macro expansion and file inclusion",
+        "Generating final machine code for the target"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Preprocessors handle macros and file inclusion.",
+      "explanation": "A preprocessor performs textual transformations such as macro expansion and including other source files before actual compilation begins."
+    },
+    {
+      "id": 3,
+      "text": "Which of the following is NOT a phase of a compiler?",
+      "options": [
+        "Semantic analysis",
+        "Text editing",
+        "Intermediate code generation",
+        "Lexical analysis"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Editing is not a compiler phase.",
+      "explanation": "Lexical analysis, semantic analysis, and intermediate code generation are compiler phases; text editing is an external activity, not part of compilation."
+    },
+    {
+      "id": 4,
+      "text": "The number of passes of a compiler refers to:",
+      "options": [
+        "The number of tokens it produces",
+        "The count of registers it uses",
+        "The number of errors it tolerates",
+        "How many times it traverses the source or its representation"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A pass is one complete traversal of the program.",
+      "explanation": "A pass is a single traversal over the source program or an intermediate form; a multi-pass compiler traverses the representation more than once."
+    },
+    {
+      "id": 5,
+      "text": "Unlike a compiler, an interpreter:",
+      "options": [
+        "Performs only lexical analysis",
+        "Produces a standalone executable that runs without the interpreter present",
+        "Executes the source directly",
+        "Cannot report any errors"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Interpreters execute directly without separate target code.",
+      "explanation": "An interpreter processes and executes the source program statement by statement, without producing a separate target program."
+    },
+    {
+      "id": 6,
+      "text": "Just-in-time (JIT) compilation generally takes place:",
+      "options": [
+        "Only on a different machine than the target",
+        "At run time",
+        "Before the program source has even been written by the developer",
+        "During lexical analysis"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "JIT compiles at run time.",
+      "explanation": "A JIT compiler translates code (often bytecode) into machine code while the program is running, combining interpretation flexibility with compiled speed."
+    },
+    {
+      "id": 7,
+      "text": "Resolving references between separately compiled modules is the job of the:",
+      "options": [
+        "Linker",
+        "Optimizer",
+        "Preprocessor",
+        "Lexical analyzer that scans the source"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "The linker resolves external references.",
+      "explanation": "The linker combines object modules and resolves external symbols (such as functions defined in one file and used in another) into a single program."
+    },
+    {
+      "id": 8,
+      "text": "A compiler that emits assembly language as its output still requires a(n):",
+      "options": [
+        "Text editor",
+        "Assembler",
+        "Source-level debugger",
+        "Interpreter to execute it statement by statement"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "An assembler converts assembly to machine code.",
+      "explanation": "If a compiler emits assembly language, an assembler is required to translate that assembly into relocatable machine code."
+    },
+    {
+      "id": 9,
+      "text": "Placing an executable into memory and starting its execution is performed by the:",
+      "options": [
+        "Code optimizer that improves the program",
+        "Parser",
+        "Loader",
+        "Lexical analyzer"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "The loader places the program in memory.",
+      "explanation": "A loader copies the executable into memory, adjusts addresses if needed, and prepares it for execution."
+    },
+    {
+      "id": 10,
+      "text": "Three-address code is best classified as a(n):",
+      "options": [
+        "Finite automaton",
+        "Token type produced by the scanner",
+        "Parsing technique used by the parser",
+        "Intermediate representation"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Three-address code is an IR.",
+      "explanation": "Three-address code is a common intermediate representation in which each instruction has at most three operands, used between analysis and code generation."
+    },
+    {
+      "id": 11,
+      "text": "Which part of a compiler is generally machine-independent?",
+      "options": [
+        "Register allocation for the target processor",
+        "The analysis (front-end) part",
+        "Final emission of machine code",
+        "Instruction selection"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "The front-end is largely machine-independent.",
+      "explanation": "Lexical, syntax, and semantic analysis depend on the source language, not the target machine, making the front-end machine-independent."
+    },
+    {
+      "id": 12,
+      "text": "A compiler written in the very language it compiles is said to be:",
+      "options": [
+        "Interpreted",
+        "A cross-compiler that runs on a separate host machine",
+        "Self-hosting",
+        "Single-pass"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Self-hosting compilers compile their own language.",
+      "explanation": "A self-hosting compiler is implemented in the very language it translates, a situation enabled through bootstrapping."
+    },
+    {
+      "id": 13,
+      "text": "A source-to-source translator (transpiler) produces:",
+      "options": [
+        "A list of tokens",
+        "A symbol table",
+        "Relocatable machine code for the processor",
+        "Another high-level language"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Transpilers emit high-level code.",
+      "explanation": "A source-to-source compiler translates one high-level language into another high-level language rather than into machine code."
+    },
+    {
+      "id": 14,
+      "text": "In a typical language-processing system, which tool runs immediately before the assembler?",
+      "options": [
+        "The running program itself",
+        "The compiler",
+        "The loader that brings the program into memory",
+        "The linker"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Compiler output (assembly) feeds the assembler.",
+      "explanation": "The typical pipeline is preprocessor → compiler (emitting assembly) → assembler → linker/loader, so the compiler precedes the assembler."
+    },
+    {
+      "id": 15,
+      "text": "Which statement about the symbol table is correct?",
+      "options": [
+        "It is built only after code generation finishes",
+        "It is used only by the scanner",
+        "It is shared and updated by several compiler phases",
+        "It stores the final target machine code of the program"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Multiple phases share the symbol table.",
+      "explanation": "The symbol table records identifier information and is created and used across lexical, syntactic, semantic, and later phases."
+    },
+    {
+      "id": 16,
+      "text": "Dynamic linking means library code is linked:",
+      "options": [
+        "During lexical analysis of the program",
+        "Before the source program is compiled at all",
+        "At load time or run time",
+        "Only by the assembler in pass one"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Dynamic linking happens at load/run time.",
+      "explanation": "With dynamic linking, shared library references are resolved when the program is loaded or while it runs, instead of being copied in at build time."
+    },
+    {
+      "id": 17,
+      "text": "Reporting diagnostics and recovering so analysis can continue is the role of the:",
+      "options": [
+        "Register allocator that assigns machine registers",
+        "Error handler",
+        "Loader",
+        "Linker"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "The error handler manages diagnostics and recovery.",
+      "explanation": "The error-handling component reports diagnostics and applies recovery strategies so the compiler can keep processing the rest of the program."
+    },
+    {
+      "id": 18,
+      "text": "Using an invalid character such as '@' where it is not allowed is detected during:",
+      "options": [
+        "Loading",
+        "Lexical analysis",
+        "Code generation",
+        "Linking of object files"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Illegal characters are lexical errors.",
+      "explanation": "When the scanner cannot match the input against any valid token pattern, it reports a lexical error."
+    },
+    {
+      "id": 19,
+      "text": "Java source code is usually compiled first into:",
+      "options": [
+        "Native machine code only, with no virtual machine involved",
+        "Bytecode",
+        "An assembly listing file",
+        "A set of regular expressions"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Java compiles to VM bytecode.",
+      "explanation": "Java source is compiled to portable bytecode that is then executed (interpreted or JIT-compiled) by the Java Virtual Machine."
+    },
+    {
+      "id": 20,
+      "text": "Which of the following is produced last in the compilation process?",
+      "options": [
+        "Target machine code",
+        "The symbol table",
+        "The parse tree",
+        "A stream of tokens from the scanner"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Machine code is the final product.",
+      "explanation": "Tokens, parse trees, and the symbol table are intermediate; the target machine code is generated at the end of the back-end."
+    },
+    {
+      "id": 21,
+      "text": "A grouping of compiler phases into one traversal of the program is called a:",
+      "options": [
+        "Lexeme",
+        "Pass",
+        "Handle",
+        "Token recognized by the lexical analyzer"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Phases are grouped into passes.",
+      "explanation": "Several phases may be combined into a single pass, where a pass reads the input once and writes an output once."
+    },
+    {
+      "id": 22,
+      "text": "Which activity belongs to the synthesis (back-end) stage?",
+      "options": [
+        "Checking the grammar rules",
+        "Tokenizing the input characters",
+        "Building the parse tree from the token stream",
+        "Generating target code"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Synthesis produces target code.",
+      "explanation": "Synthesis takes the intermediate representation and produces the target program; tokenizing and parsing belong to analysis."
+    },
+    {
+      "id": 23,
+      "text": "Compared with compiled code, interpreted execution is usually:",
+      "options": [
+        "Strictly machine dependent",
+        "Always completely free of runtime errors",
+        "Slower but easier to debug",
+        "Faster but much harder to debug at the source level"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Interpreters trade speed for flexibility.",
+      "explanation": "Interpretation tends to run slower because translation happens at run time, but it offers easier, more immediate error reporting and debugging."
+    },
+    {
+      "id": 24,
+      "text": "A compiler driver (toolchain front program) is responsible for:",
+      "options": [
+        "Invoking the preprocessor, compiler, assembler, and linker in sequence",
+        "Minimizing DFAs",
+        "Executing the final program",
+        "Drawing parse trees"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "The driver orchestrates the tools.",
+      "explanation": "The compiler driver coordinates the separate tools of the language-processing system so the user can invoke them with a single command."
+    },
+    {
+      "id": 25,
+      "text": "Translating assembly language into relocatable machine code is the task of the:",
+      "options": [
+        "Assembler",
+        "Loader that copies the program into main memory",
+        "Scanner",
+        "Compiler"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "The assembler handles assembly to machine code.",
+      "explanation": "An assembler converts low-level assembly mnemonics into relocatable machine instructions and produces an object file."
+    },
+    {
+      "id": 26,
+      "text": "Which is the correct ordering of the first three analysis phases?",
+      "options": [
+        "Semantic analysis, then lexical analysis, then syntax analysis",
+        "Lexical, syntax, semantic",
+        "Lexical, semantic, syntax",
+        "Syntax analysis, then lexical analysis, then semantic analysis"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Order is lexical → syntax → semantic.",
+      "explanation": "Scanning produces tokens, parsing builds structure, and then semantic analysis checks meaning, so the order is lexical, syntax, semantic."
+    },
+    {
+      "id": 27,
+      "text": "A type mismatch between an integer and a string is detected during:",
+      "options": [
+        "Lexical analysis of the character stream",
+        "Loading of the executable",
+        "Linking",
+        "Semantic analysis"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Type errors are semantic errors.",
+      "explanation": "Type checking is part of semantic analysis, which verifies that operations are applied to operands of compatible types."
+    },
+    {
+      "id": 28,
+      "text": "A two-pass assembler uses its first pass primarily to:",
+      "options": [
+        "Optimize the assembly program for speed",
+        "Generate the final machine code for every instruction",
+        "Build the symbol table of labels",
+        "Load the program into memory"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Pass one records label addresses.",
+      "explanation": "The first pass of a two-pass assembler scans the source to assign addresses and record labels in a symbol table; the second pass emits code."
+    },
+    {
+      "id": 29,
+      "text": "A missing semicolon at the end of a statement is most likely reported during:",
+      "options": [
+        "Syntax analysis",
+        "Lexical analysis of individual characters",
+        "Machine code generation",
+        "Optimization of the intermediate code"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Structural errors are syntactic.",
+      "explanation": "A missing semicolon violates the grammar of the language, so it is detected by the parser during syntax analysis."
+    },
+    {
+      "id": 30,
+      "text": "The main benefit of splitting a compiler into a front-end and a back-end is:",
+      "options": [
+        "It removes the need for a symbol table entirely",
+        "It allows reuse across languages and machines",
+        "It makes parsing unnecessary",
+        "It eliminates all possible runtime errors in programs"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Front/back split enables retargeting and reuse.",
+      "explanation": "With a shared intermediate representation, one front-end can target many machines and one back-end can serve many languages."
+    },
+    {
+      "id": 31,
+      "text": "The smallest meaningful unit returned by the scanner is a:",
+      "options": [
+        "Token",
+        "Complete parse tree",
+        "Nonterminal symbol",
+        "Production rule of the grammar"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Scanners output tokens.",
+      "explanation": "The lexical analyzer groups characters into tokens, the smallest meaningful syntactic units passed to the parser."
+    },
+    {
+      "id": 32,
+      "text": "A pattern, in lexical analysis, is:",
+      "options": [
+        "A rule describing the lexemes a token can represent",
+        "A node of the parse tree",
+        "The actual matched text",
+        "A machine instruction"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "A pattern is the rule for a token's lexemes.",
+      "explanation": "A pattern (often a regular expression) describes the form that the lexemes of a particular token may take; an actual matched string is a lexeme."
+    },
+    {
+      "id": 33,
+      "text": "The token attribute value for an identifier is usually:",
+      "options": [
+        "Its line of generated object code",
+        "A pointer to its symbol-table entry",
+        "Its absolute machine address in memory",
+        "A parse tree"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Identifier tokens carry a symbol-table pointer.",
+      "explanation": "For identifiers, the scanner records an attribute that points to the symbol-table entry holding the identifier's information."
+    },
+    {
+      "id": 34,
+      "text": "Two-buffer input with sentinels is used by the scanner to:",
+      "options": [
+        "Resolve ambiguity in the grammar of the language",
+        "Optimize the use of machine registers",
+        "Reduce the size of the parse tree",
+        "Speed up reading of source characters"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Buffering speeds scanner input.",
+      "explanation": "Two-buffer schemes with a sentinel character reduce the number of tests and I/O operations the scanner performs while reading the source."
+    },
+    {
+      "id": 35,
+      "text": "A sentinel in input buffering is:",
+      "options": [
+        "A grammar symbol",
+        "A special marker placed at the end of a buffer half",
+        "A reserved keyword of the source language",
+        "An accepting state of the automaton"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Sentinels mark buffer ends.",
+      "explanation": "A sentinel is a special character (such as EOF) placed at the end of each buffer half so a single test can detect both end-of-buffer and end-of-input."
+    },
+    {
+      "id": 36,
+      "text": "The positive closure operator (+) applied to r denotes:",
+      "options": [
+        "Exactly one occurrence of r",
+        "One or more occurrences of r",
+        "An optional single occurrence of r",
+        "Zero or more occurrences of the expression r"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "r+ means one or more.",
+      "explanation": "Positive closure r+ matches one or more concatenations of r, equivalent to r r*."
+    },
+    {
+      "id": 37,
+      "text": "If L = {a, b}, then L* contains:",
+      "options": [
+        "The empty string and all strings over {a, b}",
+        "Only the two strings a and b themselves",
+        "Every string except the empty string",
+        "Exactly two strings and nothing else"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Kleene star includes ε and all combinations.",
+      "explanation": "The Kleene closure L* is the set of all strings formed by concatenating zero or more members of L, including the empty string."
+    },
+    {
+      "id": 38,
+      "text": "A string over an alphabet is:",
+      "options": [
+        "A single symbol only",
+        "A finite sequence of symbols",
+        "A set of grammar production rules",
+        "An infinite sequence of symbols from the alphabet"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "A string is a finite symbol sequence.",
+      "explanation": "A string (or word) is a finite sequence of symbols taken from a given alphabet; its length is the number of symbols."
+    },
+    {
+      "id": 39,
+      "text": "The empty string is denoted by:",
+      "options": [
+        "The symbol Σ used for the alphabet",
+        "The start symbol S",
+        "ε",
+        "The empty-set symbol ∅"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "ε denotes the empty string.",
+      "explanation": "The empty string, written ε (epsilon), is the string of length zero containing no symbols."
+    },
+    {
+      "id": 40,
+      "text": "Which of the following is a prefix of the string 'compiler'?",
+      "options": [
+        "'mpile'",
+        "'piler'",
+        "'iler'",
+        "'comp'"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A prefix is taken from the front.",
+      "explanation": "A prefix is obtained by removing zero or more symbols from the end, so 'comp' is a prefix of 'compiler' while 'piler' is a suffix."
+    },
+    {
+      "id": 41,
+      "text": "Finite automata are equal in expressive power to:",
+      "options": [
+        "Regular expressions",
+        "Turing machines",
+        "The context-free grammars used in parsing",
+        "Pushdown automata with a stack"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "FA = regular expressions in power.",
+      "explanation": "Finite automata and regular expressions describe exactly the same class of languages: the regular languages."
+    },
+    {
+      "id": 42,
+      "text": "A key limitation of a finite automaton is that it:",
+      "options": [
+        "Has no memory beyond its current state",
+        "Contains no accepting states at all",
+        "Has no defined transitions between its states",
+        "Cannot have a designated start state"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "FAs have only finite-state memory.",
+      "explanation": "A finite automaton cannot store unbounded information; its only memory is the current state, which is why it cannot match nested constructs."
+    },
+    {
+      "id": 43,
+      "text": "Converting a regular expression directly into an NFA is commonly done by:",
+      "options": [
+        "Left factoring of the grammar",
+        "Thompson's construction",
+        "DFA state minimization",
+        "Subset construction applied to the states"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Thompson's construction builds an NFA from a regex.",
+      "explanation": "Thompson's construction builds an NFA (with ε-transitions) compositionally from the operators of a regular expression."
+    },
+    {
+      "id": 44,
+      "text": "Subset construction is the algorithm used to:",
+      "options": [
+        "Build an LR parsing table",
+        "Remove left recursion from a grammar",
+        "Convert an NFA into an equivalent DFA",
+        "Minimize the number of DFA states"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Subset construction does NFA → DFA.",
+      "explanation": "Subset (powerset) construction creates DFA states from sets of NFA states, producing a DFA that accepts the same language."
+    },
+    {
+      "id": 45,
+      "text": "An ε-transition in an NFA lets the automaton:",
+      "options": [
+        "Change state without consuming input",
+        "Push a symbol onto an auxiliary stack",
+        "Reject every string immediately",
+        "Read two input symbols in a single move"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "ε-moves consume no input.",
+      "explanation": "An ε-transition moves the NFA from one state to another without reading any input symbol."
+    },
+    {
+      "id": 46,
+      "text": "A dead (trap) state in a DFA is a state that:",
+      "options": [
+        "Is always chosen as the start state",
+        "Accepts the empty string by default",
+        "Has the largest number of outgoing transitions",
+        "Can never reach an accepting state"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A dead state cannot reach acceptance.",
+      "explanation": "Once a DFA enters a dead state it can never reach an accepting state, so the remaining input is rejected."
+    },
+    {
+      "id": 47,
+      "text": "DFA minimization produces a DFA that:",
+      "options": [
+        "Accepts a strictly larger language than before",
+        "Recognizes the same language with the fewest states",
+        "Has no start state remaining",
+        "Contains additional accepting states"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Minimization yields the smallest equivalent DFA.",
+      "explanation": "Minimization merges equivalent states to give the unique DFA with the minimum number of states for that language."
+    },
+    {
+      "id": 48,
+      "text": "Compared with an NFA, a DFA is usually preferred for implementation because it:",
+      "options": [
+        "Runs faster with a single deterministic path",
+        "Recognizes a strictly larger class of languages",
+        "Always uses fewer states than the NFA",
+        "Permits convenient ε-transitions"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "DFAs run deterministically and fast.",
+      "explanation": "A DFA has exactly one transition per symbol per state, so it can be simulated quickly without exploring multiple paths, even though it may have more states."
+    },
+    {
+      "id": 49,
+      "text": "A regular definition is useful because it allows you to:",
+      "options": [
+        "Define context-free grammar productions",
+        "Allocate memory for variables",
+        "Name regular expressions and reuse them",
+        "Construct a complete parse tree"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Regular definitions name and reuse regexes.",
+      "explanation": "A regular definition assigns names to regular expressions so that those names can be referenced when defining more complex token patterns."
+    },
+    {
+      "id": 50,
+      "text": "The 'maximal munch' (longest match) rule says the scanner should choose the:",
+      "options": [
+        "A randomly selected matching lexeme",
+        "First pattern listed, regardless of length",
+        "Shortest lexeme that matches some pattern",
+        "Longest matching lexeme"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Longest-match selects the longest lexeme.",
+      "explanation": "When several prefixes match, the scanner selects the longest one (maximal munch), so '>=' is read as one token rather than '>' then '='."
+    },
+    {
+      "id": 51,
+      "text": "When two patterns match the same longest lexeme, the tie is broken by:",
+      "options": [
+        "Choosing the pattern with the shortest name",
+        "Building a parse tree for both",
+        "Rejecting the input as a lexical error",
+        "The order in which the patterns are listed"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Rule order breaks ties.",
+      "explanation": "Scanner generators resolve ties by giving priority to the pattern listed first, which is how keywords are preferred over identifiers."
+    },
+    {
+      "id": 52,
+      "text": "Keywords such as 'while' and 'if' are usually:",
+      "options": [
+        "Stored directly as parse trees",
+        "Treated exactly like ordinary user identifiers",
+        "Reserved tokens",
+        "Discarded by the scanner before parsing"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Keywords are reserved tokens.",
+      "explanation": "Reserved keywords are recognized as their own tokens, taking priority over the identifier pattern they would otherwise match."
+    },
+    {
+      "id": 53,
+      "text": "Which of the following CANNOT be described by a regular expression?",
+      "options": [
+        "Balanced nested parentheses",
+        "An identifier name",
+        "An integer constant",
+        "A reserved keyword"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Nesting needs more than regular power.",
+      "explanation": "Matching arbitrarily nested, balanced parentheses requires counting, which finite automata cannot do, so it is not a regular language."
+    },
+    {
+      "id": 54,
+      "text": "A transition diagram in lexical analysis is used to:",
+      "options": [
+        "Represent grammar productions for parsing",
+        "Allocate machine registers to temporaries",
+        "Optimize program loops",
+        "Model token recognition as states and edges"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Transition diagrams model token recognition.",
+      "explanation": "A transition diagram depicts states and labeled edges that the scanner follows to recognize patterns and emit tokens."
+    },
+    {
+      "id": 55,
+      "text": "The class of regular languages is closed under:",
+      "options": [
+        "Only the union operation",
+        "Union, concatenation, and Kleene star",
+        "None of these operations",
+        "Only set intersection"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Closed under union, concat, and star.",
+      "explanation": "The class of regular languages is closed under union, concatenation, and Kleene closure (and also complement and intersection)."
+    },
+    {
+      "id": 56,
+      "text": "The alternation operator '|' in a regular expression expresses:",
+      "options": [
+        "Grouping of a subexpression",
+        "Concatenation of two symbols in order",
+        "Repetition of the preceding expression",
+        "A choice between two expressions"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "'|' means choice (union).",
+      "explanation": "The '|' operator denotes alternation, matching either the expression on its left or the one on its right."
+    },
+    {
+      "id": 57,
+      "text": "The optional operator '?' applied to r means:",
+      "options": [
+        "Exactly two occurrences of r",
+        "Zero or one r",
+        "One or more occurrences of r in sequence",
+        "Zero or more occurrences of r"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "r? is zero or one.",
+      "explanation": "The '?' operator makes the preceding expression optional, matching it either zero or one time."
+    },
+    {
+      "id": 58,
+      "text": "A lexical analyzer typically discards:",
+      "options": [
+        "Reserved keywords of the language",
+        "White space and comments",
+        "Identifiers and numeric constants in the program",
+        "Arithmetic operators"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Whitespace and comments are dropped.",
+      "explanation": "The scanner removes white space and comments because they carry no token meaning, passing only significant tokens to the parser."
+    },
+    {
+      "id": 59,
+      "text": "In panic-mode lexical recovery, the scanner:",
+      "options": [
+        "Deletes characters until a valid token can start",
+        "Builds an NFA for the bad input",
+        "Stops the entire compilation immediately",
+        "Rewrites the grammar of the language"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Panic mode skips characters to recover.",
+      "explanation": "In panic-mode lexical recovery, the scanner deletes offending characters until it can begin matching a legal token again."
+    },
+    {
+      "id": 60,
+      "text": "A right-linear grammar generates exactly the:",
+      "options": [
+        "Inherently ambiguous languages",
+        "Context-sensitive languages",
+        "Recursively enumerable languages",
+        "Regular languages"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Right-linear grammars = regular languages.",
+      "explanation": "Right-linear (and left-linear) regular grammars generate exactly the regular languages, the same class as regular expressions and finite automata."
+    },
+    {
+      "id": 61,
+      "text": "A context-free grammar is formally defined by:",
+      "options": [
+        "A set of states, an alphabet, and transitions",
+        "A collection of tokens and a symbol table",
+        "Terminals, nonterminals, a start symbol, and productions",
+        "Registers and machine instructions"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "CFG = (N, T, P, S).",
+      "explanation": "A CFG comprises a set of nonterminals, a set of terminals, a set of productions, and a designated start symbol."
+    },
+    {
+      "id": 62,
+      "text": "A sentential form is:",
+      "options": [
+        "A token attribute value",
+        "A fully completed parse tree",
+        "A finished sentence of terminals only",
+        "A string of terminals and/or nonterminals derivable from the start symbol"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Sentential forms may contain nonterminals.",
+      "explanation": "A sentential form is any string derivable from the start symbol; if it contains only terminals, it is a sentence of the language."
+    },
+    {
+      "id": 63,
+      "text": "A rightmost derivation expands, at each step, the:",
+      "options": [
+        "First terminal symbol encountered",
+        "Start symbol only, repeatedly",
+        "Rightmost nonterminal",
+        "Leftmost nonterminal in the current form"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Rightmost derivation expands the rightmost nonterminal.",
+      "explanation": "In a rightmost derivation, the rightmost nonterminal of the current sentential form is replaced at each step."
+    },
+    {
+      "id": 64,
+      "text": "Reading the leaves of a parse tree from left to right gives its:",
+      "options": [
+        "Handle to be reduced next",
+        "Closure set of items",
+        "Yield",
+        "Augmented start production"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Leaves give the yield of the tree.",
+      "explanation": "The yield (or frontier) of a parse tree is the sentence formed by concatenating its leaf symbols from left to right."
+    },
+    {
+      "id": 65,
+      "text": "The classic 'dangling else' problem is an example of:",
+      "options": [
+        "Left recursion in the grammar",
+        "Grammar ambiguity",
+        "A reduce-reduce conflict only",
+        "A lexical scanning error"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Dangling else shows ambiguity.",
+      "explanation": "The dangling-else grammar allows an 'else' to attach to more than one 'if', producing multiple parse trees, which is ambiguity."
+    },
+    {
+      "id": 66,
+      "text": "Which production shows immediate left recursion?",
+      "options": [
+        "A → a b c",
+        "A → A α",
+        "A → b A",
+        "A → ε"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "A → Aα is immediate left recursion.",
+      "explanation": "A production whose right side begins with the same nonterminal on the left (A → Aα) is immediate left recursion, which breaks top-down parsing."
+    },
+    {
+      "id": 67,
+      "text": "Left factoring is applied when two productions for a nonterminal:",
+      "options": [
+        "Share a common prefix",
+        "Have completely disjoint right-hand sides",
+        "Begin from two different start symbols",
+        "Are both empty (ε) productions"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Left factoring removes a common prefix.",
+      "explanation": "Left factoring rewrites productions that share a common leading prefix so a predictive parser can defer the choice until the prefix is consumed."
+    },
+    {
+      "id": 68,
+      "text": "A grammar is LL(1) when, for each nonterminal, its productions have:",
+      "options": [
+        "Identical FIRST sets for all alternatives",
+        "No terminal symbols on the right side",
+        "At least one left-recursive alternative",
+        "Disjoint selection sets"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "LL(1) needs disjoint predict sets.",
+      "explanation": "An LL(1) grammar lets a single lookahead token uniquely choose a production because the relevant FIRST (and FOLLOW for ε) sets are disjoint."
+    },
+    {
+      "id": 69,
+      "text": "A non-recursive predictive parser is driven by:",
+      "options": [
+        "A finite automaton on its own with no stack",
+        "The compiler's symbol table only",
+        "A pushdown stack but no table",
+        "A stack and a parsing table"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Table-driven LL parser uses stack + table.",
+      "explanation": "A table-driven predictive parser uses an explicit stack and an LL(1) parsing table to decide which production to apply on each lookahead."
+    },
+    {
+      "id": 70,
+      "text": "Bottom-up parsing constructs the parse tree:",
+      "options": [
+        "From the leaves up to the root",
+        "From the root downward to the leaves",
+        "Without referring to any productions",
+        "Only at the root, left to right"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Bottom-up builds from leaves to root.",
+      "explanation": "Bottom-up parsers begin with the input tokens (leaves) and reduce them step by step until reaching the start symbol (root)."
+    },
+    {
+      "id": 71,
+      "text": "A bottom-up parser effectively traces a rightmost derivation:",
+      "options": [
+        "In reverse",
+        "Without performing any derivation",
+        "Going forward in the usual direction",
+        "Using only leftmost steps"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Bottom-up = reverse rightmost derivation.",
+      "explanation": "Each reduction in shift-reduce parsing corresponds to one step of a rightmost derivation done in reverse."
+    },
+    {
+      "id": 72,
+      "text": "Repeatedly locating a handle and reducing it is called:",
+      "options": [
+        "Handle pruning",
+        "Computing the closure of items",
+        "Backtracking through choices",
+        "Left factoring of productions"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Handle pruning drives bottom-up parsing.",
+      "explanation": "Handle pruning is the sequence of locating handles and replacing them with the left side of the matching production until the start symbol remains."
+    },
+    {
+      "id": 73,
+      "text": "In LR parsing, a viable prefix is:",
+      "options": [
+        "Any arbitrary string of terminal symbols",
+        "A token's attribute value",
+        "The grammar's start symbol alone",
+        "A prefix of a right-sentential form that can appear on the stack"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Viable prefixes can sit on the stack.",
+      "explanation": "A viable prefix is a prefix of a right-sentential form that does not extend past the right end of the rightmost handle, so it is valid on the stack."
+    },
+    {
+      "id": 74,
+      "text": "Before constructing LR item sets, the grammar is first:",
+      "options": [
+        "Deliberately made ambiguous",
+        "Converted into a nondeterministic automaton",
+        "Left factored to remove common prefixes",
+        "Augmented with a new start production"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "LR construction augments the grammar.",
+      "explanation": "LR parser construction adds a new start symbol S' with S' → S so that acceptance can be detected by reducing this single augmenting production."
+    },
+    {
+      "id": 75,
+      "text": "An LR(0) item is a production together with a:",
+      "options": [
+        "Dot marking the position parsed so far",
+        "Removed left-hand side",
+        "Copy of the entire FOLLOW set",
+        "Lookahead terminal set attached to it"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "An item has a dot position.",
+      "explanation": "An LR(0) item is a production augmented with a dot indicating the position up to which the right-hand side has been recognized."
+    },
+    {
+      "id": 76,
+      "text": "Ordering these parsing methods from least to most powerful gives:",
+      "options": [
+        "LALR, then SLR, then canonical LR(1)",
+        "Canonical LR(1), then LALR, then SLR",
+        "SLR, LALR, canonical LR(1)",
+        "SLR, then canonical LR(1), then LALR"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "SLR < LALR < canonical LR.",
+      "explanation": "SLR is the weakest, LALR is intermediate (and table-size efficient), and canonical LR(1) is the most powerful of the three."
+    },
+    {
+      "id": 77,
+      "text": "A shift-reduce conflict means the parser cannot decide whether to:",
+      "options": [
+        "Accept the input or reject it outright",
+        "Compute FIRST or compute FOLLOW",
+        "Shift or reduce",
+        "Read from or write to memory"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Conflict between shifting and reducing.",
+      "explanation": "A shift-reduce conflict arises when, in some state, the parser could legally either shift the next input symbol or perform a reduction."
+    },
+    {
+      "id": 78,
+      "text": "By default, a YACC-style parser generator resolves a shift-reduce conflict by:",
+      "options": [
+        "Selecting one of the actions at random",
+        "Reporting an error and halting the build",
+        "Shifting",
+        "Performing the reduction instead of shifting"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Default is to shift.",
+      "explanation": "Tools such as YACC resolve a shift-reduce conflict in favor of shift unless precedence and associativity declarations specify otherwise."
+    },
+    {
+      "id": 79,
+      "text": "An LR parsing table is divided into two parts called:",
+      "options": [
+        "The LEX and YACC tables",
+        "The FIRST and FOLLOW sections",
+        "The shift and load sections",
+        "ACTION and GOTO"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "LR tables have ACTION and GOTO.",
+      "explanation": "The ACTION part decides shift/reduce/accept on terminals, while the GOTO part gives the next state for nonterminals."
+    },
+    {
+      "id": 80,
+      "text": "Context-free languages are recognized by a:",
+      "options": [
+        "Linear bounded automaton only",
+        "Pushdown automaton",
+        "Mealy machine",
+        "Plain finite automaton with no extra memory"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "CFLs need a pushdown automaton.",
+      "explanation": "A pushdown automaton adds a stack to a finite automaton, giving it the memory needed to recognize context-free languages such as nested structures."
+    },
+    {
+      "id": 81,
+      "text": "In the Chomsky hierarchy, context-free grammars are:",
+      "options": [
+        "Type 1",
+        "Type 0",
+        "Type 2",
+        "Type 3"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "CFGs are Type 2.",
+      "explanation": "In the Chomsky hierarchy, Type 2 grammars are context-free; Type 3 are regular, Type 1 context-sensitive, and Type 0 unrestricted."
+    },
+    {
+      "id": 82,
+      "text": "Which of the following is a unit production?",
+      "options": [
+        "A → ε",
+        "A → A α",
+        "A → a b",
+        "A → B"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A → B is a unit production.",
+      "explanation": "A unit production has a single nonterminal on its right-hand side and can often be eliminated to simplify a grammar."
+    },
+    {
+      "id": 83,
+      "text": "An ε-production is a production whose right-hand side is:",
+      "options": [
+        "The grammar's start symbol",
+        "Composed of two nonterminal symbols",
+        "A single terminal symbol",
+        "The empty string"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "ε-production derives the empty string.",
+      "explanation": "An ε-production (A → ε) lets a nonterminal derive the empty string and affects the computation of FIRST and FOLLOW sets."
+    },
+    {
+      "id": 84,
+      "text": "A grammar symbol that can never derive any terminal string is called:",
+      "options": [
+        "The designated start symbol",
+        "A handle on the parser stack",
+        "A useless (non-generating) symbol",
+        "A terminal symbol"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Non-generating symbols are useless.",
+      "explanation": "A non-generating symbol cannot derive a terminal string and is one kind of useless symbol that can be removed from a grammar."
+    },
+    {
+      "id": 85,
+      "text": "Recursive-descent parsing without lookahead may require:",
+      "options": [
+        "Storing the stack on secondary disk",
+        "Minimization of a deterministic finite automaton",
+        "Backtracking",
+        "Allocation of machine registers"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Plain recursive descent can backtrack.",
+      "explanation": "A general recursive-descent parser may try a production, fail, and back up to try another, which predictive parsing avoids."
+    },
+    {
+      "id": 86,
+      "text": "Operator-precedence parsing is a form of:",
+      "options": [
+        "Top-down predictive parsing",
+        "Linking of object files",
+        "Bottom-up parsing",
+        "Lexical scanning"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Operator precedence is bottom-up.",
+      "explanation": "Operator-precedence parsing is a shift-reduce (bottom-up) technique that uses precedence relations between terminals to find handles."
+    },
+    {
+      "id": 87,
+      "text": "In panic-mode recovery, a parser discards tokens until it reaches a:",
+      "options": [
+        "Dead state of the automaton",
+        "Synchronizing token",
+        "Randomly chosen token in the stream",
+        "Copy of the grammar's start symbol"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "It skips to a synchronizing token.",
+      "explanation": "Panic-mode error recovery skips tokens until one from a chosen synchronizing set appears, letting the parser resume in a stable position."
+    },
+    {
+      "id": 88,
+      "text": "Left recursion in a grammar is directly unsuitable for which method?",
+      "options": [
+        "Bottom-up LR parsing of the input",
+        "Shift-reduce parsing with a stack",
+        "Top-down predictive parsing",
+        "Operator-precedence parsing"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Left recursion breaks top-down parsing.",
+      "explanation": "Left recursion causes a top-down predictive parser to loop forever, so it must be eliminated; LR parsers handle left recursion fine."
+    },
+    {
+      "id": 89,
+      "text": "The goal of parsing is to:",
+      "options": [
+        "Strip white space from the input",
+        "Check that the tokens conform to the grammar",
+        "Translate the program into machine code",
+        "Allocate registers to the variables"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Parsing checks syntax and builds structure.",
+      "explanation": "The parser checks whether the sequence of tokens forms a valid sentence of the language and produces a parse or syntax tree."
+    },
+    {
+      "id": 90,
+      "text": "Two distinct rightmost derivations of the same sentence indicate that the grammar is:",
+      "options": [
+        "A regular grammar",
+        "An LL(1) grammar",
+        "Already left factored",
+        "Ambiguous"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Multiple derivations = ambiguity.",
+      "explanation": "A grammar is ambiguous if some sentence has more than one parse tree (equivalently, more than one leftmost or rightmost derivation)."
+    },
+    {
+      "id": 91,
+      "text": "FIRST(α) is the set of:",
+      "options": [
+        "Nonterminals reachable from the string α",
+        "Terminals that can begin a string derived from α",
+        "All productions defined for the start symbol",
+        "States of the recognizing automaton"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "FIRST holds leading terminals.",
+      "explanation": "FIRST(α) contains every terminal that can appear as the first symbol of some string derived from α, plus ε if α can derive the empty string."
+    },
+    {
+      "id": 92,
+      "text": "FOLLOW(A) is the set of terminals that can appear:",
+      "options": [
+        "Only within accepting states of a DFA",
+        "Immediately to the right of A in some sentential form",
+        "Anywhere inside the compiler's symbol table",
+        "Only at the very start of the whole program"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "FOLLOW holds symbols after A.",
+      "explanation": "FOLLOW(A) is the set of terminals that can immediately follow the nonterminal A in some sentential form derived from the start symbol."
+    },
+    {
+      "id": 93,
+      "text": "The end-of-input marker '$' is normally placed in the FOLLOW set of the:",
+      "options": [
+        "Start symbol",
+        "Every terminal in the grammar",
+        "First terminal token of the program",
+        "Dead state of the automaton"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "$ is in FOLLOW of the start symbol.",
+      "explanation": "Because input ends after the start symbol's derivation, the end-of-input marker $ is placed in FOLLOW of the start symbol."
+    },
+    {
+      "id": 94,
+      "text": "In LL(1) table construction, A → α is entered under each terminal in:",
+      "options": [
+        "FIRST(α), plus FOLLOW(A) if α derives ε",
+        "FIRST(A) for the left-hand side",
+        "FOLLOW(α) only, ignoring FIRST",
+        "The set of all DFA states"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Use FIRST(α), plus FOLLOW(A) for ε.",
+      "explanation": "A → α is placed under each terminal in FIRST(α); if α derives ε, it is also placed under each terminal in FOLLOW(A)."
+    },
+    {
+      "id": 95,
+      "text": "A reduce-reduce conflict means a state allows reduction by:",
+      "options": [
+        "No production whatsoever",
+        "Exactly one production and no other",
+        "Two or more different productions",
+        "Only the augmenting start production"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Two possible reductions clash.",
+      "explanation": "A reduce-reduce conflict occurs when the parser, in one state on one lookahead, could reduce by more than one production."
+    },
+    {
+      "id": 96,
+      "text": "A parser that scans left to right and produces a leftmost derivation is an:",
+      "options": [
+        "LR parser working bottom-up",
+        "Operator-precedence parser",
+        "SLR parser",
+        "LL parser"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "LL = left scan, leftmost derivation.",
+      "explanation": "The first L in LL means left-to-right scanning and the second L means it produces a leftmost derivation, characteristic of top-down predictive parsers."
+    },
+    {
+      "id": 97,
+      "text": "LALR parsing is popular in practice mainly because it:",
+      "options": [
+        "Combines small tables with adequate power",
+        "Works only on regular languages",
+        "Needs no grammar specification at all",
+        "Is the single most powerful parsing method known"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "LALR balances power and table size.",
+      "explanation": "LALR merges canonical LR(1) states with common cores, giving much smaller tables than full LR(1) while handling most practical grammars."
+    },
+    {
+      "id": 98,
+      "text": "The CLOSURE operation on a set of LR items adds items for:",
+      "options": [
+        "The augmenting start production only",
+        "Every terminal symbol of the grammar",
+        "Productions of nonterminals just after the dot",
+        "All FOLLOW sets in the grammar"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "CLOSURE expands dotted nonterminals.",
+      "explanation": "CLOSURE adds, for every nonterminal immediately to the right of a dot, the initial items of that nonterminal's productions."
+    },
+    {
+      "id": 99,
+      "text": "A predictive parser detects a syntax error when:",
+      "options": [
+        "The parsing stack becomes completely full",
+        "The start symbol is first pushed on the stack",
+        "The table entry for the current pair is empty",
+        "Any input token at all is read"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Empty table entry signals an error.",
+      "explanation": "If the LL(1) table has no production for the top-of-stack nonterminal and current lookahead, no legal move exists, signalling a syntax error."
+    },
+    {
+      "id": 100,
+      "text": "Eliminating left recursion from A → A α | β produces:",
+      "options": [
+        "A → A α retained unchanged",
+        "A → α β",
+        "A → β A', A' → α A' | ε",
+        "A → ε as the only production"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Introduce A' for the recursive tail.",
+      "explanation": "The standard transformation rewrites left recursion into right recursion using a new nonterminal: A → β A' with A' → α A' | ε."
+    },
+    {
+      "id": 101,
+      "text": "A syntax-directed definition (SDD) attaches to grammar productions:",
+      "options": [
+        "States of a deterministic automaton",
+        "Machine instructions for the target processor",
+        "Token patterns written as regular expressions",
+        "Semantic rules"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "SDDs attach semantic rules to productions.",
+      "explanation": "An SDD associates each production with semantic rules that define how attribute values of grammar symbols are computed."
+    },
+    {
+      "id": 102,
+      "text": "A synthesized attribute of a node is computed from the attributes of its:",
+      "options": [
+        "Children",
+        "Current lookahead token",
+        "Parent node and its sibling nodes",
+        "Entry stored in the symbol table"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Synthesized = from children.",
+      "explanation": "Synthesized attributes flow up the tree: a node's synthesized attribute is computed from the attributes of its child nodes."
+    },
+    {
+      "id": 103,
+      "text": "An inherited attribute of a node gets its value from its:",
+      "options": [
+        "Loader at program start",
+        "Accepting state in the automaton",
+        "Own children only, computed bottom-up",
+        "Parent and/or sibling nodes"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Inherited = from parent/siblings.",
+      "explanation": "Inherited attributes flow down or across the tree, taking their values from the parent node and/or sibling nodes."
+    },
+    {
+      "id": 104,
+      "text": "A definition that uses only synthesized attributes is called:",
+      "options": [
+        "S-attributed",
+        "An L-attributed definition",
+        "An ambiguous definition",
+        "A left-recursive definition"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Only synthesized = S-attributed.",
+      "explanation": "An S-attributed definition uses solely synthesized attributes and can be evaluated during a bottom-up parse."
+    },
+    {
+      "id": 105,
+      "text": "S-attributed definitions are naturally evaluated during a:",
+      "options": [
+        "Linking step of separate modules",
+        "Loading of the executable",
+        "Bottom-up (LR) parse",
+        "Pass of lexical analysis over characters"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "S-attributed fits bottom-up evaluation.",
+      "explanation": "Because synthesized attributes depend only on children, they can be computed on reductions during bottom-up parsing."
+    },
+    {
+      "id": 106,
+      "text": "In an L-attributed definition, an inherited attribute may depend on:",
+      "options": [
+        "Only the node's own children",
+        "The parent and left siblings",
+        "Right siblings and the node's own subtree",
+        "Properties of the target machine"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "L-attributed: parent and left siblings.",
+      "explanation": "In an L-attributed SDD, each inherited attribute depends only on the parent and the siblings to its left, allowing a single left-to-right pass."
+    },
+    {
+      "id": 107,
+      "text": "An annotated parse tree is one in which each node also shows its:",
+      "options": [
+        "Attribute values",
+        "Source line number only",
+        "State in a DFA",
+        "Absolute machine address in memory"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Annotated trees show attribute values.",
+      "explanation": "An annotated (decorated) parse tree displays the computed attribute values at the nodes alongside the grammar symbols."
+    },
+    {
+      "id": 108,
+      "text": "A dependency graph for an SDD is used to find:",
+      "options": [
+        "A valid evaluation order for the attributes",
+        "The total number of tokens in the program",
+        "The number of machine registers needed",
+        "A minimized form of the DFA"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Dependency graphs give evaluation order.",
+      "explanation": "The dependency graph records how attributes depend on one another; a topological sort of it gives an order in which they can be evaluated."
+    },
+    {
+      "id": 109,
+      "text": "An abstract syntax tree (AST) differs from a parse tree because it:",
+      "options": [
+        "Keeps a node for every single grammar symbol used",
+        "Is incapable of representing expressions",
+        "Is constructed entirely by the loader",
+        "Omits inessential nodes"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "ASTs drop inessential detail.",
+      "explanation": "An abstract syntax tree condenses a parse tree by removing nodes that exist only for grammar derivation, keeping the meaningful operators and operands."
+    },
+    {
+      "id": 110,
+      "text": "Type checking, part of semantic analysis, verifies that:",
+      "options": [
+        "The input buffers are sized correctly",
+        "The number of tokens is within a limit",
+        "Every keyword in the program is spelled correctly",
+        "Operands have compatible types"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Type checking checks operand compatibility.",
+      "explanation": "A type checker confirms that each operator receives operands of permitted types and reports type errors otherwise."
+    },
+    {
+      "id": 111,
+      "text": "Automatically converting an int to a float when needed is an example of:",
+      "options": [
+        "Tokenizing the input stream",
+        "Type coercion",
+        "Left factoring of grammar productions",
+        "Handle pruning during parsing"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Implicit conversion is coercion.",
+      "explanation": "Type coercion is the implicit conversion the compiler inserts so operands of mixed types can be combined, such as widening an int to a float."
+    },
+    {
+      "id": 112,
+      "text": "Under name equivalence, two types are the same only if they:",
+      "options": [
+        "Have the same type name",
+        "Are combined by the same operator",
+        "Possess exactly the same internal structure",
+        "Occupy the same region of memory"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Name equivalence compares type names.",
+      "explanation": "Name equivalence treats two types as equal only when they share the same type name, unlike structural equivalence which compares their structure."
+    },
+    {
+      "id": 113,
+      "text": "The two fundamental operations on a symbol table are:",
+      "options": [
+        "Shift and reduce performed by the parser",
+        "Open and close on a file",
+        "Push and pop on a parsing stack",
+        "Insert and lookup"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Symbol tables insert and look up entries.",
+      "explanation": "A symbol table chiefly supports inserting new identifier entries and looking up existing ones during the various phases."
+    },
+    {
+      "id": 114,
+      "text": "Using an identifier that was never declared is detected as a:",
+      "options": [
+        "Loader error during execution",
+        "Linker symbol conflict",
+        "Lexical error in the character stream",
+        "Semantic error"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Undeclared use is a semantic error.",
+      "explanation": "Detecting use of an undeclared identifier requires symbol-table information, so it is a semantic (static-semantic) error."
+    },
+    {
+      "id": 115,
+      "text": "In a block-structured language, the scope of a variable is the:",
+      "options": [
+        "Whole program from beginning to end, always",
+        "Region where its declaration is visible",
+        "Contents of the compiler's symbol table",
+        "Complete set of tokens in the file"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Scope is where a name is visible.",
+      "explanation": "Scope is the textual region in which a declaration applies; nested blocks create nested scopes that the symbol table must track."
+    },
+    {
+      "id": 116,
+      "text": "Static scoping determines a name's meaning based on the:",
+      "options": [
+        "Program's textual structure",
+        "Sequence of calls made at run time",
+        "Particular DFA used for scanning",
+        "Order in which the scanner reads tokens"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Static scope follows program text.",
+      "explanation": "Under static (lexical) scoping, a name refers to the declaration found by examining the enclosing program text, independent of run-time call chains."
+    },
+    {
+      "id": 117,
+      "text": "Calling a function with the wrong number of arguments is a:",
+      "options": [
+        "Semantic error",
+        "Lexical error in the token stream",
+        "Purely syntactic error caught by the grammar",
+        "Defect that can never be detected by a compiler"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Argument-count mismatch is semantic.",
+      "explanation": "Comparing a call against the declared parameter list is a semantic check, so an argument-count mismatch is a semantic error."
+    },
+    {
+      "id": 118,
+      "text": "A directed acyclic graph (DAG) is used for an expression to:",
+      "options": [
+        "Store the program's tokens",
+        "Remove the start symbol of the grammar",
+        "Share common subexpressions",
+        "Add strictly more nodes than the corresponding tree"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "DAGs share common subexpressions.",
+      "explanation": "A DAG representation of an expression lets identical subexpressions share a single node, exposing redundancy for later use."
+    },
+    {
+      "id": 119,
+      "text": "A type expression such as array(integer) is used to:",
+      "options": [
+        "Allocate machine registers to variables",
+        "Minimize a deterministic automaton",
+        "Describe the type of a construct",
+        "Generate tokens during scanning"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Type expressions denote types.",
+      "explanation": "A type expression is a notation (built from basic types and constructors like array, record, and pointer) that denotes the type of a construct."
+    },
+    {
+      "id": 120,
+      "text": "Postfix (reverse Polish) notation for an expression is produced by a:",
+      "options": [
+        "Postorder traversal",
+        "Level-order traversal of the tree",
+        "Preorder traversal of the expression tree",
+        "Random traversal of the nodes"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Postfix comes from postorder.",
+      "explanation": "Visiting an expression tree in postorder (operands before operator) yields the postfix form of the expression."
+    },
+    {
+      "id": 121,
+      "text": "In YACC, the semantic value of a rule's left-hand side is written as:",
+      "options": [
+        "$0",
+        "$$",
+        "$n",
+        "$1"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "$$ is the left-side value.",
+      "explanation": "In YACC actions, $$ denotes the attribute of the rule's left-hand nonterminal, while $1, $2, ... refer to the right-hand symbols."
+    },
+    {
+      "id": 122,
+      "text": "Replacing 3 + 4 with the constant 7 at compile time is called:",
+      "options": [
+        "Left factoring of the grammar",
+        "Unrolling of program loops",
+        "Constant folding",
+        "Tokenizing the source"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Evaluating constants is constant folding.",
+      "explanation": "Constant folding evaluates constant expressions during compilation so the result is stored directly instead of being computed at run time."
+    },
+    {
+      "id": 123,
+      "text": "Quadruples and triples are alternative representations of:",
+      "options": [
+        "Regular expressions used by the scanner",
+        "Token attribute values",
+        "Parse trees built by the parser",
+        "Three-address code"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Quads/triples implement 3-address code.",
+      "explanation": "Quadruples and triples are common ways to store three-address instructions, differing in how they reference temporary results."
+    },
+    {
+      "id": 124,
+      "text": "Semantic actions in a translation scheme are written:",
+      "options": [
+        "Within the productions",
+        "Inside the loader of the system",
+        "Exclusively inside the lexical analyzer",
+        "Only before the grammar, never inside it"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Actions are embedded in productions.",
+      "explanation": "A translation scheme embeds program fragments (semantic actions) at positions within the right-hand sides of productions to indicate execution order."
+    },
+    {
+      "id": 125,
+      "text": "An attribute recording the data type of an expression is typically:",
+      "options": [
+        "A state of the recognizing DFA",
+        "A token pattern in the scanner",
+        "A synthesized attribute",
+        "An inherited attribute passed down from the parent"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Expression type is synthesized.",
+      "explanation": "The type of an expression is generally synthesized bottom-up from the types of its operands, making it a synthesized attribute."
+    },
+    {
+      "id": 126,
+      "text": "Nested scopes are commonly handled by organizing the symbol table as a:",
+      "options": [
+        "Complete parse tree",
+        "Single flat list of all identifiers",
+        "Deterministic finite automaton",
+        "Stack of scope tables"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Nested scopes use a stack of tables.",
+      "explanation": "Block structure is commonly implemented with a stack of symbol tables (or chained scopes) so that entering and leaving a block pushes and pops a scope."
+    },
+    {
+      "id": 127,
+      "text": "An attribute grammar is a context-free grammar augmented with:",
+      "options": [
+        "More tokens for the scanner",
+        "Several extra start symbols",
+        "Additional terminal symbols only",
+        "Attributes and semantic rules"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Attribute grammar = CFG + attributes/rules.",
+      "explanation": "An attribute grammar extends a context-free grammar by associating attributes with symbols and semantic rules with productions."
+    },
+    {
+      "id": 128,
+      "text": "Declaring the same variable twice in one scope is reported as a:",
+      "options": [
+        "Loader error at run time",
+        "Lexical error in the scanner",
+        "Shift-reduce conflict in the parser",
+        "Semantic (duplicate declaration) error"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Redeclaration is a semantic error.",
+      "explanation": "The symbol table reveals that an identifier is already declared in the current scope, so a re-declaration is flagged as a semantic error."
+    },
+    {
+      "id": 129,
+      "text": "Under structural type equivalence, two types are equal when they:",
+      "options": [
+        "Happen to share the same type name",
+        "Have the same structure",
+        "Are built using the same operator",
+        "Are declared inside the same block"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Structural equivalence compares structure.",
+      "explanation": "Structural equivalence considers two types the same if their type expressions have identical structure, even when their names differ."
+    },
+    {
+      "id": 130,
+      "text": "The information stored for an identifier in the symbol table typically includes its:",
+      "options": [
+        "Final object-code address and nothing else",
+        "Transitions in the scanning DFA",
+        "Type and scope",
+        "Height in the parse tree"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Symbol table holds type, scope, etc.",
+      "explanation": "A symbol-table entry records attributes such as the identifier's type, scope/level, storage information, and possibly its value."
+    },
+    {
+      "id": 131,
+      "text": "A bottom-up parser keeps its partially recognized symbols on a:",
+      "options": [
+        "First-in-first-out queue",
+        "Stack",
+        "Branch of the parse tree",
+        "Region of the heap only"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Shift-reduce parsers use a stack.",
+      "explanation": "Shift-reduce parsing pushes symbols onto a stack and reduces handles found on top of that stack."
+    },
+    {
+      "id": 132,
+      "text": "Which pair of phases is most tightly coupled in a syntax-directed translator?",
+      "options": [
+        "Scanning and code optimization",
+        "Loading and final code generation",
+        "Parsing and semantic analysis",
+        "Linking of modules and loading into memory"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "SDT couples parsing with semantics.",
+      "explanation": "A syntax-directed translator interleaves semantic actions with parsing, so parsing and semantic analysis run hand in hand."
+    },
+    {
+      "id": 133,
+      "text": "A scanner generator such as LEX takes regular expressions and produces a:",
+      "options": [
+        "Lexical analyzer",
+        "Linker for the object files",
+        "Loader for the executable",
+        "Bottom-up parser for the grammar"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "LEX builds a scanner from regexes.",
+      "explanation": "LEX-style tools transform regular-expression specifications into a finite-automaton-based lexical analyzer."
+    },
+    {
+      "id": 134,
+      "text": "A parser generator such as YACC takes a grammar and produces a:",
+      "options": [
+        "Lexical scanner for the tokens",
+        "Syntax analyzer",
+        "Symbol table for identifiers",
+        "Code optimizer for the IR"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "YACC builds a parser from a grammar.",
+      "explanation": "YACC-style tools take a context-free grammar with actions and generate a bottom-up (LALR) parser."
+    },
+    {
+      "id": 135,
+      "text": "An LR parser reaches the accept action when it:",
+      "options": [
+        "Empties the input buffer of all characters",
+        "Reduces by the augmenting start production",
+        "Shifts the very first token onto the stack",
+        "Enters a dead state of the automaton"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Accept = reduce the augmenting production.",
+      "explanation": "An LR parser accepts when it performs the accept action, which corresponds to reducing by the added S' → S production with the end marker."
+    },
+    {
+      "id": 136,
+      "text": "Which statement about a leftmost derivation is true?",
+      "options": [
+        "It can never generate an ambiguous string",
+        "It produces only terminals at every single step",
+        "It expands the rightmost nonterminal at each step",
+        "It always rewrites the leftmost nonterminal first"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Leftmost expands the leftmost nonterminal.",
+      "explanation": "In a leftmost derivation, the leftmost nonterminal of the current sentential form is the one rewritten at each step."
+    },
+    {
+      "id": 137,
+      "text": "Lexical and syntax analysis are kept separate mainly to:",
+      "options": [
+        "Simplify the design of each component",
+        "Eliminate the need for any grammar",
+        "Maximize the total number of tokens produced",
+        "Avoid building a symbol table altogether"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Separation simplifies and modularizes.",
+      "explanation": "Splitting scanning from parsing simplifies each component, lets specialized techniques (regular vs context-free) apply, and improves efficiency and portability."
+    },
+    {
+      "id": 138,
+      "text": "A handle in a right-sentential form is:",
+      "options": [
+        "Any leftmost terminal of the form",
+        "The grammar's start symbol by itself",
+        "A token's stored attribute value",
+        "A substring matching a production's right side, reduced next"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A handle is the next substring to reduce.",
+      "explanation": "A handle is a substring that matches the right side of a production and whose reduction represents one step of the reverse rightmost derivation."
+    },
+    {
+      "id": 139,
+      "text": "Which statement about NFAs and DFAs is correct?",
+      "options": [
+        "DFAs recognize strictly more languages than NFAs can",
+        "An NFA can never be converted into a DFA",
+        "They recognize exactly the same class of languages",
+        "A DFA may have several transitions on one symbol"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "NFAs and DFAs are equally powerful.",
+      "explanation": "Although NFAs may be more compact, they recognize exactly the regular languages, the same class DFAs recognize, and every NFA has an equivalent DFA."
+    },
+    {
+      "id": 140,
+      "text": "A production such as A → A (the same nonterminal alone) introduces a:",
+      "options": [
+        "New terminal symbol",
+        "Useful and necessary derivation step",
+        "Fresh start production",
+        "Cycle"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A → A creates a cycle.",
+      "explanation": "A production such as A → A introduces a cycle in the grammar, which must be removed because it serves no purpose and complicates parsing."
+    },
+    {
+      "id": 141,
+      "text": "A typical use of an inherited attribute is to pass down:",
+      "options": [
+        "A declared type to the identifiers it declares",
+        "The computed value of a child expression",
+        "A token's source line number only",
+        "The number of states in the scanning DFA"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Inherited attributes pass declaration types down.",
+      "explanation": "A typical use of inherited attributes is to carry a declared type from a declaration node down to each identifier being declared."
+    },
+    {
+      "id": 142,
+      "text": "Which compiler phase is specified using context-free grammars?",
+      "options": [
+        "Loading of the program into memory",
+        "Lexical analysis of the character stream",
+        "Syntax analysis",
+        "Linking of separate object modules"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Parsing is specified by CFGs.",
+      "explanation": "Syntax analysis is specified by context-free grammars, whereas lexical analysis is specified by regular expressions."
+    },
+    {
+      "id": 143,
+      "text": "Which of the following is checked by static (compile-time) semantics?",
+      "options": [
+        "The contents of memory while running",
+        "How long the program runs when executed",
+        "Whether a variable is declared before use",
+        "The exact runtime value held by a variable"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Declared-before-use is static semantics.",
+      "explanation": "Static semantics covers properties checkable at compile time, such as declaration before use and type correctness, not run-time values."
+    },
+    {
+      "id": 144,
+      "text": "When a top-down parser predicts the wrong production and must undo work, it performs:",
+      "options": [
+        "Backtracking",
+        "A closure of the item set",
+        "A reduction of the handle",
+        "A shift of the next symbol"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Undoing a wrong prediction is backtracking.",
+      "explanation": "Backtracking is the act of reversing a tried production choice in a top-down parser so an alternative can be attempted."
+    },
+    {
+      "id": 145,
+      "text": "Which sequence correctly lists data flowing through the front-end?",
+      "options": [
+        "Characters → tokens → parse tree → annotated tree",
+        "Tokens → characters → registers → memory",
+        "Characters → machine code → tokens → registers",
+        "Parse tree → tokens → characters → symbols"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Chars → tokens → parse tree → annotated tree.",
+      "explanation": "The scanner turns characters into tokens, the parser builds a parse tree, and semantic analysis decorates it, so the data flows in that order."
+    },
+    {
+      "id": 146,
+      "text": "An augmented grammar is needed in LR parsing so the parser can:",
+      "options": [
+        "Operate completely without using a stack",
+        "Recognize when the whole input is parsed",
+        "Skip the semantic analysis phase",
+        "Remove every terminal from the grammar"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Augmentation enables a clean accept action.",
+      "explanation": "Adding S' → S gives the parser a unique production whose reduction signals that the entire input has been parsed, defining acceptance."
+    },
+    {
+      "id": 147,
+      "text": "A lexical analyzer commonly interacts with the parser by:",
+      "options": [
+        "Returning the next token on request",
+        "Returning the complete token list only at the very end",
+        "Performing all the type checking",
+        "Building the entire parse tree by itself"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Scanner returns tokens on demand.",
+      "explanation": "Commonly the scanner acts as a subroutine of the parser, supplying the next token whenever the parser asks for one."
+    },
+    {
+      "id": 148,
+      "text": "Which task is performed during semantic analysis rather than parsing?",
+      "options": [
+        "Building the parse tree from tokens",
+        "Verifying that an array index is an integer",
+        "Checking that brackets are grammatically balanced",
+        "Grouping input characters into tokens"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Type of an index is a semantic check.",
+      "explanation": "Confirming that an array index is an integer requires type information and is a semantic check, while bracket balance is syntactic."
+    },
+    {
+      "id": 149,
+      "text": "Two grammars that generate exactly the same language are said to be:",
+      "options": [
+        "Equivalent",
+        "Inherently ambiguous grammars",
+        "Left-recursive grammars",
+        "Augmented grammars"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Same language ⇒ equivalent grammars.",
+      "explanation": "Grammars are equivalent when they generate the same language, even if their productions or derivations differ."
+    },
+    {
+      "id": 150,
+      "text": "The overall purpose of the compiler front-end is to:",
+      "options": [
+        "Produce optimized target machine code for the processor",
+        "Load the program and run it on the machine",
+        "Resolve external references to library functions",
+        "Analyze the source and produce a checked IR"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Front-end analyzes and yields a checked IR.",
+      "explanation": "The front-end scans, parses, and semantically checks the source program, producing an intermediate representation for the back-end to translate."
+    }
+  ]
+}

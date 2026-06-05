@@ -1,10 +1,11 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 import { getAllCustomSubjects } from '../lib/db'
+import { isGuessSubject } from '../lib/guessWarning'
 
 const modules = import.meta.glob('../data/*.json', { eager: true })
 const quizModules = import.meta.glob('../data/quiz/*.json', { eager: true })
 
-function processRaw(data, isCustom = false) {
+function processRaw(data, isCustom = false, sourcePath = '') {
   return {
     subject: data.subject,
     slug: data.slug,
@@ -12,6 +13,7 @@ function processRaw(data, isCustom = false) {
     questionCount: data.questions?.length ?? 0,
     questions: data.questions ?? [],
     guessQuestions: data.guess_questions ?? [],
+    isGuess: isGuessSubject(data.slug, sourcePath),
     isCustom,
   }
 }
@@ -30,13 +32,13 @@ export function useSubjectData() {
 
   const fileSubjects = useMemo(() => {
     return Object.entries(modules)
-      .map(([, module]) => processRaw(module.default ?? module, false))
+      .map(([path, module]) => processRaw(module.default ?? module, false, path))
       .sort((a, b) => a.subject.localeCompare(b.subject))
   }, [])
 
   const quizzes = useMemo(() => {
     return Object.entries(quizModules)
-      .map(([, module]) => processRaw(module.default ?? module, false))
+      .map(([path, module]) => processRaw(module.default ?? module, false, path))
       .sort((a, b) => a.subject.localeCompare(b.subject))
   }, [])
 
