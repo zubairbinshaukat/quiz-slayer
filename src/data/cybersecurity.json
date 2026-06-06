@@ -1,0 +1,1138 @@
+{
+  "subject": "Information Security & Cybersecurity",
+  "slug": "information-security-cybersecurity",
+  "description": "Scenario-based MCQs covering CIA triad, cryptography, authentication, network security, malware, cyber ethics, and risk management.",
+  "questions": [
+    {
+      "id": 1,
+      "text": "A university administrator secretly modifies students' grades in the database without approval from the examination department. Which security property is violated?",
+      "options": [
+        "Authentication",
+        "Integrity",
+        "Scalability",
+        "Availability"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Unauthorized modification of data violates Integrity.",
+      "explanation": "Integrity ensures that data remains accurate and unaltered by unauthorized parties. When the administrator modifies grades without approval, the trustworthiness of stored information is compromised. This is a direct violation of the CIA triad's Integrity principle."
+    },
+    {
+      "id": 2,
+      "text": "A hospital stores patient medical records on a cloud server after converting them into an unreadable form. Which security objective is achieved?",
+      "options": [
+        "Compression",
+        "Redundancy",
+        "Availability",
+        "Confidentiality"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Converting data to unreadable form protects Confidentiality.",
+      "explanation": "Confidentiality ensures that sensitive information is accessible only to authorized individuals. By converting records to an unreadable (encrypted) format, the hospital prevents unauthorized access. This directly satisfies the Confidentiality pillar of the CIA triad."
+    },
+    {
+      "id": 3,
+      "text": "An attacker sends massive traffic requests to a company website causing the server to become unavailable to users. Which attack is demonstrated?",
+      "options": [
+        "DoS attack",
+        "Spoofing",
+        "Sniffing",
+        "Phishing"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Flooding a server with traffic to make it unavailable is a DoS attack.",
+      "explanation": "A Denial of Service (DoS) attack overwhelms a target system with excessive requests, preventing legitimate users from accessing it. The attacker does not need to steal data; the goal is to disrupt service availability. This directly targets the Availability pillar of the CIA triad."
+    },
+    {
+      "id": 4,
+      "text": "A company deploys backup servers and alternative systems to ensure services continue during hardware failure. Which principle is supported?",
+      "options": [
+        "Availability",
+        "Authentication",
+        "Integrity",
+        "Hashing"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Backup systems maintain Availability during failures.",
+      "explanation": "Availability ensures that systems and data are accessible to authorized users when needed. Deploying backup servers and alternative systems means services continue even when primary hardware fails. This is a classic implementation of the Availability principle in the CIA triad."
+    },
+    {
+      "id": 5,
+      "text": "An employee accesses payroll records by using another worker's username and password without proper permission. Which concept is compromised?",
+      "options": [
+        "Availability",
+        "Compression",
+        "Fragmentation",
+        "Authorization"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Using another person's credentials to gain access violates Authorization.",
+      "explanation": "Authorization controls what resources an authenticated user is permitted to access. By using someone else's credentials to access payroll records, the employee bypasses proper access controls. This is an Authorization violation, as the person was not permitted to view those records."
+    },
+    {
+      "id": 6,
+      "text": "A bank secures ATM communication using the same secret key for both encryption and decryption processes. Which technique is applied?",
+      "options": [
+        "Symmetric encryption",
+        "Digital signing",
+        "Hashing",
+        "Asymmetric encryption"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Using the same key for both encryption and decryption is Symmetric encryption.",
+      "explanation": "Symmetric encryption uses a single shared secret key for both encrypting and decrypting data. This is efficient for secure communication between known parties like a bank and its ATM network. Common symmetric algorithms include AES and DES."
+    },
+    {
+      "id": 7,
+      "text": "A military officer rearranges the order of letters in a message without replacing the actual characters. Which cipher technique is used?",
+      "options": [
+        "RSA",
+        "Transposition cipher",
+        "Substitution cipher",
+        "AES"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Rearranging letter positions without changing them is a Transposition cipher.",
+      "explanation": "A transposition cipher changes the position of characters in a message without altering the characters themselves. Substitution ciphers, by contrast, replace characters with other characters. The technique described \u2014 reordering only \u2014 is the defining trait of a transposition cipher."
+    },
+    {
+      "id": 8,
+      "text": "A secure online platform exchanges public and private keys to establish protected communication between users. Which approach is used?",
+      "options": [
+        "Asymmetric cryptography",
+        "Compression",
+        "Symmetric cryptography",
+        "Steganography"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Using public and private key pairs is Asymmetric cryptography.",
+      "explanation": "Asymmetric cryptography uses a key pair: a public key for encryption and a private key for decryption (or vice versa for digital signatures). This eliminates the need to securely share a single secret key. Common asymmetric algorithms include RSA and ECC."
+    },
+    {
+      "id": 9,
+      "text": "An organization uses AES to protect financial transaction data from unauthorized access during communication. AES belongs to which category?",
+      "options": [
+        "Hashing algorithm",
+        "Digital certificate",
+        "Symmetric block cipher",
+        "Stream protocol"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "AES is a Symmetric block cipher.",
+      "explanation": "AES (Advanced Encryption Standard) is a widely used symmetric encryption algorithm that operates on fixed-size blocks of data. It uses the same key for both encryption and decryption. AES is the industry standard for protecting sensitive data and is used in TLS, VPNs, and file encryption."
+    },
+    {
+      "id": 10,
+      "text": "Before sending a message over the internet, a user converts readable text into an unreadable coded format. Which process is performed?",
+      "options": [
+        "Authentication",
+        "Authorization",
+        "Decryption",
+        "Encryption"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Converting readable text to unreadable form is Encryption.",
+      "explanation": "Encryption transforms plaintext (readable data) into ciphertext (unreadable data) using an algorithm and key. Only parties with the correct decryption key can reverse the process. This ensures confidentiality during data transmission over untrusted networks."
+    },
+    {
+      "id": 11,
+      "text": "A company stores user passwords in hashed form rather than plain text inside the authentication database. What is the main benefit?",
+      "options": [
+        "Improved graphics",
+        "Protection against database compromise",
+        "Reduced storage",
+        "Increased bandwidth"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Storing hashed passwords protects them if the database is breached.",
+      "explanation": "Hashing is a one-way function that converts a password into a fixed-length digest that cannot be easily reversed. Even if attackers obtain the database, they cannot directly retrieve original passwords. This significantly reduces the damage of a database breach."
+    },
+    {
+      "id": 12,
+      "text": "While visiting an e-commerce website, a user notices a padlock symbol displayed in the browser address bar. What does it indicate?",
+      "options": [
+        "The site is public",
+        "The server is offline",
+        "Secure SSL/TLS connection",
+        "The site is blocked"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "A padlock icon indicates a Secure SSL/TLS connection.",
+      "explanation": "The padlock symbol in a browser's address bar confirms that the connection between the browser and the web server is encrypted using SSL/TLS. This protects data in transit from eavesdropping and man-in-the-middle attacks. It also verifies that the site has a valid digital certificate."
+    },
+    {
+      "id": 13,
+      "text": "An organization installs fingerprint scanners for employee login to improve the security of the authentication process. Which factor is applied?",
+      "options": [
+        "Somewhere you are",
+        "Something you have",
+        "Something you know",
+        "Something you are"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Fingerprint scanning is 'Something you are' \u2014 a biometric factor.",
+      "explanation": "Authentication factors are classified into three categories: something you know (password/PIN), something you have (token/smart card), and something you are (biometrics). Fingerprints are unique biological characteristics that fall under the 'something you are' category. Biometric authentication is considered strong because it is difficult to forge or steal."
+    },
+    {
+      "id": 14,
+      "text": "A digital signature is attached to an online contract to prove the sender cannot deny signing the document later. Which service is provided?",
+      "options": [
+        "Broadcasting",
+        "Routing",
+        "Non-repudiation",
+        "Compression"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Digital signatures provide Non-repudiation by binding an action to an identity.",
+      "explanation": "Non-repudiation ensures that a party cannot deny performing an action after the fact. Digital signatures use the sender's private key to sign a document, creating cryptographic proof of their identity and intent. This prevents the signer from later claiming they did not sign the contract."
+    },
+    {
+      "id": 15,
+      "text": "A trusted Certificate Authority issues a digital certificate to a website for secure online verification. What is the purpose?",
+      "options": [
+        "Increase internet speed",
+        "Verify website identity",
+        "Manage backups",
+        "Reduce storage"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Digital certificates issued by a CA verify the identity of a website.",
+      "explanation": "A Certificate Authority (CA) is a trusted entity that issues digital certificates binding a public key to a verified identity. When users visit a website, the certificate confirms they are communicating with the legitimate server and not an imposter. This is the foundation of the Public Key Infrastructure (PKI) system."
+    },
+    {
+      "id": 16,
+      "text": "A network administrator installs a firewall at the company gateway to control incoming and outgoing network traffic. What is its primary purpose?",
+      "options": [
+        "Store passwords",
+        "Improve graphics",
+        "Increase RAM",
+        "Monitor and filter traffic"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A firewall's primary purpose is to monitor and filter network traffic.",
+      "explanation": "A firewall is a security device that inspects network packets and enforces rules about which traffic is allowed or denied. It acts as a barrier between trusted internal networks and untrusted external networks. Firewalls are a fundamental component of network security architecture."
+    },
+    {
+      "id": 17,
+      "text": "Customers receive fake emails asking them to provide banking credentials through a fraudulent website link. Which attack is illustrated?",
+      "options": [
+        "Port scanning",
+        "Flooding",
+        "Sniffing",
+        "Phishing"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Fake emails designed to steal credentials describe a Phishing attack.",
+      "explanation": "Phishing is a social engineering attack where attackers impersonate legitimate organizations via email to trick victims into revealing sensitive information such as passwords or credit card numbers. Fraudulent links direct victims to fake websites that mimic real ones. It is one of the most common and effective cyberattack techniques."
+    },
+    {
+      "id": 18,
+      "text": "An organization replaces Telnet with SSH for remote server access to improve communication security. Why is SSH preferred?",
+      "options": [
+        "SSH provides encrypted communication",
+        "SSH disables authentication",
+        "SSH is faster only",
+        "SSH reduces hardware cost"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "SSH is preferred because it encrypts all communication, unlike Telnet.",
+      "explanation": "Telnet transmits data including login credentials in plaintext, making it vulnerable to eavesdropping. SSH (Secure Shell) encrypts the entire session, protecting data in transit from interception. SSH also supports strong authentication mechanisms, making it the industry standard for secure remote administration."
+    },
+    {
+      "id": 19,
+      "text": "A company secures its wireless communication using WPA3 technology to protect data transmitted over Wi-Fi networks. What is the main objective?",
+      "options": [
+        "Increase bandwidth",
+        "Reduce power usage",
+        "Secure wireless encryption",
+        "Increase Wi-Fi range"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "WPA3 provides strong Wireless encryption to secure Wi-Fi communication.",
+      "explanation": "WPA3 (Wi-Fi Protected Access 3) is the latest wireless security protocol that provides robust encryption for data transmitted over Wi-Fi networks. It addresses vulnerabilities found in older protocols like WEP and WPA2. Its main goal is to ensure that wireless communication remains confidential and protected from unauthorized interception."
+    },
+    {
+      "id": 20,
+      "text": "A security team deploys an Intrusion Detection System within the network to monitor unusual activities and attacks. What is its primary role?",
+      "options": [
+        "Detect suspicious activities",
+        "Replace routers",
+        "Compress packets",
+        "Increase CPU speed"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "An IDS primarily detects and alerts on suspicious network activities.",
+      "explanation": "An Intrusion Detection System (IDS) monitors network traffic and system events for signs of malicious activity or policy violations. Unlike an IPS (Intrusion Prevention System), an IDS detects and alerts administrators but does not automatically block traffic. It is an essential tool for identifying attacks early in the kill chain."
+    },
+    {
+      "id": 21,
+      "text": "A cybersecurity professional evaluates a company's system vulnerabilities after obtaining official written approval from management. Which activity is performed?",
+      "options": [
+        "Cyber terrorism",
+        "Identity theft",
+        "Spoofing",
+        "Ethical hacking"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Authorized vulnerability testing is called Ethical hacking.",
+      "explanation": "Ethical hacking (also known as penetration testing) involves legally probing a system for vulnerabilities with the explicit written permission of the system owner. The goal is to identify and remediate security weaknesses before malicious actors exploit them. Authorization distinguishes ethical hacking from criminal activity."
+    },
+    {
+      "id": 22,
+      "text": "An employee illegally distributes licensed software to outside competitors without authorization from the software owner. Which issue is involved?",
+      "options": [
+        "Routing failure",
+        "Encryption process",
+        "Bandwidth limitation",
+        "Intellectual property violation"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Distributing licensed software without authorization is an Intellectual property violation.",
+      "explanation": "Intellectual property (IP) rights protect the legal ownership and use of creative works including software. Distributing licensed software without authorization violates copyright law and the terms of the software license agreement. This constitutes piracy and can result in civil and criminal penalties."
+    },
+    {
+      "id": 23,
+      "text": "An organization arranges regular awareness sessions regarding phishing emails and social engineering attacks for employees. What is the purpose?",
+      "options": [
+        "Improve employee cyber awareness",
+        "Replace antivirus software",
+        "Increase storage capacity",
+        "Reduce hardware costs"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Security awareness sessions aim to Improve employee cyber awareness.",
+      "explanation": "Security awareness training educates employees about current cyber threats and safe practices, reducing the risk of human error leading to breaches. Phishing and social engineering attacks specifically exploit human vulnerabilities rather than technical ones. Regular training is considered one of the most cost-effective security controls."
+    },
+    {
+      "id": 24,
+      "text": "Before launching a new application, a company conducts a security risk assessment to evaluate possible threats and vulnerabilities. What is the main objective?",
+      "options": [
+        "Reduce internet speed",
+        "Improve printing",
+        "Increase graphics quality",
+        "Identify potential security threats"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "A risk assessment's main objective is to Identify potential security threats.",
+      "explanation": "A security risk assessment systematically evaluates an organization's systems to identify threats, vulnerabilities, and the potential impact of security incidents. Conducting one before launch ensures risks are addressed proactively rather than reactively. It is a foundational practice in risk management frameworks."
+    },
+    {
+      "id": 25,
+      "text": "A worker intentionally leaks confidential customer information to external parties outside the organization. Which threat category applies?",
+      "options": [
+        "Routing attack",
+        "Natural disaster",
+        "Insider threat",
+        "Power failure"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "A malicious employee leaking data is an Insider threat.",
+      "explanation": "An insider threat involves a current or former employee, contractor, or business partner who misuses their authorized access to harm the organization. Intentional data leaks are a particularly dangerous form because insiders already have legitimate access. Organizations mitigate this with access controls, monitoring, and least privilege principles."
+    },
+    {
+      "id": 26,
+      "text": "A company distributes a software update through its website. How can users verify that the downloaded file has not been modified during transmission?",
+      "options": [
+        "Compare the hash value",
+        "Compare the file icon",
+        "Compare the file name",
+        "Compare the folder name"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Hash values are used to verify file integrity after download.",
+      "explanation": "A hash function generates a unique fixed-length digest of a file's contents. If the file is modified even slightly during transmission, the hash value will change completely. Users compare the downloaded file's hash against the publisher's original hash to confirm integrity."
+    },
+    {
+      "id": 27,
+      "text": "An online banking system wants to protect customer passwords in case its database is compromised. What is the best approach?",
+      "options": [
+        "Store passwords in emails",
+        "Store passwords as hash values",
+        "Store passwords as images",
+        "Store passwords in plain text"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Storing passwords as hash values protects them if the database is stolen.",
+      "explanation": "Hashing passwords means only a digest is stored, not the original password. Even if attackers access the database, they cannot easily reverse a hash to recover the original password. This is a fundamental best practice in secure authentication system design."
+    },
+    {
+      "id": 28,
+      "text": "A user changes one character in a password before hashing it. What is expected to happen to the resulting hash value?",
+      "options": [
+        "Hash changes significantly",
+        "Password becomes public",
+        "Hash remains unchanged",
+        "Password becomes shorter"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Even a tiny input change causes a dramatically different hash \u2014 the avalanche effect.",
+      "explanation": "Hash functions exhibit the avalanche effect, where a small change in input produces a completely different output. Changing even one character results in a hash that is entirely different from the original. This property makes hashing secure for integrity verification and password storage."
+    },
+    {
+      "id": 29,
+      "text": "An e-commerce company is selecting a secure hash algorithm. Which characteristic is most important?",
+      "options": [
+        "The algorithm should be reversible",
+        "Different inputs should not generate the same hash",
+        "Different inputs should generate the same hash",
+        "The hash length should change every time"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Collision resistance \u2014 different inputs producing different hashes \u2014 is essential.",
+      "explanation": "Collision resistance means it should be computationally infeasible for two different inputs to produce the same hash output. If collisions are easy to find, attackers could substitute malicious data with the same hash as legitimate data. This is a core security property required of any cryptographic hash function."
+    },
+    {
+      "id": 30,
+      "text": "A company's employee database stores hashed passwords. Why is hashing useful in this situation?",
+      "options": [
+        "Passwords can be easily recovered",
+        "Hashes can be reversed quickly",
+        "Recovering original passwords is computationally difficult",
+        "Passwords become publicly accessible"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Hashing makes recovering original passwords computationally infeasible.",
+      "explanation": "Cryptographic hash functions are one-way: they are easy to compute forward but extremely difficult to reverse. Even if an attacker obtains a database of hashed passwords, reversing them to plaintext requires enormous computational effort. This significantly limits the damage from database breaches."
+    },
+    {
+      "id": 31,
+      "text": "A student uploads an assignment to a Learning Management System (LMS). How can the university verify that the file has not been altered?",
+      "options": [
+        "Compare browser settings",
+        "Compare hash values",
+        "Compare upload speed",
+        "Compare file names"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Comparing hash values before and after confirms file integrity.",
+      "explanation": "Hash values serve as a digital fingerprint of a file. The university can compute the hash of the uploaded file and compare it to a stored reference hash to detect any changes. Even minor modifications to the file would produce a completely different hash."
+    },
+    {
+      "id": 32,
+      "text": "A user enters the same password twice into a system. What will happen if the same hash algorithm is applied each time?",
+      "options": [
+        "Different outputs will be generated",
+        "No output will be generated",
+        "The same output will be generated",
+        "Random outputs will be generated"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Hash functions are deterministic \u2014 the same input always produces the same output.",
+      "explanation": "Determinism is a fundamental property of hash functions: identical inputs always produce identical outputs. This is why hashing is useful for password verification \u2014 the system hashes the entered password and compares it to the stored hash. (Note: salted hashing adds a random value to prevent rainbow table attacks.)"
+    },
+    {
+      "id": 33,
+      "text": "A cloud storage provider wants to detect unauthorized modifications to stored files. Which method should be used?",
+      "options": [
+        "Compare file colors",
+        "Compare file locations",
+        "Compare generated hashes",
+        "Compare usernames"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Comparing generated hashes detects any unauthorized file modifications.",
+      "explanation": "Hash-based integrity checking involves storing a hash of each file at the time of upload and recomputing the hash when the file is retrieved. If the values differ, the file has been altered. This technique is widely used in digital forensics, secure storage, and software distribution."
+    },
+    {
+      "id": 34,
+      "text": "A bank receives a transaction request from a remote server. What should the bank verify before processing the request?",
+      "options": [
+        "Internet speed",
+        "Storage space",
+        "Sender authenticity",
+        "Monitor size"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Verifying sender authenticity ensures the request is from a legitimate source.",
+      "explanation": "Before processing financial transactions, a bank must authenticate the source to prevent fraud and unauthorized transactions. Message Authentication Codes (MACs) or digital signatures are commonly used for this purpose. Without authentication, attackers could forge transaction requests."
+    },
+    {
+      "id": 35,
+      "text": "An online payment system receives a transaction message. How can it determine whether the message was altered during transmission?",
+      "options": [
+        "Compare usernames",
+        "Compare folder names",
+        "Compare MAC values",
+        "Compare IP addresses"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Comparing MAC values reveals whether a message was tampered with.",
+      "explanation": "A Message Authentication Code (MAC) is a cryptographic checksum computed using a secret key and the message contents. The receiver recomputes the MAC and compares it to the received value; any mismatch indicates tampering. MACs provide both integrity and authentication."
+    },
+    {
+      "id": 36,
+      "text": "An online shopping website wants to prevent attackers from reusing old transaction messages. What should it use?",
+      "options": [
+        "Compression",
+        "Backups",
+        "File sharing",
+        "Timestamps"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Timestamps ensure message freshness and prevent replay attacks.",
+      "explanation": "Replay attacks involve capturing and retransmitting a valid message to repeat an action (such as a payment). Including timestamps in messages ensures that old messages are rejected if they arrive after a defined time window. This is a standard countermeasure against replay attacks in secure communication protocols."
+    },
+    {
+      "id": 37,
+      "text": "A banking application uses a Message Authentication Code (MAC) to secure transactions. What is required to generate the MAC?",
+      "options": [
+        "Public key only",
+        "Message and secret key",
+        "Message only",
+        "Username only"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "A MAC requires both the message and a shared secret key.",
+      "explanation": "A MAC is computed by combining the message content with a secret key through a cryptographic function. Both the sender and receiver must possess the same secret key to generate and verify the MAC. This shared key requirement provides both authentication and integrity."
+    },
+    {
+      "id": 38,
+      "text": "A financial institution receives a transaction along with its MAC. When should the transaction be accepted?",
+      "options": [
+        "When the MAC matches",
+        "When the sender is known",
+        "Regardless of the MAC",
+        "When the message is long"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "A transaction should only be accepted when its MAC matches the recomputed value.",
+      "explanation": "The receiver recomputes the MAC using the received message and the shared secret key. Only when the computed MAC matches the received MAC can the institution be confident the message is authentic and unaltered. Accepting transactions without MAC verification would allow fraudulent or tampered requests to succeed."
+    },
+    {
+      "id": 39,
+      "text": "A mobile banking application needs to authenticate API requests sent to its server. Which solution is most appropriate?",
+      "options": [
+        "Compression",
+        "HMAC-SHA256",
+        "File transfer",
+        "Data backup"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "HMAC-SHA256 is the standard for authenticating API requests securely.",
+      "explanation": "HMAC (Hash-based Message Authentication Code) using SHA-256 combines a cryptographic hash function with a secret key to produce a secure authentication code. It is widely used to authenticate API requests in mobile banking and web services. HMAC-SHA256 provides strong integrity and authentication guarantees."
+    },
+    {
+      "id": 40,
+      "text": "A company signs an electronic contract before sending it to a client. Which key is used to create the digital signature?",
+      "options": [
+        "Shared secret key",
+        "Receiver's public key",
+        "Receiver's private key",
+        "Sender's private key"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Digital signatures are created using the sender's private key.",
+      "explanation": "In asymmetric cryptography, the sender uses their private key to create a digital signature. The receiver (or anyone) can then verify the signature using the sender's public key. The private key must be kept secret to ensure only the legitimate owner can create valid signatures."
+    },
+    {
+      "id": 41,
+      "text": "A citizen receives a digital certificate from a government department. Which key should be used to verify the digital signature?",
+      "options": [
+        "Internet speed",
+        "Sender's password",
+        "Sender's public key",
+        "File size"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Digital signatures are verified using the sender's public key.",
+      "explanation": "The verification process uses the sender's public key to decrypt the signature and compare it to a fresh hash of the received document. If they match, the signature is valid. The public key is widely distributed and available to anyone who needs to verify signatures."
+    },
+    {
+      "id": 42,
+      "text": "A company manager approves an online purchase order using a digital signature. What security service does this primarily provide?",
+      "options": [
+        "Non-repudiation",
+        "Integrity",
+        "Confidentiality",
+        "Compression"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Digital signatures on approved documents primarily provide Non-repudiation.",
+      "explanation": "Non-repudiation ensures that the signer cannot later deny having signed a document. Because the signature is created with the manager's unique private key, it is cryptographically bound to their identity. This is essential for legally binding electronic documents and audit trails."
+    },
+    {
+      "id": 43,
+      "text": "Two organizations exchange electronic agreements through a secure platform. Why are digital signatures used?",
+      "options": [
+        "Backup and recovery",
+        "Compression and storage",
+        "Printing and scanning",
+        "Authentication and integrity"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Digital signatures provide Authentication and integrity for electronic agreements.",
+      "explanation": "Digital signatures verify the identity of the signer (authentication) and ensure the document has not been altered since signing (integrity). Together, these properties make electronic agreements legally enforceable and trustworthy. They also provide non-repudiation, preventing parties from denying their agreement."
+    },
+    {
+      "id": 44,
+      "text": "Before digitally signing a legal document, what is typically performed first?",
+      "options": [
+        "Delete the document",
+        "Generate a hash of the document",
+        "Compress the document",
+        "Rename the document"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "A hash of the document is generated before applying the digital signature.",
+      "explanation": "The digital signing process first generates a hash (digest) of the document to create a compact, fixed-length representation. The hash is then encrypted with the sender's private key to produce the digital signature. This approach is efficient and ensures any modification to the document will invalidate the signature."
+    },
+    {
+      "id": 45,
+      "text": "A hospital allows doctors to access patient records but prevents receptionists from viewing medical histories. Which security principle is being implemented?",
+      "options": [
+        "Least Privilege",
+        "Data Compression",
+        "Backup Management",
+        "Network Routing"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Restricting access to what is necessary for each role is the Least Privilege principle.",
+      "explanation": "The principle of least privilege grants users only the minimum access rights required to perform their job functions. By allowing doctors but not receptionists to view medical histories, the hospital limits potential damage from accidental or intentional misuse. This reduces the attack surface and protects sensitive data."
+    },
+    {
+      "id": 46,
+      "text": "An employee enters a password and then confirms identity through a mobile authentication app. What security mechanism is being used?",
+      "options": [
+        "Multi-Factor Authentication",
+        "Single Sign-On",
+        "Encryption",
+        "Authorization"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Using two verification methods together is Multi-Factor Authentication.",
+      "explanation": "Multi-Factor Authentication (MFA) requires users to verify their identity using two or more factors from different categories: something you know, something you have, or something you are. A password combined with a mobile authentication app combines knowledge and possession factors. MFA significantly reduces the risk of unauthorized access even if a password is compromised."
+    },
+    {
+      "id": 47,
+      "text": "A company assigns access rights based on job responsibilities such as Manager, HR Officer, and Accountant. Which access control model is being used?",
+      "options": [
+        "Mandatory Encryption",
+        "Open Access Control",
+        "Public Key Infrastructure",
+        "Role-Based Access Control"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Assigning permissions based on job roles is Role-Based Access Control (RBAC).",
+      "explanation": "Role-Based Access Control (RBAC) assigns permissions to roles rather than individuals. Users are then assigned to roles appropriate for their job function. This simplifies access management in organizations and ensures consistent application of security policies."
+    },
+    {
+      "id": 48,
+      "text": "A university student attempts to access faculty payroll records but is denied access. What security process prevented the access?",
+      "options": [
+        "Data Recovery",
+        "Authentication",
+        "Compression",
+        "Authorization"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Denying access to resources a user is not permitted to see is Authorization.",
+      "explanation": "Authorization determines what an authenticated user is allowed to do or access. Even though the student successfully authenticated (logged in), the system checked their permissions and denied access to payroll records they are not authorized to view. Authentication confirms identity; authorization controls access."
+    },
+    {
+      "id": 49,
+      "text": "A government agency classifies documents as Confidential, Secret, and Top Secret. Which access control model is most suitable?",
+      "options": [
+        "Open Access",
+        "Mandatory Access Control",
+        "Role-Based Access Control",
+        "Discretionary Access Control"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Security classifications enforced by the system describe Mandatory Access Control (MAC).",
+      "explanation": "Mandatory Access Control (MAC) enforces access decisions based on security labels assigned to both subjects and objects. Users cannot change these labels or share access arbitrarily \u2014 the system enforces the policy. This rigid model is ideal for government and military environments where classification levels are critical."
+    },
+    {
+      "id": 50,
+      "text": "An employee can decide which colleagues may access files stored in their department folder. Which access control model is being applied?",
+      "options": [
+        "Discretionary Access Control",
+        "Role-Based Access Control",
+        "Rule-Based Access Control",
+        "Mandatory Access Control"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Allowing owners to control who accesses their files is Discretionary Access Control (DAC).",
+      "explanation": "Discretionary Access Control (DAC) allows the resource owner to control who has access to their files and data. The employee (data owner) exercises discretion in granting or revoking access to colleagues. This is the most flexible but also potentially the least secure model, as it depends on individual decisions."
+    },
+    {
+      "id": 51,
+      "text": "Employees working remotely connect securely to company resources through an encrypted communication channel. Which technology is being used?",
+      "options": [
+        "VPN",
+        "Telnet",
+        "HTTP",
+        "FTP"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "An encrypted tunnel for remote access to corporate resources is a VPN.",
+      "explanation": "A Virtual Private Network (VPN) creates an encrypted tunnel over a public network (like the Internet), allowing remote employees to securely access company resources as if they were on the internal network. It protects data in transit from eavesdropping and unauthorized interception. VPNs are essential for secure remote work."
+    },
+    {
+      "id": 52,
+      "text": "A customer sees a padlock icon in a web browser while making an online purchase. Which protocol is protecting the communication?",
+      "options": [
+        "TLS",
+        "FTP",
+        "DHCP",
+        "SMTP"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "The padlock in a browser indicates TLS is protecting the connection.",
+      "explanation": "TLS (Transport Layer Security) is the protocol that encrypts communications between a web browser and server, indicated by the padlock icon and HTTPS in the URL. It provides confidentiality, integrity, and authentication for web transactions. HTTPS is HTTP running over TLS."
+    },
+    {
+      "id": 53,
+      "text": "A company monitors network traffic and receives alerts when suspicious activities are detected. Which system is most likely being used?",
+      "options": [
+        "Intrusion Detection System",
+        "Backup System",
+        "Payroll System",
+        "Database Management System"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "A system that monitors traffic and sends alerts about suspicious activity is an IDS.",
+      "explanation": "An Intrusion Detection System (IDS) continuously monitors network traffic and system activity for signs of malicious behavior or policy violations. When it detects anomalies, it generates alerts for security administrators. An IDS detects and reports; an IPS (Intrusion Prevention System) also blocks threats automatically."
+    },
+    {
+      "id": 54,
+      "text": "An attacker floods a company's website with massive amounts of traffic from multiple systems, causing it to become unavailable. What type of attack is occurring?",
+      "options": [
+        "Phishing",
+        "DDoS Attack",
+        "Spyware Attack",
+        "Trojan Attack"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Flooding a target with traffic from multiple compromised systems is a DDoS attack.",
+      "explanation": "A Distributed Denial of Service (DDoS) attack uses many compromised computers (a botnet) to simultaneously send excessive traffic to a target, overwhelming its resources. Unlike a simple DoS attack (from one source), DDoS is harder to block because traffic comes from many IP addresses. The goal is to make the service unavailable to legitimate users."
+    },
+    {
+      "id": 55,
+      "text": "A malicious program encrypts company files and demands payment to restore access. What type of malware is involved?",
+      "options": [
+        "Ransomware",
+        "Spyware",
+        "Adware",
+        "Virus"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Malware that encrypts files and demands payment is Ransomware.",
+      "explanation": "Ransomware is a type of malware that encrypts the victim's files or locks their system, then demands a ransom payment (usually in cryptocurrency) for the decryption key. It has become one of the most costly forms of cybercrime. Organizations defend against ransomware with regular backups, patching, and email security."
+    },
+    {
+      "id": 56,
+      "text": "A malicious application secretly records a user's keystrokes to steal passwords and banking information. What type of malware is this?",
+      "options": [
+        "Adware",
+        "Firewall",
+        "Spyware",
+        "Worm"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Software that secretly records keystrokes is Spyware (specifically a keylogger).",
+      "explanation": "Spyware secretly monitors user activity, including keystrokes, screen captures, and browsing habits, without the user's knowledge or consent. A keylogger is a specific form of spyware that records every keystroke, allowing attackers to capture passwords and sensitive data. It typically runs silently in the background."
+    },
+    {
+      "id": 57,
+      "text": "An employee installs a free game that appears harmless but secretly creates a backdoor into the system. What type of malware is this?",
+      "options": [
+        "Trojan Horse",
+        "Antivirus",
+        "Patch",
+        "VPN"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Malware disguised as legitimate software that creates backdoors is a Trojan Horse.",
+      "explanation": "A Trojan Horse (or simply Trojan) disguises itself as legitimate or desirable software to trick users into installing it. Unlike viruses and worms, Trojans do not self-replicate but instead create backdoors, steal data, or perform other malicious actions. The name comes from the ancient Greek story of the wooden horse."
+    },
+    {
+      "id": 58,
+      "text": "A malicious program spreads automatically across a network without requiring user interaction. What type of malware is it?",
+      "options": [
+        "Adware",
+        "Worm",
+        "Rootkit",
+        "Virus"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Self-propagating malware that spreads without user interaction is a Worm.",
+      "explanation": "A computer worm is a standalone malware program that replicates itself and spreads across networks without requiring user action or a host file. Unlike viruses, worms do not need to attach to existing files. Worms can cause significant damage by consuming bandwidth, installing backdoors, or delivering payloads."
+    },
+    {
+      "id": 59,
+      "text": "Employees start seeing excessive unwanted advertisements after installing a free utility application. Which malware is most likely responsible?",
+      "options": [
+        "Adware",
+        "IDS",
+        "Firewall",
+        "Ransomware"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Software that displays unwanted advertisements is Adware.",
+      "explanation": "Adware is malware designed to display unwanted advertisements, often bundled with free software as a hidden monetization strategy. While often less dangerous than ransomware or spyware, adware can degrade system performance and user experience. Some adware also tracks user behavior to deliver targeted ads."
+    },
+    {
+      "id": 60,
+      "text": "A company regularly updates operating systems and applications to fix known security vulnerabilities. What security practice is being followed?",
+      "options": [
+        "Packet Routing",
+        "Patch Management",
+        "Data Mining",
+        "Network Segmentation"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Regularly applying updates to fix vulnerabilities is Patch Management.",
+      "explanation": "Patch management is the process of identifying, testing, and applying software updates (patches) to fix security vulnerabilities and bugs. Unpatched systems are a leading cause of successful cyberattacks. A disciplined patch management program significantly reduces an organization's attack surface."
+    },
+    {
+      "id": 61,
+      "text": "A security team immediately disconnects an infected computer from the network to stop malware from spreading. What incident response action is being taken?",
+      "options": [
+        "Detection",
+        "Containment",
+        "Authentication",
+        "Recovery"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Isolating an infected system to stop malware spread is the Containment phase.",
+      "explanation": "The incident response lifecycle includes preparation, detection, containment, eradication, recovery, and lessons learned. Containment involves limiting the damage of an ongoing incident, such as disconnecting an infected device from the network to prevent malware from spreading further. This is a critical early step in incident response."
+    },
+    {
+      "id": 62,
+      "text": "An employee's account is automatically disabled immediately after resignation. What security practice is being implemented?",
+      "options": [
+        "Network Segmentation",
+        "Packet Filtering",
+        "Account Deprovisioning",
+        "Data Encryption"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Immediately disabling accounts upon departure is Account Deprovisioning.",
+      "explanation": "Account deprovisioning is the process of removing or disabling a user's access rights when they leave an organization. Prompt deprovisioning is critical to prevent former employees from accessing systems after their departure. Delayed deprovisioning is a common security gap that can lead to unauthorized access or insider threats."
+    },
+    {
+      "id": 63,
+      "text": "An employee discovers a security vulnerability in the company website and reports it to management instead of exploiting it. Which ethical principle is demonstrated?",
+      "options": [
+        "Resource Sharing",
+        "Data Mining",
+        "Professional Responsibility",
+        "Network Routing"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Reporting vulnerabilities instead of exploiting them demonstrates Professional Responsibility.",
+      "explanation": "Professional responsibility in cybersecurity means acting ethically and in the best interest of the organization and society, even when exploitation would be technically possible. Reporting vulnerabilities rather than exploiting them protects the organization and its customers. This behavior is a cornerstone of cybersecurity ethics and professional codes of conduct."
+    },
+    {
+      "id": 64,
+      "text": "A staff member accesses confidential employee records without authorization simply out of curiosity. Which ethical principle has been violated?",
+      "options": [
+        "Availability",
+        "Privacy",
+        "Compression",
+        "Scalability"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Accessing others' private records without authorization violates Privacy.",
+      "explanation": "Privacy is the right of individuals to control access to their personal information. Accessing confidential records without a legitimate business need violates this principle even if no harm was intended. Organizations enforce privacy through access controls, acceptable use policies, and disciplinary measures."
+    },
+    {
+      "id": 65,
+      "text": "An organization requires all employees to sign a document describing acceptable computer and Internet usage. What is this document called?",
+      "options": [
+        "Incident Report",
+        "Disaster Recovery Plan",
+        "Acceptable Use Policy",
+        "Access Log"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "A document defining acceptable computer usage is an Acceptable Use Policy (AUP).",
+      "explanation": "An Acceptable Use Policy (AUP) outlines the rules and guidelines employees must follow when using organizational technology resources. It defines permitted and prohibited activities for computers, networks, and the internet. Employees signing the AUP acknowledges their understanding and agreement to comply with these rules."
+    },
+    {
+      "id": 66,
+      "text": "An employee shares their system password with a coworker to save time. Which policy is being violated?",
+      "options": [
+        "Maintenance Policy",
+        "Backup Policy",
+        "Audit Policy",
+        "Password Policy"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Sharing passwords violates the Password Policy.",
+      "explanation": "Password policies typically prohibit sharing passwords with others, including coworkers. Sharing passwords undermines individual accountability, making it impossible to audit who accessed what resources. Each user should have unique credentials to maintain a clear audit trail and protect account security."
+    },
+    {
+      "id": 67,
+      "text": "A software developer secretly collects customer information without their consent. Which ethical issue is involved?",
+      "options": [
+        "Confidentiality Violation",
+        "Accountability",
+        "Transparency",
+        "Compliance"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Collecting personal data without consent is a Confidentiality Violation.",
+      "explanation": "Confidentiality in ethics means respecting individuals' private information and not disclosing or using it without consent. Secretly collecting customer data violates both ethical principles and data protection regulations such as GDPR. Users have the right to know what data is collected about them and how it is used."
+    },
+    {
+      "id": 68,
+      "text": "A security analyst immediately reports a data breach after discovering it. Which ethical behavior is demonstrated?",
+      "options": [
+        "Accountability",
+        "Avoidance",
+        "Exploitation",
+        "Negligence"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Promptly reporting a discovered breach demonstrates Accountability.",
+      "explanation": "Accountability means taking responsibility for one's actions and obligations. Immediately reporting a data breach demonstrates ethical professionalism and protects the organization and affected individuals. Delayed reporting can worsen damage and may violate legal notification requirements under data protection laws."
+    },
+    {
+      "id": 69,
+      "text": "An employee copies proprietary software and sells it to competitors. Which ethical principle is violated?",
+      "options": [
+        "Integrity",
+        "Accessibility",
+        "Intellectual Property Rights",
+        "Availability"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Copying and selling proprietary software violates Intellectual Property Rights.",
+      "explanation": "Intellectual property rights protect the legal ownership of creations including software, inventions, and creative works. Copying and selling proprietary software without authorization constitutes software piracy, which is both unethical and illegal. Such actions harm the software owner financially and damage competitive fairness."
+    },
+    {
+      "id": 70,
+      "text": "An accountant intentionally changes financial records to hide mistakes. Which ethical principle is violated?",
+      "options": [
+        "Scalability",
+        "Availability",
+        "Integrity",
+        "Redundancy"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Intentionally altering records to deceive violates Integrity.",
+      "explanation": "Integrity as an ethical principle requires honesty and accuracy in information handling. Intentionally modifying financial records to conceal errors is both an ethical violation and potentially fraud. This undermines trust in financial systems and violates professional accounting standards."
+    },
+    {
+      "id": 71,
+      "text": "A company requires employees to report suspected security incidents immediately. Why is this important?",
+      "options": [
+        "Larger storage capacity",
+        "Reduced printing costs",
+        "Faster incident response",
+        "Better graphics performance"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Immediate reporting enables Faster incident response to minimize damage.",
+      "explanation": "Prompt reporting of security incidents is critical because the faster a breach is identified, the faster containment and remediation can begin. Delayed reporting allows attackers more time to exfiltrate data, spread malware, or cause further damage. Most incident response frameworks emphasize early detection and reporting as key success factors."
+    },
+    {
+      "id": 72,
+      "text": "An attacker enters harmful commands into a website login form attempting to manipulate the backend database system. Which attack is this?",
+      "options": [
+        "Dictionary attack",
+        "Flooding",
+        "SQL injection",
+        "Spoofing"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Injecting malicious commands into input fields to manipulate a database is SQL injection.",
+      "explanation": "SQL injection is an attack where malicious SQL code is inserted into input fields to manipulate the backend database. Attackers can use it to bypass authentication, retrieve sensitive data, or delete records. It is consistently ranked among the top web application vulnerabilities."
+    },
+    {
+      "id": 73,
+      "text": "A company separates internal departments into different protected network zones to reduce unauthorized communication between sensitive systems. What is this technique?",
+      "options": [
+        "Broadcasting",
+        "Multiplexing",
+        "Network segmentation",
+        "Compression"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Dividing a network into separate zones to limit access is Network segmentation.",
+      "explanation": "Network segmentation divides a computer network into smaller subnetworks (segments) to improve security and performance. By isolating segments, a breach in one zone is less likely to spread to others. It is a fundamental security architecture principle used in zero-trust and defense-in-depth strategies."
+    },
+    {
+      "id": 74,
+      "text": "A bank enables multi-factor authentication for online banking customers, requiring passwords and additional verification methods. What does this primarily provide?",
+      "options": [
+        "Increases monitor resolution",
+        "Reduces hardware cost",
+        "Disables encryption",
+        "Adds multiple layers of identity verification"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "MFA adds multiple independent layers to the identity verification process.",
+      "explanation": "Multi-factor authentication requires users to prove their identity through two or more independent factors, dramatically reducing the risk of unauthorized access. Even if a password is stolen, an attacker still needs the second factor to gain access. MFA is one of the most effective controls against account compromise."
+    },
+    {
+      "id": 75,
+      "text": "An attacker secretly monitors data packets traveling across a computer network, potentially capturing usernames and passwords. Which attack is this?",
+      "options": [
+        "Flooding",
+        "Sniffing",
+        "Phishing",
+        "Smurf attack"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Secretly capturing network packets to steal credentials is called Sniffing.",
+      "explanation": "Network sniffing (packet sniffing) involves intercepting and capturing data packets as they travel across a network. Attackers use specialized tools (sniffers) to read unencrypted data including login credentials and personal information. Encryption protocols like TLS mitigate the risk of sniffing attacks."
+    },
+    {
+      "id": 76,
+      "text": "A hacker intercepts communication between two users and secretly alters messages while pretending to be each party. Which attack is this?",
+      "options": [
+        "Port scanning",
+        "Compression attack",
+        "Dictionary attack",
+        "Man-in-the-middle attack"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Secretly intercepting and altering communications between two parties is a Man-in-the-middle attack.",
+      "explanation": "In a man-in-the-middle (MITM) attack, the attacker secretly positions themselves between two communicating parties, intercepting and potentially modifying messages without either party's knowledge. This can compromise confidentiality, integrity, and authentication. HTTPS and certificate pinning help prevent MITM attacks."
+    },
+    {
+      "id": 77,
+      "text": "A hacker attempts to guess passwords by trying commonly used words from a predefined list. Which attack is this?",
+      "options": [
+        "SQL injection",
+        "Spoofing",
+        "Flooding",
+        "Dictionary attack"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Using a list of common words to guess passwords is a Dictionary attack.",
+      "explanation": "A dictionary attack is a type of brute force attack that uses a predefined list of common words, phrases, and passwords to guess credentials. Unlike random brute force, dictionary attacks are faster because they target predictable password choices. Strong, unique passwords and account lockout policies mitigate this risk."
+    },
+    {
+      "id": 78,
+      "text": "A hacker attempts to overwhelm a mail server with thousands of spam messages, making legitimate communication unavailable. Which attack is this?",
+      "options": [
+        "Compression attack",
+        "Routing attack",
+        "Multiplexing attack",
+        "Email flooding attack"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "Overwhelming a mail server with spam to disrupt service is Email flooding.",
+      "explanation": "Email flooding is a type of denial-of-service attack targeting mail servers by sending massive volumes of email messages. This exhausts server resources and prevents legitimate emails from being processed. Email filtering, rate limiting, and spam detection systems are common defenses."
+    },
+    {
+      "id": 79,
+      "text": "A hacker secretly redirects users from a legitimate website to a fake one, causing victims to unknowingly provide sensitive information. Which attack is this?",
+      "options": [
+        "Pharming attack",
+        "Flooding attack",
+        "Sniffing attack",
+        "Compression attack"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Redirecting users from legitimate sites to fraudulent ones is a Pharming attack.",
+      "explanation": "Pharming attacks redirect users from legitimate websites to fraudulent ones by corrupting DNS settings or exploiting browser vulnerabilities. Unlike phishing (which relies on deceptive links), pharming can affect users who type the correct URL. DNSSEC and vigilant monitoring of DNS records help prevent pharming."
+    },
+    {
+      "id": 80,
+      "text": "An attacker repeadtedly tries different password combinations on an account until the correct password is found. Which attack is this?",
+      "options": [
+        "Routing attack",
+        "Brute force attack",
+        "Compression attack",
+        "Sniffing attack"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Systematically trying all possible passwords is a Brute force attack.",
+      "explanation": "A brute force attack tries every possible combination of characters until the correct password is found. Given enough time and computing power, brute force can crack any password. Defenses include account lockout policies, CAPTCHAs, rate limiting, and using long, complex passwords."
+    },
+    {
+      "id": 81,
+      "text": "An attacker scans a server to identify open ports and running services to later launch targeted attacks. Which activity is this?",
+      "options": [
+        "Sniffing",
+        "Port scanning",
+        "Flooding",
+        "Phishing"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Probing a system to discover open ports and services is Port scanning.",
+      "explanation": "Port scanning is a reconnaissance technique used to discover which ports on a target system are open and what services are running. Attackers use this information to identify potential vulnerabilities to exploit. Organizations use firewalls and intrusion detection systems to detect and block unauthorized port scans."
+    },
+    {
+      "id": 82,
+      "text": "A hacker changes the source address of network packets to hide their identity and appear as a trusted system. Which attack is this?",
+      "options": [
+        "IP spoofing",
+        "Flooding",
+        "Sniffing",
+        "Compression"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Falsifying the source IP address of packets to impersonate a trusted system is IP spoofing.",
+      "explanation": "IP spoofing involves forging the source IP address of network packets to disguise the attacker's identity or impersonate trusted systems. It is used in various attacks including DDoS amplification and session hijacking. Ingress and egress filtering at network boundaries help mitigate IP spoofing."
+    },
+    {
+      "id": 83,
+      "text": "A hacker installs software that records keyboard activity on victim computers, potentially capturing passwords and confidential messages. Which attack is this?",
+      "options": [
+        "Keylogger attack",
+        "Compression attack",
+        "Spoofing attack",
+        "Flooding attack"
+      ],
+      "correctIndex": 0,
+      "shortExplanation": "Installing software to secretly record keystrokes is a Keylogger attack.",
+      "explanation": "A keylogger is malware that secretly records every key pressed on a keyboard and sends the captured data to the attacker. This allows attackers to steal passwords, credit card numbers, and other sensitive information. Anti-malware software and on-screen keyboards help defend against keyloggers."
+    },
+    {
+      "id": 84,
+      "text": "An attacker tricks users into revealing sensitive information through phone calls, pretending to be IT staff and exploiting human trust. Which technique is used?",
+      "options": [
+        "Fragmentation attack",
+        "Routing attack",
+        "Social engineering",
+        "SQL injection"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Manipulating people through deception to obtain information is Social engineering.",
+      "explanation": "Social engineering exploits human psychology rather than technical vulnerabilities to obtain unauthorized access to information or systems. Vishing (voice phishing) specifically uses phone calls to impersonate trusted individuals. Security awareness training is the primary defense against social engineering attacks."
+    },
+    {
+      "id": 85,
+      "text": "A company uses a Virtual Private Network for employees working remotely, creating a secure encrypted tunnel over the public internet. What is the main benefit?",
+      "options": [
+        "Disable authentication",
+        "Reduce storage capacity",
+        "Increase bandwidth",
+        "Secure remote communication"
+      ],
+      "correctIndex": 3,
+      "shortExplanation": "VPNs provide Secure remote communication over public networks.",
+      "explanation": "A VPN creates an encrypted tunnel between a remote user's device and the company's internal network, ensuring that data transmitted over the public internet cannot be intercepted. It allows remote workers to securely access company resources as if they were physically on-site. VPNs are essential for secure telework and branch office connectivity."
+    },
+    {
+      "id": 86,
+      "text": "An organization uses role-based access control in its management system, granting permissions based on official job responsibilities. What does this primarily manage?",
+      "options": [
+        "Compression technique",
+        "Multiplexing method",
+        "Authorization management",
+        "Broadcasting protocol"
+      ],
+      "correctIndex": 2,
+      "shortExplanation": "Assigning permissions based on job roles is Authorization management through RBAC.",
+      "explanation": "Role-Based Access Control (RBAC) is an authorization management approach that defines permissions based on job roles within an organization. Users inherit permissions from the roles they are assigned, simplifying administration. RBAC ensures consistent policy enforcement and reduces the risk of privilege creep."
+    },
+    {
+      "id": 87,
+      "text": "A web application automatically logs out inactive users after several minutes to reduce unauthorized access from unattended systems. What is this called?",
+      "options": [
+        "Data compression",
+        "Session management security",
+        "Packet fragmentation",
+        "Network routing"
+      ],
+      "correctIndex": 1,
+      "shortExplanation": "Automatically terminating idle sessions is Session management security.",
+      "explanation": "Session management controls the lifecycle of user sessions in applications. Automatic logout after inactivity is a key session security control that prevents unauthorized access if a user leaves their device unattended. Combined with re-authentication requirements, it significantly reduces the window of opportunity for unauthorized access."
+    }
+  ]
+}
