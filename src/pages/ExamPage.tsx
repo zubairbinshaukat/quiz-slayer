@@ -1,217 +1,91 @@
-import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { ExamSubjectCard } from "../components/exam/ExamSubjectCard";
-import { useSubjectData } from "../hooks/useSubjectData";
-import { useQuiz } from "../hooks/useQuiz";
+import { useMemo } from 'react'
+import { ExamSubjectCard } from '../components/exam/ExamSubjectCard'
+import { Page, PageHeader } from '../components/layout/Page'
+import { Icon } from '../components/ui/Icon'
+import { useNav } from '../hooks/useNav'
+import { useQuiz } from '../hooks/useQuiz'
+import { useSubjectData } from '../hooks/useSubjectData'
+import { ROUTES } from '../lib/constants'
 import {
   buildExamSubjects,
   EXAM_MODE_SESSION_KEY,
+  EXAM_PASS_THRESHOLD,
   EXAM_QUESTION_COUNT,
-  selectExamQuestions,
   getExamState,
   getTotalPoolSize,
+  selectExamQuestions,
   type QuizDataMap,
-} from "../lib/examState";
-import type { ExamSubjectConfig, Subject } from "../types";
-
-function ClipboardCheckIcon() {
-  return (
-    <svg
-      className="w-10 h-10"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-      <rect x="9" y="3" width="6" height="4" rx="1" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  );
-}
-
-function InfoPills() {
-  const pills = [
-    {
-      label: "Adaptive Retesting",
-      icon: (
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="23 4 23 10 17 10" />
-          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-        </svg>
-      ),
-    },
-    {
-      label: "Tracks Progress",
-      icon: (
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-        </svg>
-      ),
-    },
-    {
-      label: `${EXAM_QUESTION_COUNT} MCQs per Exam`,
-      icon: (
-        <svg
-          className="w-3 h-3"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4" />
-        </svg>
-      ),
-    },
-  ];
-
-  return (
-    <div className="flex flex-wrap justify-center gap-2 mt-5">
-      {pills.map((p) => (
-        <span
-          key={p.label}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-surface-secondary text-content-secondary border border-themed-border"
-        >
-          {p.icon}
-          {p.label}
-        </span>
-      ))}
-    </div>
-  );
-}
+} from '../lib/examState'
+import { usePageMeta } from '../lib/seo'
+import type { ExamSubjectConfig, Subject } from '../types'
 
 export function ExamPage() {
-  const { subjects, quizzes } = useSubjectData();
-  const { startQuiz } = useQuiz();
-  const navigate = useNavigate();
-  const examSubjects = useMemo(() => buildExamSubjects(subjects), [subjects]);
+  usePageMeta({
+    title: 'Mock exams',
+    description: `Adaptive mock exams: up to ${EXAM_QUESTION_COUNT} MCQs per subject, wrong answers repeat until mastered.`,
+    path: ROUTES.EXAM,
+  })
+  const { subjects, quizzes } = useSubjectData()
+  const { startQuiz } = useQuiz()
+  const nav = useNav()
+  const examSubjects = useMemo(() => buildExamSubjects(subjects), [subjects])
 
   function getSubjectData(slug: string): Subject | null {
-    return subjects.find((s) => s.slug === slug) ?? null;
+    return subjects.find((s) => s.slug === slug) ?? null
   }
 
   function getQuizDataMap(config: ExamSubjectConfig): QuizDataMap {
     return config.quizSlugs.reduce<QuizDataMap>((acc, slug) => {
-      acc[slug] = quizzes.find((q) => q.slug === slug) ?? null;
-      return acc;
-    }, {});
+      acc[slug] = quizzes.find((q) => q.slug === slug) ?? null
+      return acc
+    }, {})
   }
 
   function handleStartExam(config: ExamSubjectConfig) {
-    const subjectData = getSubjectData(config.slug);
-    if (!subjectData) return;
-    const quizDataMap = getQuizDataMap(config);
-    const examState = getExamState(config.slug);
-    const questions = selectExamQuestions(
-      config,
-      subjectData,
-      quizDataMap,
-      examState,
-    );
-    if (questions.length === 0) return;
-    startQuiz({ subject: config.label, slug: config.slug }, questions);
-    sessionStorage.setItem(
-      EXAM_MODE_SESSION_KEY,
-      JSON.stringify({ subjectSlug: config.slug }),
-    );
-    navigate(`/quiz/${config.slug}`);
+    const subjectData = getSubjectData(config.slug)
+    if (!subjectData) return
+    const questions = selectExamQuestions(config, subjectData, getQuizDataMap(config), getExamState(config.slug))
+    if (questions.length === 0) return
+    startQuiz({ subject: config.label, slug: config.slug }, questions, 'exam')
+    sessionStorage.setItem(EXAM_MODE_SESSION_KEY, JSON.stringify({ subjectSlug: config.slug }))
+    nav(ROUTES.QUIZ_PATH(config.slug))
   }
 
   return (
-    <div className="relative max-w-4xl mx-auto px-4 sm:px-6 pb-16">
-      {/* Hero */}
-      <div className="text-center pt-10 pb-10 animate-fade-up">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-themed-accent/10 border border-themed-accent/20 text-themed-accent mb-5 animate-pop">
-          <ClipboardCheckIcon />
+    <Page>
+      <PageHeader
+        title="Mock exams"
+        subtitle={`Up to ${EXAM_QUESTION_COUNT} adaptive MCQs per subject. Wrong answers come back until you master them.`}
+      />
+
+      {examSubjects.length === 0 ? (
+        <p className="card px-4 py-10 text-center text-sm text-muted">No subjects available yet.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {examSubjects.map((config, index) => {
+            const subjectData = getSubjectData(config.slug)
+            return (
+              <ExamSubjectCard
+                key={config.slug}
+                config={config}
+                examState={getExamState(config.slug)}
+                totalPoolSize={subjectData ? getTotalPoolSize(config, subjectData, getQuizDataMap(config)) : 0}
+                onStart={handleStartExam}
+                index={index}
+              />
+            )
+          })}
         </div>
-
-        <h1 className="text-3xl sm:text-4xl font-black text-content-primary tracking-tight flex items-center justify-center">
-          Mock Exams
-        </h1>
-
-        <p className="text-sm text-content-secondary max-w-md mx-auto mt-2 leading-relaxed">
-          Simulate your exams with up to {EXAM_QUESTION_COUNT} adaptive MCQs
-          per subject — wrong answers repeat until mastered.
-        </p>
-
-        <InfoPills />
-      </div>
-
-      {/* Subject cards */}
-      {examSubjects.length === 0 && (
-        <p className="text-center text-sm text-content-secondary">
-          No subjects available yet.
-        </p>
       )}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {examSubjects.map((config, index) => {
-          const subjectData = getSubjectData(config.slug);
-          const quizDataMap = getQuizDataMap(config);
-          const examState = getExamState(config.slug);
-          const totalPoolSize = subjectData
-            ? getTotalPoolSize(config, subjectData, quizDataMap)
-            : 0;
 
-          return (
-            <ExamSubjectCard
-              key={config.slug}
-              config={config}
-              examState={examState}
-              totalPoolSize={totalPoolSize}
-              onStart={handleStartExam}
-              index={index}
-            />
-          );
-        })}
+      <div className="card mt-6 flex items-start gap-3 p-4 text-sm leading-relaxed text-muted">
+        <Icon name="info" size={18} className="mt-0.5 shrink-0 text-accent-fg" />
+        <p>
+          <span className="font-semibold text-fg">How it works — </span>
+          each session picks up to {EXAM_QUESTION_COUNT} questions. Correct answers are mastered and drop out of future
+          attempts; wrong answers are saved and reappear until you get them right. Pass mark is {EXAM_PASS_THRESHOLD}%.
+        </p>
       </div>
-
-      {/* How it works note */}
-      <div className="mt-10 flex justify-center animate-fade-in">
-        <div className="flex items-start gap-3 px-5 py-4 rounded-2xl bg-surface-secondary border border-themed-border text-xs text-content-secondary max-w-md">
-          <svg
-            className="w-4 h-4 shrink-0 mt-0.5 text-themed-accent"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="12" />
-            <line x1="12" y1="16" x2="12.01" y2="16" />
-          </svg>
-          <p className="leading-relaxed">
-            <span className="font-bold text-content-primary">
-              How it works —{" "}
-            </span>
-            Each session picks up to {EXAM_QUESTION_COUNT} questions. Correct
-            answers are permanently mastered and removed from future attempts.
-            Wrong answers are saved and will always reappear until you get them
-            right.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+    </Page>
+  )
 }

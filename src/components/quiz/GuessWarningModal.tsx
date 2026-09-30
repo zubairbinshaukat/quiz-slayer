@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
-import { cn } from '../../lib/utils'
+import { Icon } from '../ui/Icon'
+import { Icon3D } from '../ui/Icon3D'
+import { Sheet } from '../ui/Sheet'
 
 const WARNING_EN = [
   'Not from your professor — zero authenticity guarantee.',
@@ -19,29 +20,15 @@ const WARNING_UR = [
   'آگے بڑھنے کا مطلب ہے آپ خود ذمہ دار ہیں۔ گریڈ واپس نہیں ہوگی۔',
 ]
 
-function HazardStripe() {
+function WarningList({ lang, lines, rtl }: { lang: string; lines: string[]; rtl?: boolean }) {
   return (
-    <div
-      className="h-1.5 sm:h-2 w-full shrink-0"
-      style={{
-        background:
-          'repeating-linear-gradient(-45deg, #dc2626 0, #dc2626 10px, #1a1a1a 10px, #1a1a1a 20px)',
-      }}
-    />
-  )
-}
-
-function WarningBlock({ lang, lines }: { lang: string; lines: string[] }) {
-  return (
-    <div className="space-y-1.5 sm:space-y-2">
-      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500/80">{lang}</p>
-      <ul className="space-y-1 sm:space-y-1.5">
-        {lines.map((line, i) => (
-          <li key={i} className="flex gap-1.5 sm:gap-2 text-xs sm:text-sm leading-snug text-red-700 dark:text-red-300">
-            <span className="text-red-500 font-black shrink-0 mt-px">✕</span>
-            <span className={lang === 'اردو' ? 'text-right w-full' : ''} dir={lang === 'اردو' ? 'rtl' : 'ltr'}>
-              {line}
-            </span>
+    <div>
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-danger">{lang}</p>
+      <ul className="space-y-1.5" dir={rtl ? 'rtl' : 'ltr'} lang={rtl ? 'ur' : 'en'}>
+        {lines.map((line) => (
+          <li key={line} className="flex gap-2 text-sm leading-snug">
+            <Icon name="x" size={16} className="mt-0.5 shrink-0 text-danger" />
+            <span>{line}</span>
           </li>
         ))}
       </ul>
@@ -70,95 +57,42 @@ export function GuessWarningModal({ isOpen, subjectName, onClose, onContinue }: 
   }
 
   return (
-    <Modal
-      isOpen={isOpen}
+    <Sheet
+      open={isOpen}
       onClose={handleClose}
-      className="max-w-lg max-h-[calc(100dvh-1rem)] sm:max-h-[calc(100dvh-2rem)] flex flex-col overflow-hidden"
-      contentClassName="p-0 flex flex-col min-h-0 overflow-hidden"
+      title={
+        <span className="flex items-center gap-3">
+          <Icon3D name="flag" size={40} eager />
+          <span>
+            <span className="block text-[11px] font-semibold uppercase tracking-wider text-danger">Hard mode · No mercy</span>
+            You were warned.
+          </span>
+        </span>
+      }
+      description={subjectName}
+      footer={
+        <div className="flex gap-3">
+          <Button variant="secondary" className="flex-1" onClick={handleClose}>Go back</Button>
+          <Button variant="danger" className="flex-1" onClick={handleContinue} data-autofocus>
+            I accept — continue
+          </Button>
+        </div>
+      }
     >
-      <HazardStripe />
-
-      {/* Scrollable body */}
-      <div className="relative flex-1 min-h-0 overflow-y-auto overscroll-contain">
-        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 rounded-full bg-red-500/10 blur-3xl pointer-events-none" />
-
-        <div className="relative px-4 sm:px-6 pt-4 sm:pt-5 pb-3 sm:pb-4">
-          {/* Header */}
-          <div className="text-center mb-3 sm:mb-4">
-            <div
-              className="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-red-500/15 border-2 border-red-500/40 mb-2 sm:mb-3 shadow-[0_0_24px_rgba(239,68,68,0.25)]"
-            >
-              <span className="text-2xl sm:text-3xl" role="img" aria-hidden>💀</span>
-            </div>
-
-            <p className="text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.35em] text-red-600 dark:text-red-400 mb-1 animate-pulse">
-              ⚠ Warning ⚠
-            </p>
-
-            <h2 className="text-lg sm:text-xl font-black text-content-primary leading-tight">
-              You Were Warned.
-            </h2>
-            {subjectName && (
-              <p className="text-[11px] sm:text-xs text-content-secondary mt-1 font-semibold line-clamp-2">
-                {subjectName}
-              </p>
-            )}
-            <p className="text-[10px] sm:text-[11px] text-red-500/70 font-bold mt-1.5 sm:mt-2 italic">
-              Hard mode · No mercy · Your grade may not survive
-            </p>
-          </div>
-
-          {/* Warning body */}
-          <div
-            className={cn(
-              'relative rounded-xl border-2 border-red-500/50 p-3 sm:p-4 space-y-3 sm:space-y-4',
-              'bg-gradient-to-br from-red-50 via-red-50/50 to-orange-50/30',
-              'dark:from-red-950/60 dark:via-red-950/40 dark:to-orange-950/20',
-              'shadow-[inset_0_0_30px_rgba(239,68,68,0.08)]'
-            )}
-          >
-            <div className="absolute top-2 right-2 text-[8px] sm:text-[9px] font-black text-red-500/40 uppercase tracking-widest rotate-12 select-none">
-              unverified
-            </div>
-
-            <WarningBlock lang="English" lines={WARNING_EN} />
-            <div className="border-t border-red-300/40 dark:border-red-700/40" />
-            <WarningBlock lang="اردو" lines={WARNING_UR} />
-          </div>
-
-          {/* Checkbox */}
-          <label className="flex items-center gap-2.5 mt-3 sm:mt-4 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={neverShowAgain}
-              onChange={(e) => setNeverShowAgain(e.target.checked)}
-              className="w-4 h-4 rounded accent-red-600 cursor-pointer shrink-0"
-            />
-            <span className="text-xs text-content-secondary group-hover:text-content-primary transition-colors">
-              Never show this again
-            </span>
-          </label>
-        </div>
+      <div className="space-y-4 rounded-card border border-danger/25 bg-danger/5 p-4">
+        <WarningList lang="English" lines={WARNING_EN} />
+        <div className="border-t border-danger/20" />
+        <WarningList lang="اردو" lines={WARNING_UR} rtl />
       </div>
-
-      {/* Sticky footer — always visible on short screens */}
-      <div className="shrink-0 px-4 sm:px-6 pb-4 pt-2 border-t border-themed-border/60 bg-surface-card">
-        <div className="flex gap-2 sm:gap-3">
-          <Button variant="secondary" size="sm" className="flex-1 sm:text-sm" onClick={handleClose}>
-            Go Back
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            className="flex-1 font-black sm:text-sm"
-            onClick={handleContinue}
-          >
-            I Accept — Continue →
-          </Button>
-        </div>
-      </div>
-
-      <HazardStripe />
-    </Modal>
+      <label className="mt-4 flex min-h-11 cursor-pointer items-center gap-3 text-sm text-muted">
+        <input
+          type="checkbox"
+          checked={neverShowAgain}
+          onChange={(e) => setNeverShowAgain(e.target.checked)}
+          className="size-5 shrink-0 accent-[var(--color-danger)]"
+        />
+        Never show this again
+      </label>
+    </Sheet>
   )
 }

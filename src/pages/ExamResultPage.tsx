@@ -1,87 +1,69 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { useNavigate, useLocation, Link } from 'react-router-dom'
-import { ScoreSummary } from '../components/analytics/ScoreSummary'
-import { BreakdownChart } from '../components/analytics/BreakdownChart'
+import { useLocation } from 'react-router-dom'
 import { QuestionReview } from '../components/analytics/QuestionReview'
+import { ScoreHero } from '../components/analytics/ScoreHero'
+import { Page } from '../components/layout/Page'
 import { Button } from '../components/ui/Button'
-import { CountUp } from '../components/ui/CountUp'
-import { ExamConfetti } from '../components/exam/ExamConfetti'
+import { Confetti } from '../components/ui/Confetti'
+import { Icon } from '../components/ui/Icon'
+import { StatStrip } from '../components/ui/StatStrip'
+import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
 import { useSubjectData } from '../hooks/useSubjectData'
 import { readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
-import {
-  buildExamSubjects,
-  EXAM_PASS_THRESHOLD,
-  saveExamState,
-} from '../lib/examState'
+import { ROUTES } from '../lib/constants'
+import { buildExamSubjects, EXAM_PASS_THRESHOLD, saveExamState } from '../lib/examState'
+import { usePageMeta } from '../lib/seo'
+import { cn, formatClock } from '../lib/utils'
 import { isRecord, type QuestionId } from '../types'
 
 export function ExamResultPage() {
-  const navigate = useNavigate()
+  usePageMeta({ title: 'Exam result', path: ROUTES.EXAM_RESULT })
+  const nav = useNav()
   const location = useLocation()
   const { resetQuiz } = useQuiz()
   const { subjects, quizzes } = useSubjectData()
   const examSubjects = useMemo(() => buildExamSubjects(subjects), [subjects])
   const savedRef = useRef(false)
 
-  // Read analytics data (same key as regular AnalyticsPage)
+  // Same snapshot the regular results page reads
   const data = useMemo(() => readAnalyticsSnapshot(), [])
 
   const stateSlug: string | null =
-    isRecord(location.state) && typeof location.state.subjectSlug === 'string'
-      ? location.state.subjectSlug
-      : null
+    isRecord(location.state) && typeof location.state.subjectSlug === 'string' ? location.state.subjectSlug : null
 
-  // Derive subjectSlug: prefer location state, fallback to exam subject lookup by label
+  // Prefer location state, fall back to exam subject lookup by label
   const subjectSlug = useMemo(() => {
     if (stateSlug) return stateSlug
     if (!data) return null
     return examSubjects.find((s) => s.label === data.subject)?.slug ?? null
   }, [stateSlug, data, examSubjects])
 
-  // Redirect if no data (direct URL access)
   useEffect(() => {
-    if (!data) {
-      navigate('/exam', { replace: true })
-    }
-  }, [data, navigate])
+    if (!data) nav(ROUTES.EXAM, { replace: true })
+  }, [data, nav])
 
-  // Save exam state once on mount
+  // Save exam mastery state once
   useEffect(() => {
     if (!data || !subjectSlug || savedRef.current) return
     savedRef.current = true
+    const { questions, answers, result } = data
 
-    const { questions, answers } = data
-
-    // Build quiz question ID set for 'main+quiz' categorization
+    // Quiz question ids for 'main+quiz' categorisation
     const subjectConfig = examSubjects.find((s) => s.slug === subjectSlug)
     const quizQuestionIds = new Set<QuestionId>()
-    if (subjectConfig?.quizSlugs?.length) {
-      subjectConfig.quizSlugs.forEach((qSlug) => {
-        const qData = quizzes.find((q) => q.slug === qSlug)
-        if (qData?.questions) {
-          qData.questions.forEach((q) => quizQuestionIds.add(q.id))
-        }
-      })
-    }
+    subjectConfig?.quizSlugs.forEach((qSlug) => {
+      quizzes.find((q) => q.slug === qSlug)?.questions.forEach((q) => quizQuestionIds.add(q.id))
+    })
 
-    const correctIds = questions
-      .filter((q, i) => answers[i] === q.correctIndex)
-      .map((q) => q.id)
+    const correctIds = questions.filter((q, i) => answers[i] === q.correctIndex).map((q) => q.id)
+    const incorrectIds = questions.filter((q, i) => answers[i] !== q.correctIndex).map((q) => q.id)
 
-    const incorrectIds = questions
-      .filter((q, i) => answers[i] !== q.correctIndex)
-      .map((q) => q.id)
-
-    const quizCorrectIds = correctIds.filter((id) => quizQuestionIds.has(id))
-    const quizIncorrectIds = incorrectIds.filter((id) => quizQuestionIds.has(id))
-
-    const { result } = data
     saveExamState(subjectSlug, {
       correctIds,
       incorrectIds,
-      quizCorrectIds,
-      quizIncorrectIds,
+      quizCorrectIds: correctIds.filter((id) => quizQuestionIds.has(id)),
+      quizIncorrectIds: incorrectIds.filter((id) => quizQuestionIds.has(id)),
       attempt: {
         date: new Date().toISOString(),
         score: result.score,
@@ -94,164 +76,62 @@ export function ExamResultPage() {
 
   if (!data) return null
 
-  const { result: r, subject, questions: qs, answers: ans } = data
-  const isPassed = r.score >= EXAM_PASS_THRESHOLD
-  const correctCount = r.correct
+  const { result: r } = data
+  const passed = r.score >= EXAM_PASS_THRESHOLD
   const wrongCount = r.total - r.correct
   const subjectConfig = examSubjects.find((s) => s.slug === subjectSlug)
 
   function handleRetake() {
     resetQuiz()
-    navigate('/exam')
+    nav(ROUTES.EXAM)
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8 pb-20">
-      {/* Confetti on pass */}
-      {isPassed && <ExamConfetti />}
+    <Page>
+      {passed && <Confetti />}
+      <h1 className="sr-only">Exam result</h1>
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 animate-fade-in">
-        <div>
-          <h1
-            className={`text-2xl font-black animate-pop ${isPassed
-              ? 'text-emerald-600 dark:text-emerald-400'
-              : 'text-amber-600 dark:text-amber-400'
-            }`}
-          >
-            {isPassed ? 'Exam Complete' : 'Keep Going'}
-          </h1>
-          {subjectConfig && (
-            <p className="text-sm text-content-secondary mt-0.5">{subjectConfig.examName}</p>
-          )}
-        </div>
-        <Link
-          to="/exam"
-          className="text-sm text-content-secondary hover:text-themed-accent transition-colors font-semibold"
-        >
-          Exam Hub →
-        </Link>
+      <ScoreHero score={r.score} subject={subjectConfig?.examName ?? data.subject} eyebrow={passed ? 'Exam passed' : 'Keep going'} />
+
+      <StatStrip
+        className="mt-3"
+        stats={[
+          { label: passed ? 'Mastered' : 'Correct', value: r.correct, tone: 'text-success' },
+          { label: 'Will repeat', value: wrongCount, tone: wrongCount > 0 ? 'text-danger' : undefined },
+          { label: 'Time', value: <span className="font-mono text-lg">{formatClock(r.timeTaken)}</span> },
+        ]}
+      />
+
+      <div
+        role="status"
+        className={cn(
+          'card mt-3 flex items-start gap-3 p-4 text-sm leading-relaxed',
+          passed ? 'border-success/30' : 'border-accent/30',
+        )}
+      >
+        <Icon name={passed ? 'check' : 'info'} size={18} className={cn('mt-0.5 shrink-0', passed ? 'text-success' : 'text-accent-fg')} />
+        <p>
+          {passed ? 'You passed the simulation. ' : 'Every attempt makes you stronger. '}
+          {wrongCount > 0
+            ? `${wrongCount} wrong answer${wrongCount === 1 ? ' is' : 's are'} saved and will reappear in your next retest — review them below.`
+            : 'Perfect score — every question in this attempt is mastered.'}
+        </p>
       </div>
 
-      <div className="space-y-5">
-        {/* Score summary */}
-        <div className="card p-6 sm:p-8 animate-fade-up">
-          <ScoreSummary
-            score={r.score}
-            correct={r.correct}
-            total={r.total}
-            subject={subject}
-            timeTaken={r.timeTaken}
-          />
-        </div>
-
-        {/* Exam-specific outcome banner */}
-        <div
-          className={`card p-5 border-l-4 animate-fade-up ${isPassed
-            ? 'border-l-emerald-500 bg-emerald-50 dark:bg-emerald-950/30'
-            : 'border-l-amber-500 bg-amber-50 dark:bg-amber-950/30'
-          }`}
-        >
-          {isPassed ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-emerald-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <p className="font-bold text-emerald-700 dark:text-emerald-300">
-                  Well done — you passed the simulation.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <div className="text-center">
-                  <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                    <CountUp to={correctCount} from={0} duration={1} />
-                  </p>
-                  <p className="text-xs text-content-secondary font-semibold">Mastered</p>
-                </div>
-                {wrongCount > 0 && (
-                  <div className="text-center">
-                    <p className="text-2xl font-black text-rose-500">
-                      <CountUp to={wrongCount} from={0} duration={1} />
-                    </p>
-                    <p className="text-xs text-content-secondary font-semibold">Will Repeat</p>
-                  </div>
-                )}
-              </div>
-              {wrongCount > 0 ? (
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
-                  The <strong>{wrongCount} wrong answer{wrongCount > 1 ? 's' : ''}</strong> are saved and
-                  will appear in your next retest — review them below!
-                </p>
-              ) : (
-                <p className="text-sm text-emerald-700 dark:text-emerald-300 font-semibold">
-                  Perfect score — all questions mastered for this attempt.
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-amber-500 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-                </svg>
-                <p className="font-bold text-amber-700 dark:text-amber-300">
-                  Every attempt makes you stronger — keep going.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-4">
-                <div className="text-center">
-                  <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                    <CountUp to={correctCount} from={0} duration={1} />
-                  </p>
-                  <p className="text-xs text-content-secondary font-semibold">Correct</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-2xl font-black text-rose-500">
-                    <CountUp to={wrongCount} from={0} duration={1} />
-                  </p>
-                  <p className="text-xs text-content-secondary font-semibold">Wrong</p>
-                </div>
-              </div>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                <strong>{wrongCount} question{wrongCount > 1 ? 's' : ''}</strong> answered incorrectly —
-                they're queued for your retest. Study the explanations below and try again!
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Breakdown chart */}
-        <div className="card p-6">
-          <BreakdownChart correct={r.correct} total={r.total} />
-        </div>
-
-        {/* Question review */}
-        <div className="card p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <svg className="w-4 h-4 text-content-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2M9 12h6M9 16h4" />
-            </svg>
-            <h2 className="text-base font-extrabold text-content-primary">Question Review</h2>
-            {wrongCount > 0 && (
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900 text-rose-600 dark:text-rose-400">
-                {wrongCount} will repeat
-              </span>
-            )}
-          </div>
-          <QuestionReview questions={qs} answers={ans} />
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3">
-          <Button variant="secondary" className="flex-1" onClick={() => navigate('/exam')}>
-            Back to Exams
-          </Button>
-          <Button className="flex-1" onClick={handleRetake}>
-            Retake
-          </Button>
-        </div>
+      <div className="mt-4 flex gap-3">
+        <Button variant="secondary" className="flex-1" onClick={() => nav(ROUTES.EXAM)}>
+          <Icon name="back" size={18} />
+          Exams
+        </Button>
+        <Button className="flex-1" onClick={handleRetake}>
+          <Icon name="refresh" size={18} />
+          Retake
+        </Button>
       </div>
-    </div>
+
+      <div className="mt-8">
+        <QuestionReview questions={data.questions} answers={data.answers} />
+      </div>
+    </Page>
   )
 }

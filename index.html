@@ -1,14 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0B0B0F" />
-    <meta name="description" content="Quiz Slayer — Study smarter with interactive quizzes for your university subjects." />
+    <title>Quiz Slayer — Slay your midterms</title>
+    <meta name="description" content="Quiz Slayer: fast, offline-ready MCQ practice for your university subjects. Mock exams, mistake retries, streaks and a leaderboard." />
+    <link rel="canonical" href="https://quiz.zubyr.dev/" />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://quiz.zubyr.dev/" />
     <meta property="og:title" content="Quiz Slayer" />
     <meta property="og:description" content="Study smarter with interactive quizzes for your university subjects." />
     <meta property="og:image" content="/og-image.png" />
@@ -19,11 +22,27 @@
     <meta name="twitter:title" content="Quiz Slayer" />
     <meta name="twitter:description" content="Study smarter with interactive quizzes for your university subjects." />
     <meta name="twitter:image" content="/og-image.png" />
-    <title>Quiz Slayer</title>
-    <!-- Google Fonts: Nunito — preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Quiz Slayer",
+        "url": "https://quiz.zubyr.dev/",
+        "description": "Fast, offline-ready MCQ practice for university subjects with mock exams, mistake retries and a leaderboard.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+    <script>
+      // Apply the saved theme before first paint (dark-first; avoids a light/dark flash)
+      try {
+        if (localStorage.getItem('quiz-theme') === 'light') {
+          document.documentElement.classList.remove('dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F7F5F0')
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

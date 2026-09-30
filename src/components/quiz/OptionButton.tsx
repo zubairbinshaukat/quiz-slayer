@@ -1,91 +1,66 @@
+import { OPTION_LETTERS } from '../../lib/constants'
 import { cn } from '../../lib/utils'
-import type { Answer } from '../../types'
+import { Icon } from '../ui/Icon'
 
-const LABELS = ['A', 'B', 'C', 'D', 'E', 'F']
+export type OptionState = 'idle' | 'correct' | 'wrong' | 'dim'
 
 interface OptionButtonProps {
   option: string
   index: number
-  selectedIndex: Answer
-  correctIndex: number
-  isSubmitted: boolean
-  onClick: () => void
+  state: OptionState
+  locked: boolean
+  /** Changes whenever the matching key is pressed; replays the keycap flash. */
+  flash: number
+  onSelect: () => void
 }
 
-export function OptionButton({
-  option,
-  index,
-  selectedIndex,
-  correctIndex,
-  isSubmitted,
-  onClick,
-}: OptionButtonProps) {
-  const isSelected = selectedIndex === index
-  const isCorrect = correctIndex === index
-  const isWrongSelected = isSubmitted && isSelected && !isCorrect
+const STATE_CLASSES: Record<OptionState, string> = {
+  idle: 'border-line bg-surface hover:border-line-strong hover:bg-surface-2',
+  correct: 'border-success bg-success/10',
+  wrong: 'border-danger bg-danger/10',
+  dim: 'border-line bg-surface opacity-45',
+}
 
-  let stateClasses = ''
-  let labelClasses = ''
+const KEYCAP_CLASSES: Record<OptionState, string> = {
+  idle: '',
+  correct: 'border-success bg-success text-bg',
+  wrong: 'border-danger bg-danger text-bg',
+  dim: '',
+}
 
-  if (!isSubmitted) {
-    if (isSelected) {
-      stateClasses = 'border-themed-accent bg-themed-accent/10 shadow-glow'
-      labelClasses = 'bg-themed-accent text-white'
-    } else {
-      stateClasses = 'border-themed-border bg-surface-card hover:border-themed-accent/50 hover:bg-themed-accent/5'
-      labelClasses = 'bg-surface-secondary text-content-secondary'
-    }
-  } else {
-    if (isCorrect) {
-      stateClasses = 'border-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 shadow-sm'
-      labelClasses = 'bg-emerald-500 text-white'
-    } else if (isWrongSelected) {
-      stateClasses = 'border-rose-400 bg-rose-50 dark:bg-rose-950/50 shadow-sm'
-      labelClasses = 'bg-rose-500 text-white'
-    } else {
-      stateClasses = 'border-themed-border bg-surface-card opacity-45'
-      labelClasses = 'bg-surface-secondary text-content-secondary'
-    }
-  }
-
+export function OptionButton({ option, index, state, locked, flash, onSelect }: OptionButtonProps) {
+  const letter = OPTION_LETTERS[index] ?? String(index + 1)
   return (
     <button
-      onClick={isSubmitted ? undefined : onClick}
-      disabled={isSubmitted}
+      type="button"
+      data-quiz-option
+      disabled={locked}
+      onClick={onSelect}
       className={cn(
-        'w-full flex items-center gap-3.5 p-4 rounded-xl border-2',
-        'text-left transition-all duration-200 font-semibold',
-        'enabled:active:scale-[0.985]',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-themed-accent',
+        'press flex min-h-14 w-full items-center gap-3 rounded-[18px] border px-3.5 py-3 text-left',
         'disabled:cursor-default',
-        stateClasses
+        STATE_CLASSES[state],
       )}
     >
-      {/* Letter label */}
-      <span className={cn(
-        'flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center',
-        'text-xs font-black transition-colors duration-200',
-        labelClasses
-      )}>
-        {LABELS[index] ?? index + 1}
+      <span
+        key={flash}
+        aria-hidden="true"
+        className={cn('keycap shrink-0', flash > 0 && 'keycap-flash', KEYCAP_CLASSES[state])}
+      >
+        {letter}
       </span>
-
-      {/* Option text */}
-      <span className="text-sm sm:text-base text-content-primary">{option}</span>
-
-      {/* Result icon */}
-      {isSubmitted && isCorrect && (
-        <span className="ml-auto text-emerald-500 flex-shrink-0 animate-pop">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+      <span className="sr-only">Option {letter}: </span>
+      <span className="min-w-0 flex-1 text-[15px] leading-snug sm:text-base">{option}</span>
+      {state === 'correct' && (
+        <span className="flex size-7 shrink-0 animate-pop items-center justify-center rounded-full bg-success text-bg">
+          <Icon name="check" size={16} strokeWidth={3} />
+          <span className="sr-only">Correct answer</span>
         </span>
       )}
-      {isSubmitted && isWrongSelected && (
-        <span className="ml-auto text-rose-500 flex-shrink-0 animate-pop">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+      {state === 'wrong' && (
+        <span className="flex size-7 shrink-0 animate-pop items-center justify-center rounded-full bg-danger text-bg">
+          <Icon name="x" size={16} strokeWidth={3} />
+          <span className="sr-only">Your answer, incorrect</span>
         </span>
       )}
     </button>

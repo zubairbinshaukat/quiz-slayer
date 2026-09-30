@@ -23,21 +23,16 @@ export function formatTime(seconds: number): string {
   return `${m}:${String(s).padStart(2, '0')}`
 }
 
-/** Format ISO date string to readable form */
-export function formatDate(isoString: string): string {
-  return new Date(isoString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+/** Stopwatch format: mm:ss (h:mm:ss past an hour) */
+export function formatClock(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds))
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
+  const sec = String(s % 60).padStart(2, '0')
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${sec}` : `${String(m).padStart(2, '0')}:${sec}`
 }
 
-/** Convert a slug like "compiler-construction" to "Compiler Construction" */
-export function slugToTitle(slug: string): string {
-  return slug
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ')
+/** Local time of day, e.g. "3:42 PM" */
+export function formatTimeOfDay(isoString: string): string {
+  return new Date(isoString).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
 }

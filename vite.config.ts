@@ -27,7 +27,20 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,mp3,woff2}'],
+        // 3D icons are fetched on demand (runtime cache below); non-Latin font subsets load only if needed
+        globIgnores: ['**/icons3d/**', '**/*cyrillic*.woff2', '**/*vietnamese*.woff2'],
         navigateFallback: '/index.html',
+        runtimeCaching: [
+          {
+            urlPattern: /\/icons3d\/[^/]+\.webp$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'icons3d',
+              expiration: { maxEntries: 160, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+        ],
       },
     }),
   ],

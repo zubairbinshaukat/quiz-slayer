@@ -7,7 +7,7 @@ import type {
   Subject,
 } from '../types'
 import { isRecord } from '../types'
-import { getSubjectColor, getSubjectIconKey } from './subjectUtils'
+import { getSubjectIcon } from './subjectUtils'
 import { EXAM_MODE_SESSION_KEY, EXAM_PASS_THRESHOLD, EXAM_STATE_KEY_PREFIX } from './constants'
 
 export { EXAM_MODE_SESSION_KEY, EXAM_PASS_THRESHOLD, EXAM_STATE_KEY_PREFIX }
@@ -38,8 +38,7 @@ export function buildExamSubject(subject: Subject): ExamSubjectConfig {
     slug: subject.slug,
     label: subject.subject,
     shortLabel: shortLabelFor(subject.subject),
-    iconKey: getSubjectIconKey(subject.slug),
-    color: getSubjectColor(subject.slug),
+    iconKey: getSubjectIcon(subject.slug),
     unlockUtc: null,
     quizSlugs: [],
     poolType: 'main',

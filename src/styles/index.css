@@ -3,156 +3,274 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ─── Light mode CSS custom properties ─────────────────────────────── */
-:root {
-  --bg-primary:    250 248 245;
-  --bg-secondary:  240 235 228;
-  --bg-card:       245 241 235;
-  --text-primary:  42 37 32;
-  --text-secondary: 106 101 96;
-  --border:        214 206 196;
-  --accent:        229 57 53;
-  --accent-hover:  183 28 28;
-}
+/* ─── Design tokens (dark-first) ───────────────────────────────────────
+   Utilities read these as vars, so the light override below re-themes
+   everything without touching components. */
+@theme static {
+  --color-bg: #0b0b0f;
+  --color-surface: #15161c;
+  --color-surface-2: #1c1d25;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.16);
+  --color-fg: #f4f4f5;
+  --color-muted: #9a9aa3;
+  --color-accent: #f5b73a;
+  --color-accent-hover: #ffc857;
+  --color-accent-ink: #1a1200;
+  /* Accent when used as text on the page background (AA in both themes) */
+  --color-accent-fg: #f5b73a;
+  --color-success: #3ddc97;
+  --color-danger: #ff5c5c;
+  --color-info: #6ea8ff;
 
-/* ─── Dark mode CSS custom properties ──────────────────────────────── */
-.dark {
-  --bg-primary:    10 10 15;
-  --bg-secondary:  18 18 26;
-  --bg-card:       26 26 37;
-  --text-primary:  232 230 227;
-  --text-secondary: 154 149 144;
-  --border:        50 47 42;
-  --accent:        196 167 125;
-  --accent-hover:  216 190 150;
-}
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-/* ─── Theme tokens (map CSS vars → Tailwind utilities) ─────────────── */
-/* `inline` so utilities resolve the runtime vars where they are used (.dark switching) */
-@theme inline {
-  --color-surface-primary: rgb(var(--bg-primary));
-  --color-surface-secondary: rgb(var(--bg-secondary));
-  --color-surface-card: rgb(var(--bg-card));
+  --radius-card: 16px;
+  --radius-sheet: 20px;
+  --radius-btn: 12px;
 
-  --color-content-primary: rgb(var(--text-primary));
-  --color-content-secondary: rgb(var(--text-secondary));
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --color-themed-border: rgb(var(--border));
-  --color-themed-accent: rgb(var(--accent));
-  --color-themed-accent-hover: rgb(var(--accent-hover));
-  --shadow-glow: 0 0 0 3px rgb(var(--accent) / 0.2);
-}
+  --animate-fade-up: fade-up 320ms var(--ease-out-quint) backwards;
+  --animate-fade-in: fade-in 220ms ease-out backwards;
+  --animate-pop: pop 240ms var(--ease-out-quint) backwards;
+  --animate-sheet-up: sheet-up 340ms var(--ease-out-quint) backwards;
 
-@theme {
-  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
-
-  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.04), 0 6px 16px -4px rgb(0 0 0 / 0.08);
-  --shadow-card-hover: 0 4px 8px rgb(0 0 0 / 0.05), 0 20px 48px -8px rgb(0 0 0 / 0.16);
-  --shadow-modal: 0 24px 64px -8px rgb(0 0 0 / 0.28);
-
-  /* Simple entrance animations (replacing framer-motion) */
-  --animate-fade-in: fade-in 0.3s ease-out both;
-  --animate-fade-up: fade-up 0.4s ease-out both;
-  --animate-pop: pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  --animate-pulse-ring: pulse-ring 2.8s ease-out infinite;
-
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
   @keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
   @keyframes pop {
-    from { opacity: 0; transform: scale(0.94); }
+    from { opacity: 0; transform: scale(0.96); }
     to { opacity: 1; transform: scale(1); }
   }
-
-  @keyframes pulse-ring {
-    0% { transform: scale(1); opacity: 0.35; }
-    60%, 100% { transform: scale(1.65); opacity: 0; }
+  @keyframes sheet-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
   }
 }
 
-/* Used via inline `animation` style in ExamConfetti (not a utility, so defined outside @theme) */
+:root {
+  color-scheme: dark;
+  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --scrim: rgba(0, 0, 0, 0.6);
+}
+
+:root:not(.dark) {
+  color-scheme: light;
+  --color-bg: #f7f5f0;
+  --color-surface: #ffffff;
+  --color-surface-2: #f0ede6;
+  --color-line: rgba(0, 0, 0, 0.08);
+  --color-line-strong: rgba(0, 0, 0, 0.16);
+  --color-fg: #111114;
+  --color-muted: #6b6b75;
+  --color-accent-fg: #8f5a00;
+  --color-success: #0f9a62;
+  --color-danger: #d93636;
+  --color-info: #2f6fdb;
+  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --scrim: rgba(17, 17, 20, 0.45);
+}
+
+/* ─── Keyframes used outside utilities ─────────────────────────────── */
 @keyframes confetti-fall {
   0% { transform: translate(0, -20px) rotate(0deg); opacity: 1; }
   70% { opacity: 1; }
   100% { transform: translate(var(--confetti-drift, 0px), 115vh) rotate(var(--confetti-rotate, 360deg)); opacity: 0; }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .animate-fade-in,
-  .animate-fade-up,
-  .animate-pop,
-  .animate-pulse-ring {
-    animation: none;
-  }
+@keyframes key-flash {
+  0% { background: var(--color-accent); color: var(--color-accent-ink); transform: translateY(1px); border-bottom-width: 1px; }
+  100% { transform: translateY(0); }
 }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(8px); } }
+@keyframes q-out-left { to { opacity: 0; transform: translateX(-32px); } }
+@keyframes q-in-right { from { opacity: 0; transform: translateX(32px); } }
+@keyframes q-out-right { to { opacity: 0; transform: translateX(32px); } }
+@keyframes q-in-left { from { opacity: 0; transform: translateX(-32px); } }
+@keyframes preloader-out { to { opacity: 0; visibility: hidden; } }
+@keyframes fill-in { to { fill-opacity: 1; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
 
-/* ─── Base layer ────────────────────────────────────────────────────── */
+/* ─── Base ─────────────────────────────────────────────────────────── */
 @layer base {
   *,
   ::after,
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: rgb(var(--border));
+    border-color: var(--color-line);
   }
 
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
+  html {
+    -webkit-text-size-adjust: 100%;
+    background: var(--color-bg);
   }
 
   body {
-    @apply text-content-primary font-sans antialiased;
-    background: linear-gradient(160deg, rgb(var(--bg-primary)) 0%, rgb(var(--bg-secondary)) 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+  @media (min-width: 640px) {
+    body { font-size: 16px; }
   }
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
+  h1, h2, h3, h4 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    text-wrap: balance;
   }
 
-  ::-webkit-scrollbar-thumb {
-    @apply bg-themed-border rounded-full;
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-content-secondary;
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-accent) 35%, transparent);
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--color-line-strong); border-radius: 9999px; }
+}
+
+/* ─── Components ───────────────────────────────────────────────────── */
+@layer components {
+  /* Matte card: 1px border + faint inner highlight, no heavy shadow */
+  .card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: var(--hl);
+  }
+
+  /* Tactile press feedback for tappables */
+  .press {
+    transition:
+      transform 160ms var(--ease-out-quint),
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease;
+    touch-action: manipulation;
+  }
+  .press:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: scale(0.98);
+  }
+
+  /* Staggered entrance: set style={{ '--i': n }} on each child */
+  .rise {
+    animation: fade-up 320ms var(--ease-out-quint) backwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+
+  /* Keyboard-key look: darker bottom edge */
+  .keycap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.75rem;
+    height: 1.75rem;
+    padding: 0 0.375rem;
+    border-radius: 7px;
+    border: 1px solid var(--color-line-strong);
+    border-bottom-width: 3px;
+    background: var(--color-surface-2);
+    color: var(--color-fg);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .keycap-flash {
+    animation: key-flash 260ms ease-out;
   }
 }
 
-/* ─── Component layer ───────────────────────────────────────────────── */
-@layer components {
-  .card {
-    @apply bg-surface-card rounded-2xl border border-themed-border;
-    box-shadow:
-      0 1px 3px rgb(0 0 0 / 0.04),
-      0 6px 16px -4px rgb(0 0 0 / 0.08),
-      0 20px 40px -12px rgb(0 0 0 / 0.06);
-  }
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
 
-  .dark .card {
-    box-shadow:
-      0 1px 3px rgb(0 0 0 / 0.25),
-      0 6px 16px -4px rgb(0 0 0 / 0.30),
-      0 20px 40px -12px rgb(0 0 0 / 0.35);
-  }
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
-  .focus-ring {
-    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-themed-accent focus-visible:ring-offset-2 focus-visible:ring-offset-surface-primary;
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* ─── View transitions ─────────────────────────────────────────────── */
+::view-transition-old(root) {
+  animation: vt-out 160ms ease-in both;
+}
+::view-transition-new(root) {
+  animation: vt-in 220ms var(--ease-out-quint) both;
+}
+
+/* Question-to-question: only the card slides, the rest swaps instantly */
+.vt-question {
+  view-transition-name: question;
+}
+html[data-q-dir]::view-transition-old(root),
+html[data-q-dir]::view-transition-new(root) {
+  animation: none;
+}
+html[data-q-dir]::view-transition-group(question) {
+  animation-duration: 240ms;
+}
+html[data-q-dir="next"]::view-transition-old(question) {
+  animation: q-out-left 180ms ease-in both;
+}
+html[data-q-dir="next"]::view-transition-new(question) {
+  animation: q-in-right 240ms var(--ease-out-quint) both;
+}
+html[data-q-dir="prev"]::view-transition-old(question) {
+  animation: q-out-right 180ms ease-in both;
+}
+html[data-q-dir="prev"]::view-transition-new(question) {
+  animation: q-in-left 240ms var(--ease-out-quint) both;
+}
+
+/* ─── Reduced motion: no transforms, no animation ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+  .press:active:not(:disabled) {
+    transform: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

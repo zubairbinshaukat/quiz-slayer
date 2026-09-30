@@ -1,5 +1,7 @@
 // ─── Shared domain types ──────────────────────────────────────────────────────
 
+import type { Icon3DName } from './lib/icons3d'
+
 /** Question IDs are numbers in the bundled data, but uploaded JSON may use strings. */
 export type QuestionId = number | string
 
@@ -112,8 +114,7 @@ export interface ExamSubjectConfig {
   slug: string
   label: string
   shortLabel: string
-  iconKey: string
-  color: string
+  iconKey: Icon3DName
   /** ISO UTC unlock time, or null when always available. */
   unlockUtc: string | null
   quizSlugs: string[]

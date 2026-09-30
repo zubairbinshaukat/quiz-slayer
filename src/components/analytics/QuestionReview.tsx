@@ -1,152 +1,100 @@
 import { useState } from 'react'
+import { OPTION_LETTERS } from '../../lib/constants'
 import { cn } from '../../lib/utils'
+import { FilterChip } from '../ui/Chip'
+import { Icon } from '../ui/Icon'
 import type { Answer, Question } from '../../types'
 
-const LABELS = ['A', 'B', 'C', 'D', 'E', 'F']
-
-interface ReviewItemProps {
-  question: Question
-  userAnswer: Answer
-  index: number
-}
-
-function ReviewItem({ question, userAnswer, index }: ReviewItemProps) {
+function ReviewItem({ question, answer, index }: { question: Question; answer: Answer; index: number }) {
   const [open, setOpen] = useState(false)
-  const [showFull, setShowFull] = useState(false)
-  const isCorrect = userAnswer === question.correctIndex
-  const isSkipped = userAnswer === null
-
+  const correct = answer === question.correctIndex
+  const skipped = answer === null
   return (
-    <div className={cn(
-      'rounded-xl border overflow-hidden transition-colors',
-      isCorrect ? 'border-emerald-200 dark:border-emerald-800' :
-      isSkipped ? 'border-themed-border' :
-      'border-rose-200 dark:border-rose-800'
-    )}>
-      {/* Header */}
+    <li className="card overflow-hidden">
       <button
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-secondary transition-colors"
+        type="button"
         onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="press flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left"
       >
-        {/* Status icon */}
-        <span className={cn(
-          'flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white',
-          isCorrect ? 'bg-emerald-500' : isSkipped ? 'bg-surface-secondary' : 'bg-rose-500'
-        )}>
-          {isCorrect ? '✓' : isSkipped ? '–' : '✗'}
-        </span>
-
-        <div className="flex-1 min-w-0">
-          <p className="text-xs text-content-secondary mb-0.5">Q{index + 1}</p>
-          <p className="text-sm font-semibold text-content-primary truncate">{question.text}</p>
-        </div>
-
-        <svg
-          className={cn('w-4 h-4 text-content-secondary flex-shrink-0 transition-transform duration-200', open && 'rotate-180')}
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        <span
+          className={cn(
+            'flex size-7 shrink-0 items-center justify-center rounded-full',
+            correct ? 'bg-success/15 text-success' : skipped ? 'bg-surface-2 text-muted' : 'bg-danger/15 text-danger',
+          )}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-        </svg>
+          <Icon name={correct ? 'check' : 'x'} size={14} strokeWidth={3} />
+          <span className="sr-only">{correct ? 'Correct' : skipped ? 'Skipped' : 'Wrong'}</span>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-mono text-[11px] text-muted">Q{index + 1}</span>
+          <span className={cn('block text-sm font-medium', !open && 'line-clamp-2')}>{question.text}</span>
+        </span>
+        <Icon name="chevronDown" size={18} className={cn('shrink-0 text-muted transition-transform duration-200', open && 'rotate-180')} />
       </button>
 
-      {/* Expanded content */}
       {open && (
-          <div className="overflow-hidden animate-fade-in">
-            <div className="px-4 pb-4 space-y-2 border-t border-themed-border pt-3">
-              {question.options.map((option, i) => {
-                const isOpt = i === question.correctIndex
-                const isUserOpt = i === userAnswer
-                const isWrong = isUserOpt && !isOpt
-
-                return (
-                  <div key={i} className={cn(
-                    'flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm',
-                    isOpt ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300' :
-                    isWrong ? 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300' :
-                    'text-content-secondary'
-                  )}>
-                    <span className={cn(
-                      'w-5 h-5 rounded-md flex-shrink-0 flex items-center justify-center text-[10px] font-bold',
-                      isOpt ? 'bg-emerald-500 text-white' :
-                      isWrong ? 'bg-rose-500 text-white' :
-                      'bg-surface-secondary text-content-secondary'
-                    )}>
-                      {LABELS[i]}
-                    </span>
-                    <span>{option}</span>
-                    {isOpt && <span className="ml-auto text-xs font-bold">✓ Correct</span>}
-                    {isWrong && <span className="ml-auto text-xs font-bold">✗ Your answer</span>}
-                  </div>
-                )
-              })}
-
-              {/* Explanation */}
-              {(question.shortExplanation || question.explanation) && (
-                <div className="mt-3 pt-3 border-t border-themed-border">
-                  <div className="flex items-start gap-2">
-                    <span className="text-xs">💡</span>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-0.5">Quick Answer</p>
-                      <p className="text-xs text-content-secondary leading-relaxed">
-                        {question.shortExplanation || (question.explanation ?? '').split('.').slice(0, 2).join('.') + '.'}
-                      </p>
-
-                      {question.explanation && (
-                        <>
-                          <button
-                            onClick={() => setShowFull((v) => !v)}
-                            className="mt-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors"
-                          >
-                            {showFull ? '▲ Show Less' : '▼ Know More'}
-                          </button>
-
-                            {showFull && (
-                              <div className="overflow-hidden animate-fade-in">
-                                <div className="mt-1.5 pt-1.5 border-t border-themed-border">
-                                  <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 mb-0.5">Detailed Explanation</p>
-                                  <div className="text-xs text-content-secondary leading-relaxed space-y-1.5">
-                                    {question.explanation.split('\n\n').map((para, i) => (
-                                      <p key={i}>{para}</p>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                        </>
-                      )}
-                    </div>
-                  </div>
+        <div className="animate-fade-in space-y-2 border-t border-line px-4 pt-3 pb-4">
+          {question.options.map((option, i) => {
+            const isAnswer = i === question.correctIndex
+            const isWrongPick = i === answer && !isAnswer
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'flex items-start gap-2.5 rounded-btn px-3 py-2 text-sm',
+                  isAnswer && 'bg-success/10 text-success',
+                  isWrongPick && 'bg-danger/10 text-danger',
+                  !isAnswer && !isWrongPick && 'text-muted',
+                )}
+              >
+                <span className="keycap h-6 min-w-6 shrink-0 text-[11px]">{OPTION_LETTERS[i] ?? i + 1}</span>
+                <span className="flex-1 pt-0.5">{option}</span>
+                {isAnswer && <span className="shrink-0 pt-0.5 text-xs font-bold">Answer</span>}
+                {isWrongPick && <span className="shrink-0 pt-0.5 text-xs font-bold">Your pick</span>}
+              </div>
+            )
+          })}
+          {(question.shortExplanation || question.explanation) && (
+            <div className="mt-3 rounded-btn bg-surface-2 p-3 text-sm leading-relaxed">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">Explanation</p>
+              {question.shortExplanation && <p>{question.shortExplanation}</p>}
+              {question.explanation && question.explanation !== question.shortExplanation && (
+                <div className="mt-2 space-y-2 text-muted">
+                  {question.explanation.split('\n\n').map((para, i) => <p key={i}>{para}</p>)}
                 </div>
               )}
-
             </div>
-          </div>
+          )}
+        </div>
       )}
-    </div>
+    </li>
   )
 }
 
-interface QuestionReviewProps {
-  questions: Question[]
-  answers: Answer[]
-}
+export function QuestionReview({ questions, answers }: { questions: Question[]; answers: Answer[] }) {
+  const [filter, setFilter] = useState<'all' | 'wrong'>('all')
+  const items = questions
+    .map((q, i) => ({ q, a: answers[i] ?? null, i }))
+    .filter(({ q, a }) => filter === 'all' || a !== q.correctIndex)
+  const wrongCount = questions.filter((q, i) => answers[i] !== q.correctIndex).length
 
-export function QuestionReview({ questions, answers }: QuestionReviewProps) {
   return (
-    <div>
-      <h3 className="text-sm font-bold text-content-secondary uppercase tracking-wide mb-4">
-        Question Review
-      </h3>
-      <div className="space-y-2">
-        {questions.map((q, i) => (
-          <ReviewItem
-            key={q.id}
-            question={q}
-            userAnswer={answers[i] ?? null}
-            index={i}
-          />
-        ))}
+    <section aria-labelledby="review-heading">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h2 id="review-heading" className="text-xl">Review</h2>
+        <div className="flex gap-2">
+          <FilterChip active={filter === 'all'} onClick={() => setFilter('all')}>All {questions.length}</FilterChip>
+          <FilterChip active={filter === 'wrong'} onClick={() => setFilter('wrong')}>Wrong {wrongCount}</FilterChip>
+        </div>
       </div>
-    </div>
+      {items.length === 0 ? (
+        <p className="card px-4 py-8 text-center text-sm text-muted">Nothing wrong here. Clean sweep.</p>
+      ) : (
+        <ul className="space-y-2">
+          {items.map(({ q, a, i }) => <ReviewItem key={`${q.id}-${i}`} question={q} answer={a} index={i} />)}
+        </ul>
+      )}
+    </section>
   )
 }

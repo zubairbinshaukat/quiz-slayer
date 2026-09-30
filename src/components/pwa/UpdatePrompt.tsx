@@ -1,4 +1,6 @@
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { IconButton } from '../ui/Button'
+import { Icon } from '../ui/Icon'
 
 /** Small toast shown when a new service worker is waiting (registerType: 'prompt'). */
 export function UpdatePrompt() {
@@ -12,25 +14,20 @@ export function UpdatePrompt() {
   return (
     <div
       role="status"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[70] flex items-center gap-3 px-4 py-3 rounded-2xl
-                 bg-surface-card border border-themed-border shadow-modal text-sm text-content-primary animate-fade-up"
+      aria-live="polite"
+      className="card fixed inset-x-4 bottom-[calc(80px+env(safe-area-inset-bottom))] z-[70] mx-auto flex max-w-sm animate-fade-up items-center gap-3 py-2 pl-4 pr-2 text-sm md:bottom-6"
     >
-      <span className="font-semibold">Update available</span>
+      <span className="flex-1 font-semibold">Update available</span>
       <button
+        type="button"
         onClick={() => void updateServiceWorker(true)}
-        className="px-3 py-1.5 rounded-xl bg-themed-accent hover:bg-themed-accent-hover text-white font-bold transition-colors"
+        className="press min-h-10 rounded-btn bg-accent px-4 font-bold text-accent-ink hover:bg-accent-hover"
       >
         Reload
       </button>
-      <button
-        onClick={() => setNeedRefresh(false)}
-        aria-label="Dismiss update notice"
-        className="p-1 rounded-lg text-content-secondary hover:text-content-primary transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+      <IconButton label="Dismiss update notice" onClick={() => setNeedRefresh(false)}>
+        <Icon name="close" size={18} />
+      </IconButton>
     </div>
   )
 }

@@ -1,84 +1,35 @@
-import { useEffect, useState, useRef } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
-import { QuestionCard } from '../components/quiz/QuestionCard'
-import { QuizProgressBar } from '../components/quiz/QuizProgressBar'
-import { QuizNavigation } from '../components/quiz/QuizNavigation'
-import { Button } from '../components/ui/Button'
-import { Modal } from '../components/ui/Modal'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { ExplanationPanel } from '../components/quiz/ExplanationPanel'
+import { OptionButton, type OptionState } from '../components/quiz/OptionButton'
+import { QuestionPalette } from '../components/quiz/QuestionPalette'
+import { QuizBottomBar } from '../components/quiz/QuizBottomBar'
+import { QuizHeader } from '../components/quiz/QuizHeader'
+import { ResumeSheet, ShortcutsSheet, SubmitSheet } from '../components/quiz/QuizSheets'
+import type { QuestionStatus } from '../components/quiz/SegmentedProgress'
+import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
-import { useSubjectData } from '../hooks/useSubjectData'
-import { cn, shuffleArray } from '../lib/utils'
-import { getColorClasses } from '../lib/constants'
-import { EXAM_MODE_SESSION_KEY } from '../lib/examState'
-import { getSubjectColor } from '../lib/subjectUtils'
-import { getSavedProgress, clearProgress } from '../lib/quizProgress'
+import { useQuizKeyboard } from '../hooks/useQuizKeyboard'
 import { useSound } from '../hooks/useSound'
+import { useSubjectData } from '../hooks/useSubjectData'
+import { ROUTES } from '../lib/constants'
+import { EXAM_MODE_SESSION_KEY } from '../lib/examState'
+import { clearProgress, getSavedProgress } from '../lib/quizProgress'
+import { usePageMeta } from '../lib/seo'
+import { shuffleArray } from '../lib/utils'
+import { withQuestionTransition } from '../lib/viewTransition'
 import { isRecord, type SavedProgress } from '../types'
-
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-type IconProps = { className?: string }
-
-function SpeakerOnIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-    </svg>
-  )
-}
-
-function SpeakerOffIcon({ className }: IconProps) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-      <line x1="23" y1="9" x2="17" y2="15" />
-      <line x1="17" y1="9" x2="23" y2="15" />
-    </svg>
-  )
-}
-
-// ─── Tooltip phrases ───────────────────────────────────────────────────────────
-
-const TOOLTIP_PHRASES = [
-  { text: 'psst… tap me!',          icon: '👆', from: '#7F77DD', to: '#534AB7' },
-  { text: 'sound makes it fun!',    icon: '🎵', from: '#1D9E75', to: '#0F6E56' },
-  { text: "you're missing out fr",  icon: '💀', from: '#3C3489', to: '#7F77DD' },
-  { text: 'click. trust me.',       icon: '🎧', from: '#D85A30', to: '#993C1D' },
-  { text: 'unmute for good vibes',  icon: '✨', from: '#BA7517', to: '#854F0B' },
-  { text: 'bro… just click it',     icon: '🫵', from: '#D4537E', to: '#993556' },
-  { text: 'ur quiz is so quiet rn', icon: '🤫', from: '#378ADD', to: '#185FA5' },
-]
-
-function TooltipBubble({ phraseIndex }: { phraseIndex: number }) {
-  const phrase = TOOLTIP_PHRASES[phraseIndex % TOOLTIP_PHRASES.length]
-
-  return (
-    <div
-      style={{
-        background: `linear-gradient(135deg, ${phrase.from}, ${phrase.to})`,
-        color: 'rgba(255,255,255,0.96)',
-      }}
-      className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold shadow-lg select-none"
-    >
-      <span className="text-sm leading-none">{phrase.icon}</span>
-      <span className="overflow-hidden whitespace-nowrap">{phrase.text}</span>
-    </div>
-  )
-}
-
-// ─── Main component ────────────────────────────────────────────────────────────
 
 export function QuizPage() {
   const { slug } = useParams()
-  const navigate = useNavigate()
+  const nav = useNav()
   const {
-    status, subject, questions, answers, currentIndex,
-    answerQuestion, goToQuestion, nextQuestion, prevQuestion, submitQuiz, rehydrate, rehydrateFromProgress,
+    status, subject, questions, answers, currentIndex, startTime, mode,
+    answerQuestion, goToQuestion, submitQuiz, rehydrate, rehydrateFromProgress,
   } = useQuiz()
   const { getSubjectBySlug } = useSubjectData()
-  const { playSound, soundEnabled, toggleSound } = useSound()
+  const { playSound } = useSound()
+  usePageMeta({ title: subject ? `${subject} quiz` : 'Quiz', path: ROUTES.QUIZ_PATH(slug ?? '') })
 
   // Saved progress (localStorage) offered for resume when landing here without an active quiz
   const [savedProgress, setSavedProgress] = useState<SavedProgress | null>(() => {
@@ -86,346 +37,194 @@ export function QuizPage() {
     const saved = getSavedProgress(slug)
     return saved && saved.answers.some((a) => a !== null) ? saved : null
   })
-  const showResumeModal = savedProgress !== null
-  const [showFullExplanation, setShowFullExplanation] = useState<Record<number, boolean>>({})
-  const [showSoundTooltip, setShowSoundTooltip] = useState(() => !soundEnabled)
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({})
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [flash, setFlash] = useState({ index: -1, n: 0 })
 
-  // Each tooltip dismiss schedules a fresh tooltip key so the bubble
-  // remounts (replaying its entrance animation) with the next phrase
-  const [tooltipKey, setTooltipKey] = useState(0)
-  const [tooltipPhraseIndex, setTooltipPhraseIndex] = useState(() => Math.floor(Math.random() * TOOLTIP_PHRASES.length))
-
-  // Ref to hold the auto-dismiss timer
-  const tooltipTimerRef = useRef<number | undefined>(undefined)
-
-  // Scroll to top when quiz starts
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
-  // Auto-dismiss tooltip after 3 s
-  useEffect(() => {
-    if (!showSoundTooltip) return
-
-    tooltipTimerRef.current = window.setTimeout(() => {
-      setShowSoundTooltip(false)
-    }, 3000)
-
-    return () => {
-      window.clearTimeout(tooltipTimerRef.current)
-    }
-  }, [showSoundTooltip, tooltipKey]) // re-runs on each new tooltip show
-
-  // Handle arrow key navigation (← previous, → next)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault()
-        prevQuestion()
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault()
-        nextQuestion()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [prevQuestion, nextQuestion])
-
-  // Re-hydrate quiz if user refreshed the page
+  // Re-hydrate after a refresh; route to results once submitted
   useEffect(() => {
     if (status === 'idle') {
       const subjectData = getSubjectBySlug(slug)
       if (!subjectData) {
-        navigate('/', { replace: true })
+        nav('/', { replace: true })
         return
       }
-
-      // Waiting for the user to choose Resume / Start Fresh
-      if (savedProgress) return
-
+      if (savedProgress) return // waiting for Resume / Start fresh
       rehydrate(subjectData, shuffleArray(subjectData.questions))
     }
     if (status === 'completed') {
       const examModeRaw = sessionStorage.getItem(EXAM_MODE_SESSION_KEY)
+      sessionStorage.removeItem(EXAM_MODE_SESSION_KEY)
       if (examModeRaw) {
         try {
           const examMode: unknown = JSON.parse(examModeRaw)
-          const subjectSlug = isRecord(examMode) && typeof examMode.subjectSlug === 'string'
-            ? examMode.subjectSlug
-            : undefined
-          sessionStorage.removeItem(EXAM_MODE_SESSION_KEY)
-          navigate('/exam/result', { replace: true, state: { subjectSlug } })
-        } catch {
-          sessionStorage.removeItem(EXAM_MODE_SESSION_KEY)
-          navigate('/analytics', { replace: true })
-        }
-      } else {
-        navigate('/analytics', { replace: true })
+          const subjectSlug = isRecord(examMode) && typeof examMode.subjectSlug === 'string' ? examMode.subjectSlug : undefined
+          nav(ROUTES.EXAM_RESULT, { replace: true, state: { subjectSlug } })
+          return
+        } catch { /* fall through to analytics */ }
       }
+      nav(ROUTES.ANALYTICS, { replace: true })
     }
-  }, [status, slug, navigate, getSubjectBySlug, rehydrate, savedProgress])
+  }, [status, slug, nav, getSubjectBySlug, rehydrate, savedProgress])
 
-  function handleResume() {
-    if (savedProgress) rehydrateFromProgress(savedProgress)
-    setSavedProgress(null)
-  }
+  // New question → back to the top so the question is in view
+  useEffect(() => {
+    if (window.scrollY > 0) window.scrollTo({ top: 0 })
+  }, [currentIndex])
 
-  function handleStartFresh() {
-    if (slug) clearProgress(slug)
-    const subjectData = getSubjectBySlug(slug)
-    if (subjectData) {
-      rehydrate(subjectData, shuffleArray(subjectData.questions))
-    }
-    setSavedProgress(null)
-  }
+  const statuses = useMemo<QuestionStatus[]>(
+    () => questions.map((q, i) => (answers[i] == null ? 'open' : answers[i] === q.correctIndex ? 'correct' : 'wrong')),
+    [questions, answers],
+  )
 
-  function handleToggleSound() {
-    if (soundEnabled) {
-      // Turning OFF → show a fresh tooltip phrase
-      window.clearTimeout(tooltipTimerRef.current)
-      setTooltipPhraseIndex(Math.floor(Math.random() * TOOLTIP_PHRASES.length))
-      setTooltipKey(k => k + 1)   // remount TooltipBubble → new phrase
-      setShowSoundTooltip(true)
-      toggleSound()
-      return
-    }
-
-    // Turning ON → hide tooltip
-    setShowSoundTooltip(false)
-    toggleSound()
-  }
-
-  // ── Resume modal ─────────────────────────────────────────────────────────────
-
-  if (showResumeModal) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Modal isOpen={showResumeModal} onClose={handleStartFresh} title="Resume Quiz?">
-          <div className="text-center py-4">
-            <div className="text-4xl mb-4">📝</div>
-            <p className="text-base font-bold text-content-primary mb-2">
-              You have saved progress!
-            </p>
-            <p className="text-sm text-content-secondary mb-1">
-              {savedProgress?.answers.filter(a => a !== null).length} of {savedProgress?.questions.length} questions answered
-            </p>
-            <p className="text-xs text-content-secondary mb-6">
-              Would you like to continue where you left off?
-            </p>
-            <div className="flex gap-3">
-              <Button variant="secondary" className="flex-1" onClick={handleStartFresh}>
-                Start Fresh
-              </Button>
-              <Button className="flex-1" onClick={handleResume}>
-                Resume Quiz
-              </Button>
-            </div>
-          </div>
-        </Modal>
-      </div>
-    )
-  }
-
-  // ── Loading guard ─────────────────────────────────────────────────────────────
-
-  if (status !== 'active' || questions.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-center text-content-secondary">
-          <p className="text-lg font-semibold">Loading quiz...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // ── Derived values ────────────────────────────────────────────────────────────
-
-  const currentQuestion = questions[currentIndex]
+  const active = status === 'active' && questions.length > 0 && !savedProgress
+  const question = active ? questions[currentIndex] : null
   const currentAnswer = answers[currentIndex] ?? null
-  const isLastQuestion = currentIndex === questions.length - 1
-  const answeredCount = answers.filter((a) => a !== null).length
-  const c =getColorClasses(getSubjectColor(slug ?? ''))
+  const isLast = currentIndex === questions.length - 1
+  const answeredCount = statuses.filter((s) => s !== 'open').length
 
-  function handleSubmit() {
-    submitQuiz()
+  function goTo(index: number) {
+    if (index === currentIndex || index < 0 || index >= questions.length) return
+    withQuestionTransition(index > currentIndex ? 'next' : 'prev', () => goToQuestion(index))
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────────
+  function select(i: number) {
+    if (!question || currentAnswer !== null) return
+    answerQuestion(currentIndex, i)
+    playSound(i === question.correctIndex ? 'Correct' : 'Incorrect')
+  }
+
+  function requestSubmit(forceConfirm: boolean) {
+    if (forceConfirm || answeredCount < questions.length) setConfirmOpen(true)
+    else submitQuiz()
+  }
+
+  function next() {
+    if (currentAnswer === null) return
+    if (isLast) requestSubmit(true)
+    else goTo(currentIndex + 1)
+  }
+
+  function toggleMore() {
+    if (currentAnswer === null || !question?.explanation) return
+    setExpanded((prev) => ({ ...prev, [currentIndex]: !prev[currentIndex] }))
+  }
+
+  useQuizKeyboard(
+    {
+      optionCount: question?.options.length ?? 0,
+      answered: currentAnswer !== null,
+      onSelect: (i) => {
+        setFlash((f) => ({ index: i, n: f.n + 1 }))
+        select(i)
+      },
+      onNext: next,
+      onPrev: () => goTo(currentIndex - 1),
+      onSubmit: () => requestSubmit(true),
+      onToggleMore: toggleMore,
+      onHelp: () => setHelpOpen(true),
+    },
+    active,
+  )
+
+  if (savedProgress) {
+    return (
+      <main id="main" className="min-h-dvh">
+        <ResumeSheet
+          open
+          answered={savedProgress.answers.filter((a) => a !== null).length}
+          total={savedProgress.questions.length}
+          onResume={() => {
+            rehydrateFromProgress(savedProgress)
+            setSavedProgress(null)
+          }}
+          onStartFresh={() => {
+            if (slug) clearProgress(slug)
+            const subjectData = getSubjectBySlug(slug)
+            if (subjectData) rehydrate(subjectData, shuffleArray(subjectData.questions))
+            setSavedProgress(null)
+          }}
+        />
+      </main>
+    )
+  }
+
+  if (!question) return <main id="main" className="min-h-dvh" aria-busy="true" />
+
+  function optionState(i: number): OptionState {
+    if (currentAnswer === null || !question) return 'idle'
+    if (i === question.correctIndex) return 'correct'
+    return i === currentAnswer ? 'wrong' : 'dim'
+  }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+    <>
+      <QuizHeader
+        subject={subject ?? ''}
+        mode={mode}
+        exitTo={mode === 'exam' ? ROUTES.EXAM : ROUTES.HOME}
+        current={currentIndex}
+        statuses={statuses}
+        startTime={startTime}
+        onHelp={() => setHelpOpen(true)}
+      />
 
-      {/* ── Subject header ─────────────────────────────────────────────────── */}
-      <div className="relative z-30 flex items-center justify-between mb-6">
-        <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-bold', c.badge, c.badgeDark, c.text, c.textDark)}>
-          <span className="font-bold">{subject || ''}</span>
-        </div>
+      <main id="main" className="mx-auto w-full max-w-[640px] px-4 pt-5 pb-[calc(112px+env(safe-area-inset-bottom))]">
+        <section className="vt-question" aria-labelledby="question-text">
+          <p className="font-mono text-xs font-medium uppercase tracking-wider text-muted">Question {currentIndex + 1}</p>
+          <h1 id="question-text" className="mt-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] sm:text-[21px]">
+            {question.text}
+          </h1>
 
-        <div className="flex items-center gap-2">
-
-          {/* ── Sound toggle + tooltip ──────────────────────────────────────── */}
-          <div className="relative z-50">
-            <button
-              onClick={handleToggleSound}
-              aria-label={soundEnabled ? 'Disable sound' : 'Enable sound'}
-              className={cn(
-                'w-9 h-9 rounded-xl flex items-center justify-center transition-[color,background-color,transform] duration-200',
-                'hover:scale-110 active:scale-90',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-themed-accent',
-                soundEnabled
-                  ? 'text-themed-accent bg-themed-accent/10'
-                  : 'text-content-secondary hover:text-content-primary hover:bg-surface-secondary'
-              )}
-            >
-              {soundEnabled ? (
-                <SpeakerOnIcon key="on" className="w-4 h-4 animate-pop" />
-              ) : (
-                <SpeakerOffIcon key="off" className="w-4 h-4 animate-pop" />
-              )}
-            </button>
-
-            {/* ── Surprise tooltip ─────────────────────────────────────────── */}
-            {showSoundTooltip && !soundEnabled && (
-              <div
-                key={tooltipKey}
-                className="absolute right-0 top-full mt-2 z-[60] animate-pop"
-              >
-                <TooltipBubble phraseIndex={tooltipPhraseIndex} />
-
-                <div
-                  className="absolute -top-1.5 right-3 w-3 h-3 rotate-45 rounded-sm"
-                  style={{
-                    background: TOOLTIP_PHRASES[tooltipPhraseIndex].from,
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          <Link
-            to="/"
-            className="text-xs text-content-secondary hover:text-content-primary transition-colors flex items-center gap-1"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Exit
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Quiz card ──────────────────────────────────────────────────────── */}
-      <div>
-        <div className="card p-6 sm:p-8">
-          <QuizProgressBar
-            current={currentIndex + 1}
-            total={questions.length}
-            answeredCount={answeredCount}
-          />
-
-          <QuestionCard
-            question={currentQuestion}
-            questionNumber={currentIndex + 1}
-            selectedIndex={currentAnswer}
-            isSubmitted={currentAnswer !== null}
-            onSelect={(i) => {
-              answerQuestion(currentIndex, i)
-              playSound(i === currentQuestion.correctIndex ? 'Correct' : 'Incorrect')
-            }}
-          />
-
-          <QuizNavigation
-            currentIndex={currentIndex}
-            total={questions.length}
-            selectedIndex={currentAnswer}
-            isLastQuestion={isLastQuestion}
-            onPrev={prevQuestion}
-            onNext={nextQuestion}
-            onSubmit={handleSubmit}
-          />
-
-          {/* ── Explanation ──────────────────────────────────────────────── */}
-          {currentAnswer !== null && (currentQuestion.shortExplanation || currentQuestion.explanation) && (
-            <div
-              key={`explanation-${currentIndex}`}
-              className="mt-6 overflow-hidden animate-fade-up"
-            >
-              <div className="p-4 rounded-xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800">
-                <div className="flex items-start gap-2.5">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center text-xs font-bold mt-0.5">
-                    💡
-                  </span>
-                  <div className="flex-1">
-                    <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wide mb-1">
-                      Quick Answer
-                    </p>
-                    <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">
-                      {currentQuestion.shortExplanation || (currentQuestion.explanation ?? '').split('.').slice(0, 2).join('.') + '.'}
-                    </p>
-
-                    {currentQuestion.explanation && (
-                      <>
-                        <button
-                          onClick={() => setShowFullExplanation((prev) => ({
-                            ...prev,
-                            [currentIndex]: !prev[currentIndex]
-                          }))}
-                          className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors"
-                        >
-                          {showFullExplanation[currentIndex] ? '▲ Show Less' : '▼ Know More'}
-                        </button>
-
-                        {showFullExplanation[currentIndex] && (
-                          <div className="overflow-hidden animate-fade-in">
-                            <div className="mt-2 pt-2 border-t border-indigo-200 dark:border-indigo-800">
-                              <p className="text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wide mb-1">
-                                Detailed Explanation
-                              </p>
-                              <div className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed space-y-2">
-                                {currentQuestion.explanation.split('\n\n').map((para, i) => (
-                                  <p key={i}>{para}</p>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* ── Question palette ───────────────────────────────────────────────── */}
-      {questions.length > 1 && (
-        <div className="mt-4 card p-4">
-          <p className="text-xs text-content-secondary font-semibold mb-3">Question Palette</p>
-          <div className="flex flex-wrap gap-2">
-            {questions.map((_, i) => (
-              <button
+          <div role="group" aria-label="Answer options" className="mt-5 space-y-2.5">
+            {question.options.map((option, i) => (
+              <OptionButton
                 key={i}
-                onClick={() => goToQuestion(i)}
-                className={cn(
-                  'w-8 h-8 rounded-lg text-xs font-bold transition-all',
-                  i === currentIndex
-                    ? 'bg-themed-accent text-white shadow-md'
-                    : answers[i] !== null
-                      ? answers[i] === questions[i].correctIndex
-                        ? 'bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300'
-                        : 'bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300'
-                      : 'bg-surface-secondary text-content-secondary hover:bg-themed-accent/10 hover:text-themed-accent'
-                )}
-              >
-                {i + 1}
-              </button>
+                option={option}
+                index={i}
+                state={optionState(i)}
+                locked={currentAnswer !== null}
+                flash={flash.index === i ? flash.n : 0}
+                onSelect={() => select(i)}
+              />
             ))}
           </div>
-        </div>
-      )}
-    </div>
+
+          {currentAnswer !== null && (
+            <ExplanationPanel
+              key={currentIndex}
+              question={question}
+              isCorrect={currentAnswer === question.correctIndex}
+              expanded={!!expanded[currentIndex]}
+              onToggle={toggleMore}
+            />
+          )}
+        </section>
+
+        {questions.length > 1 && <QuestionPalette statuses={statuses} current={currentIndex} onJump={goTo} />}
+      </main>
+
+      <QuizBottomBar
+        canPrev={currentIndex > 0}
+        canAdvance={currentAnswer !== null}
+        isLast={isLast}
+        onPrev={() => goTo(currentIndex - 1)}
+        onNext={next}
+        onSubmit={() => requestSubmit(false)}
+      />
+
+      <ShortcutsSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <SubmitSheet
+        open={confirmOpen}
+        answered={answeredCount}
+        total={questions.length}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false)
+          submitQuiz()
+        }}
+      />
+    </>
   )
 }
