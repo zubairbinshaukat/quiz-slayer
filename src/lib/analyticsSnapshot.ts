@@ -1,3 +1,4 @@
+import { parseQuizMode } from './quizProgress'
 import { isRecord, type AnalyticsSnapshot, type Answer, type Question } from '../types'
 
 export const ANALYTICS_KEY = 'quiz-analytics'
@@ -35,6 +36,8 @@ export function readAnalyticsSnapshot(): AnalyticsSnapshot | null {
         timeTaken: result.timeTaken,
       },
       subject,
+      slug: typeof parsed.slug === 'string' ? parsed.slug : undefined,
+      mode: parseQuizMode(parsed.mode),
       // Written by this app from validated question data
       questions: questions as Question[],
       answers,

@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['target.svg', 'sounds/*.mp3'],
+      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png', 'sounds/*.mp3'],
       manifest: {
         name: 'Quiz Slayer',
         short_name: 'Quiz Slayer',
@@ -22,7 +22,7 @@ export default defineConfig({
         icons: [
           { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'pwa-maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {

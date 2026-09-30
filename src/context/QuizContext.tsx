@@ -2,8 +2,10 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { SESSION_KEY } from '../lib/constants'
 import { saveQuizResult } from '../lib/db'
 import { clearProgress, writeProgress } from '../lib/quizProgress'
-import { isRecord, type AnalyticsSnapshot, type Question, type SavedProgress, type SubjectMeta } from '../types'
-import { ANALYTICS_KEY } from '../lib/analyticsSnapshot'
+import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
+import { shuffleArray } from '../lib/utils'
+import { isRecord, type AnalyticsSnapshot, type Answer, type Question, type QuizMode, type SavedProgress, type SubjectMeta } from '../types'
+import { ANALYTICS_KEY, readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
 import { QuizContext, type QuizState } from './quizContextDef'
 
 const INITIAL_STATE: QuizState = {
@@ -15,6 +17,7 @@ const INITIAL_STATE: QuizState = {
   startTime: null,
   status: 'idle',
   result: null,
+  mode: 'quiz',
 }
 
 /* ─── Progress helpers (localStorage) ─────────────────────────── */
@@ -27,6 +30,7 @@ function saveProgress(state: QuizState): void {
     answers: state.answers,
     currentIndex: state.currentIndex,
     startTime: (state.startTime ?? new Date()).toISOString(),
+    mode: state.mode,
   })
 }
 
@@ -46,7 +50,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<QuizState>(INITIAL_STATE)
 
   /** Start a new quiz session */
-  const startQuiz = useCallback((subjectMeta: SubjectMeta, questions: Question[]) => {
+  const startQuiz = useCallback((subjectMeta: SubjectMeta, questions: Question[], mode: QuizMode = 'quiz') => {
     const startTime = new Date()
     setState({
       subject: subjectMeta.subject,
@@ -57,6 +61,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       startTime,
       status: 'active',
       result: null,
+      mode,
     })
     sessionStorage.setItem(
       SESSION_KEY,
@@ -65,6 +70,33 @@ export function QuizProvider({ children }: { children: ReactNode }) {
     // Clear any previous analytics snapshot so stale data doesn't bleed through
     sessionStorage.removeItem(ANALYTICS_KEY)
   }, [])
+
+  /** Start a new quiz with only the wrong questions of the completed quiz */
+  const startRetry = useCallback((): number => {
+    let slug: string | null = null
+    let subject = ''
+    let questions: Question[] = []
+    let answers: Answer[] = []
+    if (state.status === 'completed' && state.slug) {
+      slug = state.slug
+      subject = state.subject ?? ''
+      questions = state.questions
+      answers = state.answers
+    } else {
+      const snap = readAnalyticsSnapshot()
+      if (snap?.slug) {
+        slug = snap.slug
+        subject = snap.subject
+        questions = snap.questions
+        answers = snap.answers
+      }
+    }
+    if (!slug) return 0
+    const wrong = getWrongQuestions(questions, answers)
+    if (wrong.length === 0) return 0
+    startQuiz({ subject, slug }, shuffleArray(wrong), 'retry')
+    return wrong.length
+  }, [state, startQuiz])
 
   /** Record user's answer for a question index */
   const answerQuestion = useCallback((questionIndex: number, optionIndex: number) => {
@@ -124,6 +156,8 @@ export function QuizProvider({ children }: { children: ReactNode }) {
         subject: prev.subject ?? '',
         questions: prev.questions,
         answers: prev.answers,
+        slug: prev.slug ?? undefined,
+        mode: prev.mode,
       }
 
       // Guard prevents double-saving in StrictMode (updater is called twice but
@@ -138,6 +172,10 @@ export function QuizProvider({ children }: { children: ReactNode }) {
           total,
           answers: prev.answers,
           timeTaken,
+          mode: prev.mode,
+          questionIds: prev.questions.map((q) => String(q.id)),
+          wrongIds: getWrongQuestions(prev.questions, prev.answers).map((q) => String(q.id)),
+          optionsCount: getOptionsCount(prev.questions),
         })
       }
 
@@ -174,6 +212,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       startTime,
       status: 'active',
       result: null,
+      mode: 'quiz',
     })
   }, [])
 
@@ -188,6 +227,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       startTime: new Date(saved.startTime),
       status: 'active',
       result: null,
+      mode: saved.mode,
     })
     sessionStorage.setItem(
       SESSION_KEY,
@@ -199,6 +239,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
     () => ({
       ...state,
       startQuiz,
+      startRetry,
       answerQuestion,
       goToQuestion,
       nextQuestion,
@@ -211,6 +252,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
     [
       state,
       startQuiz,
+      startRetry,
       answerQuestion,
       goToQuestion,
       nextQuestion,

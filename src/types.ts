@@ -50,6 +50,9 @@ export type Answer = number | null
 
 export type QuizStatus = 'idle' | 'active' | 'completed'
 
+/** How a quiz session was started. */
+export type QuizMode = 'quiz' | 'exam' | 'retry'
+
 export interface QuizResult {
   correct: number
   total: number
@@ -65,14 +68,19 @@ export interface SavedProgress {
   answers: Answer[]
   currentIndex: number
   startTime: string
+  mode: QuizMode
 }
 
 /** Snapshot stored in sessionStorage (quiz-analytics) for the results pages. */
 export interface AnalyticsSnapshot {
   result: QuizResult
   subject: string
+  /** Absent in snapshots written by older versions. */
+  slug?: string
   questions: Question[]
   answers: Answer[]
+  /** Absent in snapshots written by older versions (treated as 'quiz'). */
+  mode?: QuizMode
 }
 
 /** Record written to IndexedDB quiz_history (without id / dateTaken). */
@@ -84,6 +92,11 @@ export interface NewHistoryEntry {
   total: number
   answers: Answer[]
   timeTaken: number
+  mode?: QuizMode
+  /** Absent on entries saved before these fields existed. */
+  questionIds?: string[]
+  wrongIds?: string[]
+  optionsCount?: number
 }
 
 export interface HistoryEntry extends NewHistoryEntry {

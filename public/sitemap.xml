@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO: replace https://quiz-slayer.vercel.app with the real deploy URL (must match robots.txt and canonical URLs). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://quiz-slayer.vercel.app/</loc>
+    <lastmod>2026-10-01</lastmod>
+  </url>
+  <url>
+    <loc>https://quiz-slayer.vercel.app/leaderboard</loc>
+    <lastmod>2026-10-01</lastmod>
+  </url>
+  <url>
+    <loc>https://quiz-slayer.vercel.app/history</loc>
+    <lastmod>2026-10-01</lastmod>
+  </url>
+  <url>
+    <loc>https://quiz-slayer.vercel.app/exam</loc>
+    <lastmod>2026-10-01</lastmod>
+  </url>
+  <url>
+    <loc>https://quiz-slayer.vercel.app/upload</loc>
+    <lastmod>2026-10-01</lastmod>
+  </url>
+</urlset>

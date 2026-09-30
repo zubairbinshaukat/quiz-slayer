@@ -1,5 +1,9 @@
 import { PROGRESS_KEY_PREFIX } from './constants'
-import { isRecord, type Answer, type Question, type SavedProgress } from '../types'
+import { isRecord, type Answer, type Question, type QuizMode, type SavedProgress } from '../types'
+
+export function parseQuizMode(v: unknown): QuizMode {
+  return v === 'exam' || v === 'retry' ? v : 'quiz'
+}
 
 export function clearProgress(slug: string): void {
   try {
@@ -37,6 +41,7 @@ function parseProgress(value: unknown): SavedProgress | null {
     answers,
     currentIndex: typeof currentIndex === 'number' ? currentIndex : 0,
     startTime: typeof startTime === 'string' ? startTime : new Date().toISOString(),
+    mode: parseQuizMode(value.mode),
   }
 }
 

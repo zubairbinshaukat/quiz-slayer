@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img">
+  <title>Quiz Slayer mark</title>
+  <!--
+    The Sliced S. 24-unit grid.
+    Bowls: outer r=6 / inner r=2 (stroke 4), centred on the "\" diagonal at (8.5,8.5) and (15.5,15.5).
+    Blade: one cut on the "/" diagonal x+y=24. Gap = x+y in (23,25) for #m, (22,26) for #ms.
+    The same single cut forms both blade-tip terminals and severs the spine.
+    #m: upper half slipped 0.5 down-left along the blade, lower half 0.5 up-right.
+    Vars: --ink (obsidian ground), --paper (bone text), --accent (amber mark).
+  -->
+  <defs>
+    <g id="m"><path fill="var(--accent)" d="M20.5 2.5H8.5A6 6 0 0 0 8.5 14.5L12.5 10.5H8.5A2 2 0 0 1 8.5 6.5H16.5Z"/><path fill="var(--accent)" d="M3.5 21.5H15.5A6 6 0 0 0 15.5 9.5L11.5 13.5H15.5A2 2 0 0 1 15.5 17.5H7.5Z"/></g>
+    <g id="ms"><path fill="var(--accent)" d="M20 2H9A6 6 0 0 0 8.07 13.93L12 10H9A2 2 0 0 1 9 6H16Z"/><path fill="var(--accent)" d="M4 22H15A6 6 0 0 0 15.93 10.07L12 14H15A2 2 0 0 1 15 18H8Z"/></g>
+  </defs>
+  <use href="#m" style="--ink:#0B0B0F;--paper:#F4F2EE;--accent:#F5B73A"/>
+</svg>

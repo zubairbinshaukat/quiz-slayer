@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { Answer, Question, QuizResult, QuizStatus, SavedProgress, SubjectMeta } from '../types'
+import type { Answer, Question, QuizMode, QuizResult, QuizStatus, SavedProgress, SubjectMeta } from '../types'
 
 export interface QuizState {
   subject: string | null
@@ -10,10 +10,13 @@ export interface QuizState {
   startTime: Date | null
   status: QuizStatus
   result: QuizResult | null
+  mode: QuizMode
 }
 
 export interface QuizActions {
-  startQuiz: (subjectMeta: SubjectMeta, questions: Question[]) => void
+  startQuiz: (subjectMeta: SubjectMeta, questions: Question[], mode?: QuizMode) => void
+  /** Restart with only the wrong questions of the completed quiz. Returns count started (0 = nothing done). */
+  startRetry: () => number
   answerQuestion: (questionIndex: number, optionIndex: number) => void
   goToQuestion: (index: number) => void
   nextQuestion: () => void
