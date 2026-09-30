@@ -5,11 +5,19 @@
 <p align="left">
 	<img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
 	<img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite" />
-	<img src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+	<img src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+	<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
 	<img src="https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white" alt="React Router" />
-	<img src="https://img.shields.io/badge/Framer_Motion-12-0055FF?logo=framer&logoColor=white" alt="Framer Motion" />
+	<img src="https://img.shields.io/badge/Convex-backend-EE342F?logo=convex&logoColor=white" alt="Convex" />
+	<img src="https://img.shields.io/badge/PWA-vite--plugin--pwa-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
 	<img src="https://img.shields.io/badge/IndexedDB-idb-2563EB?logo=databricks&logoColor=white" alt="idb" />
 </p>
+
+- **TypeScript** (strict) — `npm run typecheck`
+- **Tailwind CSS 4** via `@tailwindcss/vite` (theme tokens in `src/styles/index.css`)
+- **Lenis** smooth scrolling
+- **PWA** via `vite-plugin-pwa` (installable, offline precache, update prompt)
+- **Convex** backend scaffolding in `convex/` (players, attempts, leaderboard). Optional: set `VITE_CONVEX_URL` (see `.env.example`); the app runs fully local without it.
 
 
 <p align="center">
