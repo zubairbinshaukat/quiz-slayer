@@ -27,7 +27,7 @@ export function Navbar({ onOpenSettings, onLogoTap }: NavbarProps) {
     <header className="glass pt-safe sticky top-0 z-40 border-b border-line lg:hidden [view-transition-name:navbar]">
       <div className="mx-auto flex h-14 max-w-[1260px] items-center justify-between gap-2 px-4 md:h-16 md:px-6">
         <Link to={ROUTES.HOME} viewTransition={!lite} className="press -ml-1 flex items-center rounded-btn p-1 text-fg" aria-label="Quiz Slayer home" onClick={onLogoTap}>
-          <LogoWordmark size={24} title="" markClassName="text-accent" />
+          <LogoWordmark size={24} title="" />
         </Link>
 
         <nav aria-label="Primary" className="flex items-center gap-0.5">

@@ -43,9 +43,9 @@ export function Sidebar({ onOpenSettings, onLogoTap }: SidebarProps) {
         viewTransition={!lite}
         onClick={onLogoTap}
         aria-label="Quiz Slayer home"
-        className={cn(ITEM, 'text-fg hover:text-accent')}
+        className={ITEM}
       >
-        <Logo size={30} title="" className="transition-colors duration-200" />
+        <Logo size={44} title="" className="transition-transform duration-200 group-hover:-rotate-6 group-hover:scale-110" />
       </Link>
 
       <div className="my-5 h-px w-8 bg-line" aria-hidden="true" />

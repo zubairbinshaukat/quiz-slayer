@@ -13,7 +13,8 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon.png', 'sounds/*.mp3'],
+      includeManifestIcons: false,
+      includeAssets: ['favicon-96.png', 'favicon.ico', 'apple-touch-icon.png', 'sounds/*.mp3'],
       manifest: {
         name: 'Quiz Slayer',
         short_name: 'Quiz Slayer',
@@ -30,8 +31,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json,mp3,woff2}'],
-        // 3D icons are fetched on demand (runtime cache below); non-Latin font subsets load only if needed
-        globIgnores: ['**/icons3d/**', '**/*cyrillic*.woff2', '**/*vietnamese*.woff2'],
+        // 3D icons are fetched on demand (runtime cache below); non-Latin font subsets load only if needed;
+        // install icons and the social card are never shown inside the app
+        globIgnores: ['**/icons3d/**', '**/*cyrillic*.woff2', '**/*vietnamese*.woff2', 'pwa-*.png', 'og-image.png'],
         navigateFallback: '/index.html',
         runtimeCaching: [
           {

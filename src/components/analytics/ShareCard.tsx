@@ -35,7 +35,7 @@ function ShareCardArt({ data, ref }: { data: ShareCardData; ref?: Ref<HTMLDivEle
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <LogoWordmark size={60} title="" markClassName="text-accent" style={{ color: C.fg }} />
+        <LogoWordmark size={64} title="" glow style={{ color: C.fg }} />
         <img src={icon3dSrc(grade.icon, 'premium')} width={180} height={180} alt="" style={{ filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.55))' }} />
       </div>
       <p style={{ marginTop: 8, fontSize: 44, fontWeight: 600, color: C.muted, letterSpacing: '-0.01em' }}>{subject}</p>
