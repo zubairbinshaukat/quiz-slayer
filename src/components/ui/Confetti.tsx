@@ -38,7 +38,7 @@ function generateParticles(count: number): Particle[] {
 export function Confetti({ count = 64 }: { count?: number }) {
   const [particles] = useState(() => generateParticles(count))
   return (
-    <div className="pointer-events-none fixed inset-0 z-[60] overflow-hidden motion-reduce:hidden" aria-hidden="true">
+    <div className="confetti pointer-events-none fixed inset-0 z-[60] overflow-hidden motion-reduce:hidden" aria-hidden="true">
       {particles.map((p) => (
         <span
           key={p.id}

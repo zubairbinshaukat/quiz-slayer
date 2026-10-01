@@ -63,7 +63,11 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
   useEffect(() => {
     if (!open || !lenis) return
     lenis.stop()
-    return () => lenis.start()
+    return () => {
+      // Lite mode can destroy Lenis while a sheet is open (destroy() strips the root
+      // `lenis` class); restarting a destroyed instance would re-add its classes.
+      if (document.documentElement.classList.contains('lenis')) lenis.start()
+    }
   }, [open, lenis])
 
   function trapTab(e: ReactKeyboardEvent<HTMLDivElement>) {

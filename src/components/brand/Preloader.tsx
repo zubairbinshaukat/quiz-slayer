@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { isLiteActive } from '../../lib/liteMode'
+import { PRELOADED_KEY as SESSION_FLAG } from '../../lib/storageKeys'
 import { prefersReducedMotion } from '../../lib/viewTransition'
 import { MARK as LOGO_MARK_PATHS } from './logoPaths'
 
-const SESSION_FLAG = 'qs-preloaded'
 const DRAW_MS = 900
 const FADE_MS = 250 // DRAW_MS + FADE_MS stays under the 1.2s cap
 
@@ -12,7 +13,7 @@ function shouldShow(): boolean {
   } catch {
     return false
   }
-  return !prefersReducedMotion()
+  return !prefersReducedMotion() && !isLiteActive()
 }
 
 /**
@@ -44,7 +45,7 @@ export function Preloader() {
   return (
     <div
       aria-hidden="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-bg"
+      className="preloader fixed inset-0 z-[100] flex items-center justify-center bg-bg"
       style={leaving ? { animation: `preloader-out ${FADE_MS}ms ease-out forwards` } : undefined}
     >
       <svg viewBox="0 0 24 24" width="88" height="88" className="text-accent">

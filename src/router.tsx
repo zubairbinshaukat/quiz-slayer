@@ -15,8 +15,6 @@ export const router = createBrowserRouter([
       { path: 'history', lazy: async () => ({ Component: (await import('./pages/HistoryPage')).HistoryPage }) },
       { path: 'leaderboard', lazy: async () => ({ Component: (await import('./pages/LeaderboardPage')).LeaderboardPage }) },
       { path: 'upload', lazy: async () => ({ Component: (await import('./pages/UploadPage')).UploadPage }) },
-      { path: 'exam', lazy: async () => ({ Component: (await import('./pages/ExamPage')).ExamPage }) },
-      { path: 'exam/result', lazy: async () => ({ Component: (await import('./pages/ExamResultPage')).ExamResultPage }) },
       { path: '*', lazy: landing },
     ],
   },

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { THEME_KEY } from '../lib/constants'
+import { THEME_KEY } from '../lib/storageKeys'
 import { ThemeContext, type Theme } from './themeContextDef'
 
 /** Must match --color-bg for each theme in styles/index.css */

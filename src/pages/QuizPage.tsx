@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ExplanationPanel } from '../components/quiz/ExplanationPanel'
-import { OptionButton, type OptionState } from '../components/quiz/OptionButton'
+import { QuestionCard } from '../components/quiz/QuestionCard'
 import { QuestionPalette } from '../components/quiz/QuestionPalette'
 import { QuizBottomBar } from '../components/quiz/QuizBottomBar'
 import { QuizHeader } from '../components/quiz/QuizHeader'
@@ -13,12 +12,12 @@ import { useQuizKeyboard } from '../hooks/useQuizKeyboard'
 import { useSound } from '../hooks/useSound'
 import { useSubjectData } from '../hooks/useSubjectData'
 import { ROUTES } from '../lib/constants'
-import { EXAM_MODE_SESSION_KEY } from '../lib/examState'
+import { EXAM_SECONDS_PER_QUESTION } from '../lib/examState'
 import { clearProgress, getSavedProgress } from '../lib/quizProgress'
 import { usePageMeta } from '../lib/seo'
 import { shuffleArray } from '../lib/utils'
 import { withQuestionTransition } from '../lib/viewTransition'
-import { isRecord, type SavedProgress } from '../types'
+import type { SavedProgress } from '../types'
 
 export function QuizPage() {
   const { slug } = useParams()
@@ -53,19 +52,7 @@ export function QuizPage() {
       if (savedProgress) return // waiting for Resume / Start fresh
       rehydrate(subjectData, shuffleArray(subjectData.questions))
     }
-    if (status === 'completed') {
-      const examModeRaw = sessionStorage.getItem(EXAM_MODE_SESSION_KEY)
-      sessionStorage.removeItem(EXAM_MODE_SESSION_KEY)
-      if (examModeRaw) {
-        try {
-          const examMode: unknown = JSON.parse(examModeRaw)
-          const subjectSlug = isRecord(examMode) && typeof examMode.subjectSlug === 'string' ? examMode.subjectSlug : undefined
-          nav(ROUTES.EXAM_RESULT, { replace: true, state: { subjectSlug } })
-          return
-        } catch { /* fall through to analytics */ }
-      }
-      nav(ROUTES.ANALYTICS, { replace: true })
-    }
+    if (status === 'completed') nav(ROUTES.ANALYTICS, { replace: true })
   }, [status, slug, nav, getSubjectBySlug, rehydrate, savedProgress])
 
   // New question → back to the top so the question is in view
@@ -73,16 +60,25 @@ export function QuizPage() {
     if (window.scrollY > 0) window.scrollTo({ top: 0 })
   }, [currentIndex])
 
+  // Timed exam: answers stay hidden until submit, so progress only shows answered / open
+  const exam = mode === 'exam'
   const statuses = useMemo<QuestionStatus[]>(
-    () => questions.map((q, i) => (answers[i] == null ? 'open' : answers[i] === q.correctIndex ? 'correct' : 'wrong')),
-    [questions, answers],
+    () =>
+      questions.map((q, i) =>
+        answers[i] == null ? 'open' : exam ? 'answered' : answers[i] === q.correctIndex ? 'correct' : 'wrong',
+      ),
+    [questions, answers, exam],
   )
+  const deadline = exam && startTime ? startTime.getTime() + questions.length * EXAM_SECONDS_PER_QUESTION * 1000 : null
 
   const active = status === 'active' && questions.length > 0 && !savedProgress
   const question = active ? questions[currentIndex] : null
   const currentAnswer = answers[currentIndex] ?? null
   const isLast = currentIndex === questions.length - 1
   const answeredCount = statuses.filter((s) => s !== 'open').length
+  // Practice locks after the first pick; exams allow skipping and changing answers
+  const locked = !exam && currentAnswer !== null
+  const canAdvance = exam || currentAnswer !== null
 
   function goTo(index: number) {
     if (index === currentIndex || index < 0 || index >= questions.length) return
@@ -90,9 +86,9 @@ export function QuizPage() {
   }
 
   function select(i: number) {
-    if (!question || currentAnswer !== null) return
+    if (!question || locked) return
     answerQuestion(currentIndex, i)
-    playSound(i === question.correctIndex ? 'Correct' : 'Incorrect')
+    if (!exam) playSound(i === question.correctIndex ? 'Correct' : 'Incorrect')
   }
 
   function requestSubmit(forceConfirm: boolean) {
@@ -101,20 +97,20 @@ export function QuizPage() {
   }
 
   function next() {
-    if (currentAnswer === null) return
+    if (!canAdvance) return
     if (isLast) requestSubmit(true)
     else goTo(currentIndex + 1)
   }
 
   function toggleMore() {
-    if (currentAnswer === null || !question?.explanation) return
+    if (exam || currentAnswer === null || !question?.explanation) return
     setExpanded((prev) => ({ ...prev, [currentIndex]: !prev[currentIndex] }))
   }
 
   useQuizKeyboard(
     {
       optionCount: question?.options.length ?? 0,
-      answered: currentAnswer !== null,
+      answered: locked,
       onSelect: (i) => {
         setFlash((f) => ({ index: i, n: f.n + 1 }))
         select(i)
@@ -152,62 +148,38 @@ export function QuizPage() {
 
   if (!question) return <main id="main" className="min-h-dvh" aria-busy="true" />
 
-  function optionState(i: number): OptionState {
-    if (currentAnswer === null || !question) return 'idle'
-    if (i === question.correctIndex) return 'correct'
-    return i === currentAnswer ? 'wrong' : 'dim'
-  }
-
   return (
     <>
       <QuizHeader
         subject={subject ?? ''}
         mode={mode}
-        exitTo={mode === 'exam' ? ROUTES.EXAM : ROUTES.HOME}
+        exitTo={ROUTES.HOME}
         current={currentIndex}
         statuses={statuses}
         startTime={startTime}
+        deadline={deadline}
+        onExpire={submitQuiz}
         onHelp={() => setHelpOpen(true)}
       />
 
       <main id="main" className="mx-auto w-full max-w-[640px] px-4 pt-5 pb-[calc(112px+env(safe-area-inset-bottom))]">
-        <section className="vt-question" aria-labelledby="question-text">
-          <p className="font-mono text-xs font-medium uppercase tracking-wider text-muted">Question {currentIndex + 1}</p>
-          <h1 id="question-text" className="mt-2 text-[19px] font-semibold leading-snug tracking-[-0.01em] sm:text-[21px]">
-            {question.text}
-          </h1>
-
-          <div role="group" aria-label="Answer options" className="mt-5 space-y-2.5">
-            {question.options.map((option, i) => (
-              <OptionButton
-                key={i}
-                option={option}
-                index={i}
-                state={optionState(i)}
-                locked={currentAnswer !== null}
-                flash={flash.index === i ? flash.n : 0}
-                onSelect={() => select(i)}
-              />
-            ))}
-          </div>
-
-          {currentAnswer !== null && (
-            <ExplanationPanel
-              key={currentIndex}
-              question={question}
-              isCorrect={currentAnswer === question.correctIndex}
-              expanded={!!expanded[currentIndex]}
-              onToggle={toggleMore}
-            />
-          )}
-        </section>
+        <QuestionCard
+          question={question}
+          index={currentIndex}
+          answer={currentAnswer}
+          exam={exam}
+          expanded={!!expanded[currentIndex]}
+          flash={flash}
+          onSelect={select}
+          onToggleMore={toggleMore}
+        />
 
         {questions.length > 1 && <QuestionPalette statuses={statuses} current={currentIndex} onJump={goTo} />}
       </main>
 
       <QuizBottomBar
         canPrev={currentIndex > 0}
-        canAdvance={currentAnswer !== null}
+        canAdvance={canAdvance}
         isLast={isLast}
         onPrev={() => goTo(currentIndex - 1)}
         onNext={next}
@@ -217,6 +189,7 @@ export function QuizPage() {
       <ShortcutsSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
       <SubmitSheet
         open={confirmOpen}
+        exam={exam}
         answered={answeredCount}
         total={questions.length}
         onCancel={() => setConfirmOpen(false)}

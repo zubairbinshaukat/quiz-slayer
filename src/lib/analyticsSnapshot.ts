@@ -1,7 +1,6 @@
 import { parseQuizMode } from './quizProgress'
+import { ANALYTICS_KEY } from './storageKeys'
 import { isRecord, type AnalyticsSnapshot, type Answer, type Question } from '../types'
-
-export const ANALYTICS_KEY = 'quiz-analytics'
 
 function isAnswer(v: unknown): v is Answer {
   return v === null || typeof v === 'number'

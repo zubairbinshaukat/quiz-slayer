@@ -11,10 +11,11 @@ import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
 import { readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
 import { ROUTES } from '../lib/constants'
+import { EXAM_PASS_THRESHOLD } from '../lib/examState'
 import { computePoints, formatPoints } from '../lib/ranking'
 import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
 import { usePageMeta } from '../lib/seo'
-import { formatClock } from '../lib/utils'
+import { cn, formatClock } from '../lib/utils'
 import type { AnalyticsSnapshot } from '../types'
 
 export function AnalyticsPage() {
@@ -42,6 +43,8 @@ export function AnalyticsPage() {
   const answered = ans.filter((a) => a !== null).length
   const points = computePoints(r.correct, answered - r.correct, getOptionsCount(qs) || 4)
   const cleared = data.mode === 'retry' && wrongCount === 0
+  const exam = data.mode === 'exam'
+  const passed = exam && r.score >= EXAM_PASS_THRESHOLD
 
   function handleRetryWrong() {
     const started = startRetry()
@@ -55,15 +58,33 @@ export function AnalyticsPage() {
 
   return (
     <Page>
-      {cleared && <Confetti />}
-      <h1 className="sr-only">Quiz results</h1>
+      {(cleared || passed) && <Confetti />}
+      <h1 className="sr-only">{exam ? 'Exam results' : 'Quiz results'}</h1>
 
       <ScoreHero
         score={r.score}
         subject={data.subject}
-        eyebrow={data.mode === 'retry' ? 'Retry round' : data.mode === 'exam' ? 'Mock exam' : 'Quiz complete'}
-        headline={cleared ? 'Cleared!' : undefined}
+        eyebrow={data.mode === 'retry' ? 'Retry round' : exam ? 'Timed exam' : 'Quiz complete'}
+        headline={exam ? (passed ? 'Passed' : 'Keep going') : cleared ? 'Cleared!' : undefined}
       />
+
+      {exam && (
+        <div
+          role="status"
+          className={cn(
+            'card mt-3 flex items-start gap-3 p-4 text-sm leading-relaxed',
+            passed ? 'border-success/30' : 'border-accent/30',
+          )}
+        >
+          <Icon name={passed ? 'check' : 'info'} size={18} className={cn('mt-0.5 shrink-0', passed ? 'text-success' : 'text-accent-fg')} />
+          <p>
+            <span className="font-semibold">{passed ? 'Passed. ' : `Keep going — the pass mark is ${EXAM_PASS_THRESHOLD}%. `}</span>
+            {wrongCount > 0
+              ? `${wrongCount} question${wrongCount === 1 ? '' : 's'} you missed will come back in your next timed exam${r.correct > 0 ? '; the ones you got right are mastered' : ''}.`
+              : 'Perfect score: every question in this exam is now mastered.'}
+          </p>
+        </div>
+      )}
 
       <StatStrip
         className="mt-3"

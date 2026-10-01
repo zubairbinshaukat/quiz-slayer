@@ -26,7 +26,7 @@ export function QuestionPalette({ statuses, current, onJump }: QuestionPalettePr
       <div ref={stripRef} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 py-1" data-lenis-prevent>
         {statuses.map((s, i) => {
           const isCurrent = i === current
-          const statusLabel = s === 'correct' ? 'correct' : s === 'wrong' ? 'wrong' : 'unanswered'
+          const statusLabel = s === 'open' ? 'unanswered' : s
           return (
             <button
               key={i}
@@ -39,6 +39,7 @@ export function QuestionPalette({ statuses, current, onJump }: QuestionPalettePr
                 'press flex size-11 shrink-0 items-center justify-center rounded-btn border font-mono text-sm font-semibold',
                 s === 'correct' && 'border-success/40 bg-success/12 text-success',
                 s === 'wrong' && 'border-danger/40 bg-danger/12 text-danger',
+                s === 'answered' && 'border-line-strong bg-surface-2 text-fg',
                 s === 'open' && 'border-line bg-surface text-muted',
                 isCurrent && 'border-accent ring-2 ring-accent/40',
                 isCurrent && s === 'open' && 'bg-accent text-accent-ink',

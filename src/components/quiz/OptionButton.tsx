@@ -2,7 +2,8 @@ import { OPTION_LETTERS } from '../../lib/constants'
 import { cn } from '../../lib/utils'
 import { Icon } from '../ui/Icon'
 
-export type OptionState = 'idle' | 'correct' | 'wrong' | 'dim'
+/** 'selected' marks the pick in a timed exam (no right/wrong until submit). */
+export type OptionState = 'idle' | 'selected' | 'correct' | 'wrong' | 'dim'
 
 interface OptionButtonProps {
   option: string
@@ -16,6 +17,7 @@ interface OptionButtonProps {
 
 const STATE_CLASSES: Record<OptionState, string> = {
   idle: 'border-line bg-surface hover:border-line-strong hover:bg-surface-2',
+  selected: 'border-accent bg-accent/10',
   correct: 'border-success bg-success/10',
   wrong: 'border-danger bg-danger/10',
   dim: 'border-line bg-surface opacity-45',
@@ -23,6 +25,7 @@ const STATE_CLASSES: Record<OptionState, string> = {
 
 const KEYCAP_CLASSES: Record<OptionState, string> = {
   idle: '',
+  selected: 'border-accent bg-accent text-accent-ink',
   correct: 'border-success bg-success text-bg',
   wrong: 'border-danger bg-danger text-bg',
   dim: '',
@@ -35,6 +38,7 @@ export function OptionButton({ option, index, state, locked, flash, onSelect }: 
       type="button"
       data-quiz-option
       disabled={locked}
+      aria-pressed={state === 'selected' ? true : undefined}
       onClick={onSelect}
       className={cn(
         'press flex min-h-14 w-full items-center gap-3 rounded-[18px] border px-3.5 py-3 text-left',

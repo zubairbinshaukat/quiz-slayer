@@ -30,12 +30,25 @@ export interface UseLeaderboardResult {
   /** True when backed by the global (Convex) board */
   enabled: boolean
   loading: boolean
+  /** Browser reports no connection */
+  offline: boolean
+  /** Showing the cached payload rather than live data */
+  stale: boolean
   top: Row[]
   me: MeRow | null
   player: PlayerInfo | null
+  /** Rejects with a user-facing message (taken / invalid / already chosen / offline). */
   setName: (name: string) => Promise<void>
   ensurePlayer: () => void
 }
 
 export const NAME_MIN = 2
 export const NAME_MAX = 20
+/** Same rule the server enforces in convex/players.ts */
+export const NAME_PATTERN = /^[A-Za-z0-9 ]{2,20}$/
+export const NAME_RULE = `${NAME_MIN}–${NAME_MAX} characters: letters, digits and spaces`
+
+/** Trims and collapses inner whitespace. */
+export function normalizeName(name: string): string {
+  return name.trim().replace(/\s+/g, ' ')
+}

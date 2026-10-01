@@ -1,4 +1,4 @@
-const DEVICE_ID_KEY = 'qs-device-id'
+import { DEVICE_ID_KEY } from './storageKeys'
 
 function randomHex(bytes: number): string {
   let out = ''

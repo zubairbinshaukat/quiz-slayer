@@ -10,7 +10,7 @@ function ReviewItem({ question, answer, index }: { question: Question; answer: A
   const correct = answer === question.correctIndex
   const skipped = answer === null
   return (
-    <li className="card overflow-hidden">
+    <li className="card cv-row-lg overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

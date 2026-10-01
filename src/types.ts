@@ -1,7 +1,5 @@
 // ─── Shared domain types ──────────────────────────────────────────────────────
 
-import type { Icon3DName } from './lib/icons3d'
-
 /** Question IDs are numbers in the bundled data, but uploaded JSON may use strings. */
 export type QuestionId = number | string
 
@@ -36,8 +34,8 @@ export interface Subject {
   description: string
   questionCount: number
   questions: Question[]
+  /** Parsed from `guess_questions` for compatibility; not offered in setup. */
   guessQuestions: Question[]
-  isGuess: boolean
   isCustom: boolean
 }
 
@@ -106,24 +104,7 @@ export interface HistoryEntry extends NewHistoryEntry {
   dateTaken: string
 }
 
-// ─── Exam ─────────────────────────────────────────────────────────────────────
-
-export type ExamPoolType = 'main' | 'combined' | 'main+quiz'
-
-export interface ExamSubjectConfig {
-  slug: string
-  label: string
-  shortLabel: string
-  iconKey: Icon3DName
-  /** ISO UTC unlock time, or null when always available. */
-  unlockUtc: string | null
-  quizSlugs: string[]
-  poolType: ExamPoolType
-  examName: string
-  description: string
-  /** Questions per exam session (30, or the whole pool if smaller). */
-  questionCount: number
-}
+// ─── Timed exam mastery ───────────────────────────────────────────────────────
 
 export interface ExamAttempt {
   date: string
@@ -133,19 +114,18 @@ export interface ExamAttempt {
   questionIds: QuestionId[]
 }
 
+/** Stored per subject in localStorage (exam-state-<slug>). */
 export interface ExamState {
+  /** Answered correctly in a timed exam: excluded from future exams */
   correctIds: QuestionId[]
+  /** Answered wrong and not yet mastered: drawn first next time */
   incorrectIds: QuestionId[]
-  quizCorrectIds: QuestionId[]
-  quizIncorrectIds: QuestionId[]
   attempts: ExamAttempt[]
 }
 
 export interface ExamStateUpdate {
   correctIds: QuestionId[]
-  incorrectIds?: QuestionId[]
-  quizCorrectIds?: QuestionId[]
-  quizIncorrectIds?: QuestionId[]
+  incorrectIds: QuestionId[]
   attempt?: ExamAttempt
 }
 

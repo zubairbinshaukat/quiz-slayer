@@ -1,21 +1,23 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
-import type { LenisOptions } from 'lenis'
-import { ReactLenis } from 'lenis/react'
 import '@fontsource-variable/geist'
 import '@fontsource-variable/geist-mono'
 import { MaybeConvexProvider } from './components/providers/MaybeConvexProvider'
+import { SmoothScroll } from './components/providers/SmoothScroll'
+import { LiteModeProvider } from './context/LiteModeContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { startOutboxSync } from './lib/attemptSink'
+import { initInstallPrompt } from './lib/installPrompt'
+import { initLiteMode } from './lib/liteMode'
 import { router } from './router'
 import './styles/index.css'
 
-// Lenis is mounted at the root but only smooths the long browsing pages;
-// everywhere else `prevent` hands scrolling back to the browser.
-const SMOOTH_SCROLL_PATHS = new Set(['/', '/history', '/leaderboard'])
-const lenisOptions: LenisOptions = {
-  prevent: () => !SMOOTH_SCROLL_PATHS.has(window.location.pathname),
-}
+// Before the first render: data-lite on <html>, and listen for the install prompt early.
+initLiteMode()
+initInstallPrompt()
+// Send any attempts queued while offline (no-op without Convex).
+startOutboxSync()
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('Root element #root not found')
@@ -23,11 +25,12 @@ if (!rootEl) throw new Error('Root element #root not found')
 createRoot(rootEl).render(
   <StrictMode>
     <MaybeConvexProvider>
-      <ReactLenis root options={lenisOptions}>
+      <LiteModeProvider>
         <ThemeProvider>
+          <SmoothScroll />
           <RouterProvider router={router} />
         </ThemeProvider>
-      </ReactLenis>
+      </LiteModeProvider>
     </MaybeConvexProvider>
   </StrictMode>,
 )

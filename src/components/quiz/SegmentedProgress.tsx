@@ -1,6 +1,7 @@
 import { cn } from '../../lib/utils'
 
-export type QuestionStatus = 'correct' | 'wrong' | 'open'
+/** 'answered' is used in timed exams, where correctness stays hidden until submit. */
+export type QuestionStatus = 'correct' | 'wrong' | 'answered' | 'open'
 
 interface SegmentedProgressProps {
   statuses: QuestionStatus[]
@@ -30,7 +31,7 @@ export function SegmentedProgress({ statuses, current }: SegmentedProgressProps)
           key={i}
           className={cn(
             'h-1.5 flex-1 rounded-full transition-colors duration-200',
-            s === 'correct' ? 'bg-success' : s === 'wrong' ? 'bg-danger' : 'bg-surface-2',
+            s === 'correct' ? 'bg-success' : s === 'wrong' ? 'bg-danger' : s === 'answered' ? 'bg-fg/55' : 'bg-surface-2',
             i === current && 'ring-2 ring-accent ring-offset-1 ring-offset-bg',
             i === current && s === 'open' && 'bg-accent',
           )}

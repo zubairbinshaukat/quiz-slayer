@@ -222,6 +222,16 @@
   padding-top: env(safe-area-inset-top);
 }
 
+/* Long lists: skip layout/paint for off-screen rows. `auto` remembers the real size once rendered. */
+@utility cv-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 64px;
+}
+@utility cv-row-lg {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 80px;
+}
+
 /* ─── View transitions ─────────────────────────────────────────────── */
 ::view-transition-old(root) {
   animation: vt-out 160ms ease-in both;
@@ -252,6 +262,34 @@ html[data-q-dir="prev"]::view-transition-old(question) {
 }
 html[data-q-dir="prev"]::view-transition-new(question) {
   animation: q-in-left 240ms var(--ease-out-quint) both;
+}
+
+/* ─── Lite mode (html[data-lite], low-end devices / Data Saver) ────────
+   No keyframe animations or stagger, no transform transitions, no splash,
+   no confetti, no view-transition animations. Colour fades stay. */
+html[data-lite] *,
+html[data-lite] ::before,
+html[data-lite] ::after {
+  animation: none !important;
+  animation-delay: 0s !important;
+  transition-property: color, background-color, border-color, opacity !important;
+}
+html[data-lite] .press:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: none;
+}
+html[data-lite] .preloader,
+html[data-lite] .confetti {
+  display: none !important;
+}
+html[data-lite] .vt-question {
+  view-transition-name: none;
+}
+html[data-lite]::view-transition-old(root),
+html[data-lite]::view-transition-new(root),
+html[data-lite]::view-transition-group(*),
+html[data-lite]::view-transition-old(*),
+html[data-lite]::view-transition-new(*) {
+  animation: none !important;
 }
 
 /* ─── Reduced motion: no transforms, no animation ──────────────────── */

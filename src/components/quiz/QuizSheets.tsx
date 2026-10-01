@@ -8,7 +8,7 @@ const SHORTCUTS: { keys: string[]; action: string }[] = [
   { keys: ['↵'], action: 'Next question' },
   { keys: ['⌫'], action: 'Previous question' },
   { keys: ['←', '→'], action: 'Previous / next' },
-  { keys: ['E'], action: 'Toggle “Know more”' },
+  { keys: ['E'], action: 'Toggle “Know more” (practice)' },
   { keys: ['Ctrl', '↵'], action: 'Submit quiz' },
   { keys: ['?'], action: 'Show this sheet' },
 ]
@@ -61,24 +61,26 @@ export function ResumeSheet({ open, answered, total, onResume, onStartFresh }: R
 
 interface SubmitSheetProps {
   open: boolean
+  /** Timed exam wording (answers are revealed on submit). */
+  exam?: boolean
   answered: number
   total: number
   onCancel: () => void
   onConfirm: () => void
 }
 
-export function SubmitSheet({ open, answered, total, onCancel, onConfirm }: SubmitSheetProps) {
+export function SubmitSheet({ open, exam = false, answered, total, onCancel, onConfirm }: SubmitSheetProps) {
   const unanswered = total - answered
+  const status =
+    unanswered > 0
+      ? `${unanswered} question${unanswered === 1 ? ' is' : 's are'} unanswered and will count as wrong.`
+      : `All ${total} questions answered.`
   return (
     <Sheet
       open={open}
       onClose={onCancel}
-      title="Submit quiz?"
-      description={
-        unanswered > 0
-          ? `${unanswered} question${unanswered === 1 ? ' is' : 's are'} unanswered and will count as wrong.`
-          : `All ${total} questions answered.`
-      }
+      title={exam ? 'Submit exam?' : 'Submit quiz?'}
+      description={exam ? `${status} You'll see your answers after submitting.` : status}
       footer={
         <div className="flex gap-3">
           <Button variant="secondary" className="flex-1" onClick={onCancel}>Keep going</Button>

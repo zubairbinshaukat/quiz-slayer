@@ -1,6 +1,5 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
 import { getAllCustomSubjects } from '../lib/db'
-import { isGuessSubject } from '../lib/guessWarning'
 import { isRecord, type CustomSubjectRecord, type Question, type Subject } from '../types'
 
 const modules = import.meta.glob<unknown>('../data/*.json', { eager: true })
@@ -22,7 +21,7 @@ function questionList(value: unknown): Question[] {
 }
 
 /** Unwrap a JSON module (`default` export) and normalise into a Subject. */
-function processRaw(raw: unknown, isCustom = false, sourcePath = ''): Subject | null {
+function processRaw(raw: unknown, isCustom = false): Subject | null {
   const data = isRecord(raw) && 'default' in raw && isRecord(raw.default) ? raw.default : raw
   if (!isRecord(data) || typeof data.subject !== 'string' || typeof data.slug !== 'string') {
     return null
@@ -35,14 +34,13 @@ function processRaw(raw: unknown, isCustom = false, sourcePath = ''): Subject | 
     questionCount: questions.length,
     questions,
     guessQuestions: questionList(data.guess_questions),
-    isGuess: isGuessSubject(data.slug, sourcePath),
     isCustom,
   }
 }
 
 function fromModules(mods: Record<string, unknown>): Subject[] {
   return Object.entries(mods)
-    .map(([path, mod]) => processRaw(mod, false, path))
+    .map(([, mod]) => processRaw(mod, false))
     .filter((s): s is Subject => s !== null)
     .sort((a, b) => a.subject.localeCompare(b.subject))
 }

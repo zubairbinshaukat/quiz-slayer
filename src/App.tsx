@@ -5,10 +5,12 @@ import { TabBar } from './components/layout/TabBar'
 import { UpdatePrompt } from './components/pwa/UpdatePrompt'
 import { QuizProvider } from './context/QuizContext'
 import { SoundProvider } from './context/SoundContext'
+import { useLiteMode } from './hooks/useLiteMode'
 
 /** Root layout: providers + chrome. Quiz routes run in a chrome-less focus mode. */
 export function AppShell() {
   const { pathname } = useLocation()
+  const { lite } = useLiteMode()
   const focusMode = pathname.startsWith('/quiz/')
 
   return (
@@ -20,7 +22,7 @@ export function AppShell() {
         >
           Skip to content
         </a>
-        <Preloader />
+        {!lite && <Preloader />}
         {!focusMode && <Navbar />}
         <Outlet />
         {!focusMode && <TabBar />}

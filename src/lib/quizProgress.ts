@@ -1,4 +1,4 @@
-import { PROGRESS_KEY_PREFIX } from './constants'
+import { PROGRESS_KEY_PREFIX } from './storageKeys'
 import { isRecord, type Answer, type Question, type QuizMode, type SavedProgress } from '../types'
 
 export function parseQuizMode(v: unknown): QuizMode {

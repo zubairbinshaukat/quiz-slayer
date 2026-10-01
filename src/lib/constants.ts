@@ -8,8 +8,6 @@ export const ROUTES = {
   HISTORY: '/history',
   LEADERBOARD: '/leaderboard',
   UPLOAD: '/upload',
-  EXAM: '/exam',
-  EXAM_RESULT: '/exam/result',
 }
 
 export const SITE_URL = 'https://quiz.zubyr.dev'
@@ -18,16 +16,9 @@ export const DEFAULT_TITLE = 'Quiz Slayer — Slay your midterms'
 export const DEFAULT_DESCRIPTION =
   'Quiz Slayer: fast, offline-ready MCQ practice for your university subjects. Mock exams, mistake retries, streaks and a leaderboard.'
 
-export const DB_NAME = 'quiz-practice-db'
-export const DB_VERSION = 2
-export const DB_STORE = 'quiz_history'
-export const CUSTOM_SUBJECTS_STORE = 'custom_subjects'
+// Storage keys and IndexedDB names live in ./storageKeys.
 
 export const OPTION_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'] as const
-
-export const THEME_KEY = 'quiz-theme'
-export const SESSION_KEY = 'quiz-session'
-export const PROGRESS_KEY_PREFIX = 'quiz-progress-'
 
 // ─── Grades ──────────────────────────────────────────────────────────────────
 
@@ -67,8 +58,3 @@ export const TONE_SOFT: Record<Tone, string> = {
   accent: 'bg-accent/15 text-accent-fg',
   danger: 'bg-danger/12 text-danger',
 }
-
-// ─── Exam constants ───────────────────────────────────────────────────────────
-export const EXAM_STATE_KEY_PREFIX = 'exam-state-'
-export const EXAM_MODE_SESSION_KEY = 'exam-mode'
-export const EXAM_PASS_THRESHOLD = 50

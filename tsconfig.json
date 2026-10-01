@@ -25,7 +25,8 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"],
-  "exclude": ["convex", "node_modules", "dist"],
+  /* convex/ is included so the generated `api` (which imports the function modules) type-checks from src */
+  "include": ["src", "convex"],
+  "exclude": ["node_modules", "dist"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

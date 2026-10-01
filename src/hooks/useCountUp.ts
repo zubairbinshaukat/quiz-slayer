@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { isLiteActive } from '../lib/liteMode'
 
 /**
  * Animates a number from `from` to `to` over `duration` seconds using rAF.
@@ -9,8 +10,8 @@ export function useCountUp(to: number, duration = 1, from = 0): number {
 
   useEffect(() => {
     const reduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+      isLiteActive() ||
+      (typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
 
     let raf = 0
     const start = performance.now()

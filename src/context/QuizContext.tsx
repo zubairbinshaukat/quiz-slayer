@@ -1,13 +1,14 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
-import { SESSION_KEY } from '../lib/constants'
+import { ANALYTICS_KEY, SESSION_KEY } from '../lib/storageKeys'
 import { saveQuizResult } from '../lib/db'
 import { recordAttempt } from '../lib/attemptSink'
 import { getDeviceId } from '../lib/deviceId'
+import { recordExamResult } from '../lib/examState'
 import { clearProgress, writeProgress } from '../lib/quizProgress'
 import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
 import { shuffleArray } from '../lib/utils'
 import { isRecord, type AnalyticsSnapshot, type Answer, type Question, type QuizMode, type SavedProgress, type SubjectMeta } from '../types'
-import { ANALYTICS_KEY, readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
+import { readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
 import { QuizContext, type QuizState } from './quizContextDef'
 
 const INITIAL_STATE: QuizState = {
@@ -166,6 +167,8 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       // didSave persists in the closure across both invocations)
       if (!didSave) {
         didSave = true
+        // Timed exams feed adaptive mastery: correct ids drop out, wrong ids repeat
+        if (prev.mode === 'exam' && prev.slug) recordExamResult(prev.slug, prev.questions, prev.answers, score)
         void saveQuizResult({
           subject: prev.subject ?? '',
           slug: prev.slug ?? '',
@@ -179,7 +182,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
           wrongIds: getWrongQuestions(prev.questions, prev.answers).map((q) => String(q.id)),
           optionsCount: getOptionsCount(prev.questions),
         }).then((saved) => {
-          if (saved) recordAttempt({ ...saved, deviceId: getDeviceId() })
+          if (saved) void recordAttempt({ ...saved, deviceId: getDeviceId() })
         })
       }
 

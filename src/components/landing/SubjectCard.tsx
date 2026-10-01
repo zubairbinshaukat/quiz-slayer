@@ -14,7 +14,6 @@ export interface SubjectCardProps {
   /** 0–1 share of questions mastered */
   mastery: number
   mistakes: number
-  isGuess?: boolean
   index?: number
   onStart: () => void
   onPracticeMistakes?: () => void
@@ -22,7 +21,7 @@ export interface SubjectCardProps {
 }
 
 export function SubjectCard({
-  subject, slug, questionCount, best, mastery, mistakes, isGuess, index = 0, onStart, onPracticeMistakes, className,
+  subject, slug, questionCount, best, mastery, mistakes, index = 0, onStart, onPracticeMistakes, className,
 }: SubjectCardProps) {
   const pct = Math.round(mastery * 100)
   return (
@@ -44,10 +43,6 @@ export function SubjectCard({
         </ProgressRing>
         <Icon3D name={getSubjectIcon(slug)} size={76} className="-mr-1.5 -mt-1.5" />
       </div>
-
-      {isGuess && (
-        <span className="absolute left-3 top-3 size-2.5 rounded-full bg-danger" role="img" aria-label="AI-generated questions" />
-      )}
 
       <div className="pointer-events-none relative mt-auto pt-4">
         <h3 className="line-clamp-2 text-lg leading-snug">{subject}</h3>

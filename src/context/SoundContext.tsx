@@ -1,15 +1,24 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react'
+import { SOUND_KEY } from '../lib/storageKeys'
 import { SoundContext, type SoundName } from './soundContextDef'
 
+function readSoundEnabled(): boolean {
+  try {
+    return localStorage.getItem(SOUND_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
+
 export function SoundProvider({ children }: { children: ReactNode }) {
-  const [soundEnabled, setSoundEnabled] = useState(
-    () => localStorage.getItem('sound-enabled') === 'true'
-  )
+  const [soundEnabled, setSoundEnabled] = useState(readSoundEnabled)
 
   const toggleSound = useCallback(() => {
     setSoundEnabled((prev) => {
       const next = !prev
-      localStorage.setItem('sound-enabled', String(next))
+      try {
+        localStorage.setItem(SOUND_KEY, String(next))
+      } catch { /* storage unavailable */ }
       return next
     })
   }, [])

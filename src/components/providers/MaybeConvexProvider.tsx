@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react'
-import { ConvexProvider, ConvexReactClient } from 'convex/react'
-import { convexEnabled, convexUrl } from '../../lib/convex'
-
-const convexClient = convexEnabled && convexUrl ? new ConvexReactClient(convexUrl) : null
+import { ConvexProvider } from 'convex/react'
+import { convexClient } from '../../lib/convex'
 
 /** Wraps children in ConvexProvider only when VITE_CONVEX_URL is configured. */
 export function MaybeConvexProvider({ children }: { children: ReactNode }) {

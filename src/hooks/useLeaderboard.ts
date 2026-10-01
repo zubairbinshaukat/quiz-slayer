@@ -1,13 +1,28 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMutation, useQuery } from 'convex/react'
+import { ConvexError } from 'convex/values'
+import type { FunctionReturnType } from 'convex/server'
+import { api } from '../../convex/_generated/api'
 import { convexEnabled } from '../lib/convex'
 import { getDeviceId } from '../lib/deviceId'
+import { readLeaderboardCache, writeLeaderboardCache } from '../lib/leaderboardCache'
 import { previewRandomName } from '../lib/randomName'
 import { accuracy, computePoints, MIN_ANSWERED_FOR_BOARD } from '../lib/ranking'
+import { PLAYER_NAME_KEY } from '../lib/storageKeys'
+import { useOnline } from './useOnline'
 import { useQuizHistory } from './useQuizHistory'
-import { NAME_MAX, NAME_MIN, type MeRow, type PlayerInfo, type Row, type UseLeaderboardResult } from './leaderboardTypes'
+import { NAME_PATTERN, NAME_RULE, normalizeName, type MeRow, type PlayerInfo, type Row, type UseLeaderboardResult } from './leaderboardTypes'
 import type { HistoryEntry } from '../types'
 
-export const PLAYER_NAME_KEY = 'qs-player-name'
+const TOP_LIMIT = 50
+
+function validName(raw: string): string {
+  const name = normalizeName(raw)
+  if (!NAME_PATTERN.test(name)) throw new Error(`Name must be ${NAME_RULE} only`)
+  return name
+}
+
+// ─── Local fallback (no Convex configured) ──────────────────────────────────
 
 function readStoredName(): string | null {
   try {
@@ -62,29 +77,84 @@ function useLocalLeaderboard(): UseLeaderboardResult {
     return [{ deviceId: id, name, points, answered, correct, accuracy: acc, rank: 1 }]
   }, [me])
 
-  const setName = useCallback(async (name: string) => {
-    const clean = name.trim().replace(/\s+/g, ' ')
-    if (clean.length < NAME_MIN || clean.length > NAME_MAX) throw new Error(`Name must be ${NAME_MIN}–${NAME_MAX} characters`)
+  const setName = useCallback(async (raw: string) => {
+    if (readStoredName() !== null) throw new Error('Name has already been chosen')
+    const name = validName(raw)
     try {
-      localStorage.setItem(PLAYER_NAME_KEY, clean)
+      localStorage.setItem(PLAYER_NAME_KEY, name)
     } catch { /* storage unavailable: keep for this session */ }
-    setStoredName(clean)
+    setStoredName(name)
   }, [])
 
   // Nothing to create locally; the Convex branch registers the device.
   const ensurePlayer = useCallback(() => {}, [])
 
-  return { enabled: false, loading, top, me, player, setName, ensurePlayer }
+  return { enabled: false, loading, offline: false, stale: false, top, me, player, setName, ensurePlayer }
+}
+
+// ─── Global board (Convex) ──────────────────────────────────────────────────
+
+function toMeRow(me: FunctionReturnType<typeof api.leaderboard.me>): MeRow | null {
+  if (!me) return null
+  return { ...me, rank: me.qualified ? me.rank : null }
 }
 
 function useConvexLeaderboard(): UseLeaderboardResult {
-  // TODO(phase3): Convex implementation.
-  //   top    ← useQuery(api.leaderboard.top, { limit: 50 })
-  //   me     ← useQuery(api.leaderboard.me, { deviceId })
-  //   player ← useQuery(api.players.get, { deviceId })
-  //   setName / ensurePlayer ← useMutation(api.players.setName / api.players.ensure)
-  // Until then, mirror the local board so the UI keeps working.
-  return useLocalLeaderboard()
+  const deviceId = useMemo(() => getDeviceId(), [])
+  const online = useOnline()
+  const [cache] = useState(readLeaderboardCache)
+
+  // Live subscriptions: every change on the server re-renders automatically.
+  const topLive = useQuery(api.leaderboard.top, { limit: TOP_LIMIT })
+  const meLive = useQuery(api.leaderboard.me, { deviceId })
+  const playerLive = useQuery(api.players.getPlayer, { deviceId })
+  const ensureMutation = useMutation(api.players.ensurePlayer)
+  const setNameMutation = useMutation(api.players.setName)
+
+  const live = topLive !== undefined && meLive !== undefined && playerLive !== undefined
+
+  const top = useMemo<Row[]>(() => topLive ?? cache?.top ?? [], [topLive, cache])
+  const me = useMemo(() => (meLive !== undefined ? toMeRow(meLive) : (cache?.me ?? null)), [meLive, cache])
+  const player = useMemo<PlayerInfo>(() => {
+    if (playerLive) return { name: playerLive.name, nameChosen: playerLive.nameChosen }
+    if (playerLive === undefined && cache?.player) return cache.player
+    return { name: previewRandomName(deviceId), nameChosen: false }
+  }, [playerLive, cache, deviceId])
+
+  useEffect(() => {
+    if (live) writeLeaderboardCache({ top, me, player })
+  }, [live, top, me, player])
+
+  const ensurePlayer = useCallback(() => {
+    ensureMutation({ deviceId }).catch(() => { /* retried on next visit / flush */ })
+  }, [ensureMutation, deviceId])
+
+  const setName = useCallback(
+    async (raw: string) => {
+      const name = validName(raw)
+      if (!navigator.onLine) throw new Error("You're offline. Connect to the internet to choose a name.")
+      try {
+        await ensureMutation({ deviceId })
+        await setNameMutation({ deviceId, name })
+      } catch (err) {
+        // ConvexError carries the server's validation message (taken / invalid / already chosen)
+        throw new Error(err instanceof ConvexError ? String(err.data) : 'Could not reach the leaderboard. Try again.')
+      }
+    },
+    [ensureMutation, setNameMutation, deviceId],
+  )
+
+  return {
+    enabled: true,
+    loading: !live && !cache,
+    offline: !online,
+    stale: !live && cache !== null,
+    top,
+    me,
+    player,
+    setName,
+    ensurePlayer,
+  }
 }
 
 /** Leaderboard data source. Picked once per load (convexEnabled is a build-time constant). */
