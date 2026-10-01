@@ -2,8 +2,11 @@ import type { ButtonHTMLAttributes } from 'react'
 import { cn } from '../../lib/utils'
 
 const variants = {
-  primary: 'bg-accent text-accent-ink hover:bg-accent-hover font-bold',
-  secondary: 'bg-surface-2 text-fg border border-line hover:border-line-strong font-semibold',
+  primary:
+    'bg-accent text-accent-ink hover:bg-accent-hover font-bold shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_8px_24px_-10px_rgb(245_183_58/0.55)]',
+  secondary: 'bg-surface-2 text-fg border border-line hover:border-line-strong hover:bg-surface-3 font-semibold',
+  /** Transparent with a hairline: secondary actions next to a primary CTA */
+  outline: 'bg-transparent text-fg border border-line-strong hover:bg-surface-2 font-semibold',
   ghost: 'bg-transparent text-muted hover:text-fg hover:bg-surface-2 font-semibold',
   danger: 'bg-danger/12 text-danger border border-danger/25 hover:bg-danger/20 font-semibold',
 } as const
@@ -25,7 +28,7 @@ export function Button({ children, variant = 'primary', size = 'md', className, 
       type={type}
       className={cn(
         'press inline-flex items-center justify-center gap-2 rounded-btn select-none',
-        'disabled:opacity-45 disabled:cursor-not-allowed',
+        'disabled:opacity-45 disabled:cursor-not-allowed disabled:shadow-none',
         variants[variant],
         sizes[size],
         className,
@@ -51,7 +54,7 @@ export function IconButton({ label, active, className, children, type = 'button'
       title={label}
       className={cn(
         'press inline-flex size-11 shrink-0 items-center justify-center rounded-btn',
-        active ? 'bg-surface-2 text-accent-fg' : 'text-muted hover:text-fg hover:bg-surface-2',
+        active ? 'bg-surface-2 text-fg' : 'text-muted hover:text-fg hover:bg-surface-2',
         className,
       )}
       {...props}

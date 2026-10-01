@@ -1,0 +1,218 @@
+/* ─── Motion (spec §10). CSS only; index.css switches all of it off for
+   lite mode (html[data-lite]) and prefers-reduced-motion. ──────────── */
+
+@keyframes ring-draw {
+  from { stroke-dashoffset: var(--ring-c); }
+}
+
+@keyframes bar-grow {
+  from { transform: scaleY(0); }
+}
+@keyframes fade-up-sm {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Wrong answer: ±6px, 3 × 120ms = 360ms */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+@keyframes attn-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+/* "+10 XP" floats up from the picked option */
+@keyframes xp-pop {
+  0% { opacity: 0; transform: translateY(0) scale(0.8); }
+  20% { opacity: 1; transform: translateY(-8px) scale(1); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-24px) scale(1); }
+}
+@keyframes lite-fade {
+  from { opacity: 0; }
+}
+@keyframes shimmer-wide {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(14px); }
+}
+
+@layer components {
+  /* Page enter: children stagger fade-up 24ms apart (style={{ '--i': n }}) */
+  .rise {
+    animation: fade-up-sm 380ms var(--ease-out-quint) backwards;
+    animation-delay: calc(var(--i, 0) * 24ms);
+  }
+
+  /* Progress rings draw from 0 on mount */
+  .ring-arc {
+    animation: ring-draw 600ms ease-out backwards;
+    transition: stroke-dashoffset 600ms ease-out;
+  }
+
+  /* Subject card hover: lift + icon tilt + "Start →" pill */
+  .lift-card {
+    transition:
+      transform 260ms var(--ease-out-quint),
+      border-color 180ms ease,
+      box-shadow 260ms ease;
+  }
+  .lift-card .lift-icon {
+    transition: transform 360ms var(--ease-out-quint);
+  }
+  .lift-card .lift-cta {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 180ms ease, transform 220ms var(--ease-out-quint);
+  }
+  @media (hover: hover) {
+    .lift-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-line-strong);
+      box-shadow: var(--hl), var(--lift);
+    }
+    .lift-card:hover .lift-icon {
+      transform: translateY(-6px) rotate(-4deg);
+    }
+    .lift-card:hover .lift-cta {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .lift-card:focus-within .lift-cta {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .lift-card:active:not(:has(.lift-chip:active)) {
+    transform: scale(0.985);
+  }
+
+
+  /* Activity chart bars grow from the baseline */
+  .bar-grow {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: bar-grow 520ms var(--ease-out-quint) backwards;
+    animation-delay: calc(var(--i, 0) * 20ms);
+  }
+
+  /* Explanation card slides up */
+  .slide-up {
+    animation: slide-up 280ms var(--ease-out-quint) backwards;
+  }
+
+  /* Credit card: 1px amber → transparent gradient border (masked) + one slow shimmer sweep */
+  .credit-card {
+    isolation: isolate;
+  }
+  /* Clipped layer that carries the sheen (the card itself stays unclipped for the 3D icon) */
+  .credit-sheen {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .credit-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, rgb(245 183 58 / 0.7), rgb(245 183 58 / 0.12) 45%, transparent 75%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .credit-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.06) 50%, transparent 65%);
+    transform: translateX(-100%);
+    animation: shimmer-wide 2400ms ease-in-out 900ms 1 both;
+    pointer-events: none;
+  }
+
+  /* Small hover lift for icon links */
+  .hover-lift {
+    transition: transform 200ms var(--ease-out-quint), color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+  }
+  @media (hover: hover) {
+    .hover-lift:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .shake {
+    animation: shake 120ms ease-in-out 3;
+  }
+  /* Attention nudge (name card): ±4px, 2 × 250ms */
+  .attn-shake {
+    animation: attn-shake 250ms ease-in-out 2;
+  }
+  .xp-pop {
+    opacity: 0;
+    animation: xp-pop 700ms var(--ease-out-quint) forwards;
+  }
+
+  /* Tab bar: active dot slides between items */
+  .tab-dot {
+    transition: left 320ms var(--ease-out-quint);
+  }
+}
+
+/* Lite mode: kill transforms that the generic rule in index.css does not cover */
+html[data-lite] .lift-card:hover,
+html[data-lite] .lift-card:active,
+html[data-lite] .lift-card:hover .lift-icon {
+  transform: none;
+}
+html[data-lite] .lift-card .lift-cta {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lift-card:hover,
+  .lift-card:active,
+  .lift-card:hover .lift-icon {
+    transform: none;
+  }
+}
+
+/* ─── Tab bar compact-on-scroll (unlayered so it beats utilities) ─────
+   Down > 24px: labels fade + collapse and the bar goes 64 → 52px; the raised
+   trophy button keeps its full size and lift. Up / top restores. */
+.tabbar ul {
+  transition: height 220ms ease;
+}
+.tabbar .tab-label {
+  max-height: 14px;
+  overflow: hidden;
+  transition: opacity 220ms ease, max-height 220ms ease;
+}
+
+.tabbar[data-compact] ul {
+  height: 52px;
+}
+.tabbar[data-compact] .tab-label {
+  opacity: 0;
+  max-height: 0;
+}
+
+@media (max-width: 767px) {
+  html.has-tabbar.tabbar-compact {
+    --tabbar-height: 64px;
+  }
+}
+/* Lite: still shrinks, faster, no scale */
+html[data-lite] .tabbar ul,
+html[data-lite] .tabbar .tab-label {
+  transition-property: height, opacity, max-height !important;
+  transition-duration: 120ms !important;
+}

@@ -40,8 +40,8 @@ export function ExamCountdown({ deadline, onExpire }: ExamCountdownProps) {
       role="timer"
       aria-label={`Time left ${formatClock(left)}`}
       className={cn(
-        'inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-sm font-semibold',
-        warn ? 'bg-danger/12 text-danger' : 'text-muted',
+        'inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border px-3 font-mono text-sm font-semibold',
+        warn ? 'border-danger/40 bg-danger/12 text-danger' : 'border-line bg-surface-2 text-fg',
       )}
     >
       <Icon name="clock" size={14} />

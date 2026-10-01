@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from './App'
+import { ErrorPage } from './pages/ErrorPage'
 
 // Route-level code splitting via the data router's `lazy` (needed for viewTransition support)
 const landing = async () => ({ Component: (await import('./pages/LandingPage')).LandingPage })
@@ -7,6 +8,8 @@ const landing = async () => ({ Component: (await import('./pages/LandingPage')).
 export const router = createBrowserRouter([
   {
     element: <AppShell />,
+    // Chunk-load failures (stale deploy) reload once; other errors get a styled screen
+    errorElement: <ErrorPage />,
     hydrateFallbackElement: <div className="min-h-dvh bg-bg" />,
     children: [
       { index: true, lazy: landing },

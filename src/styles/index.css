@@ -1,17 +1,22 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
+@import "./atmosphere.css";
+@import "./motion.css";
+@import "./podium.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ─── Design tokens (dark-first) ───────────────────────────────────────
    Utilities read these as vars, so the light override below re-themes
-   everything without touching components. */
+   everything without touching components. Spec: docs/design/ui-spec.md §1. */
 @theme static {
   --color-bg: #0b0b0f;
-  --color-surface: #15161c;
-  --color-surface-2: #1c1d25;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.16);
+  /* Three surface levels, each one step lighter */
+  --color-surface: #141419;
+  --color-surface-2: #1b1b22;
+  --color-surface-3: #22222b;
+  --color-line: rgba(255, 255, 255, 0.07);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
   --color-fg: #f4f4f5;
   --color-muted: #9a9aa3;
   --color-accent: #f5b73a;
@@ -19,12 +24,18 @@
   --color-accent-ink: #1a1200;
   /* Accent when used as text on the page background (AA in both themes) */
   --color-accent-fg: #f5b73a;
+  /* Mint / coral / info */
   --color-success: #3ddc97;
-  --color-danger: #ff5c5c;
+  --color-danger: #ff6b5e;
   --color-info: #6ea8ff;
+  /* Podium metals */
+  --color-silver: #c9cdd6;
+  --color-bronze: #d39a63;
 
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Headings. Falls back to Geist until @fontsource-variable/bricolage-grotesque is installed + imported. */
+  --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 16px;
   --radius-sheet: 20px;
@@ -57,25 +68,47 @@
 
 :root {
   color-scheme: dark;
-  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --lift: 0 12px 40px -12px rgba(0, 0, 0, 0.6);
+  --float: 0 18px 48px -16px rgba(0, 0, 0, 0.75), 0 2px 6px rgba(0, 0, 0, 0.3);
   --scrim: rgba(0, 0, 0, 0.6);
+  /* Atmosphere + subject tint strengths (halved in light) */
+  --glow-amber: 0.14;
+  --glow-blue: 0.07;
+  --tint-a: 0.22;
+  /* Floating tab bar footprint (set by <TabBar>, mobile only) */
+  --tabbar-height: 0px;
+}
+@media (max-width: 767px) {
+  html.has-tabbar {
+    --tabbar-height: 76px;
+  }
 }
 
+/* Light = cream, not white */
 :root:not(.dark) {
   color-scheme: light;
-  --color-bg: #f7f5f0;
+  --color-bg: #f6f4ee;
   --color-surface: #ffffff;
-  --color-surface-2: #f0ede6;
-  --color-line: rgba(0, 0, 0, 0.08);
-  --color-line-strong: rgba(0, 0, 0, 0.16);
-  --color-fg: #111114;
-  --color-muted: #6b6b75;
+  --color-surface-2: #f1eee7;
+  --color-surface-3: #e9e5db;
+  --color-line: rgba(21, 21, 26, 0.08);
+  --color-line-strong: rgba(21, 21, 26, 0.16);
+  --color-fg: #15151a;
+  --color-muted: #63636d;
   --color-accent-fg: #8f5a00;
-  --color-success: #0f9a62;
-  --color-danger: #d93636;
+  --color-success: #0c8a57;
+  --color-danger: #cf3a2c;
   --color-info: #2f6fdb;
-  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --color-silver: #9aa0ad;
+  --color-bronze: #b9783f;
+  --hl: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --lift: 0 14px 36px -14px rgba(60, 45, 20, 0.22);
+  --float: 0 16px 40px -14px rgba(60, 45, 20, 0.28), 0 2px 6px rgba(60, 45, 20, 0.08);
   --scrim: rgba(17, 17, 20, 0.45);
+  --glow-amber: 0.07;
+  --glow-blue: 0.035;
+  --tint-a: 0.16;
 }
 
 /* ─── Keyframes used outside utilities ─────────────────────────────── */
@@ -113,9 +146,11 @@
     background: var(--color-bg);
   }
 
+  /* Transparent so the fixed atmosphere layers (atmosphere.css) show through;
+     the page colour comes from <html>. */
   body {
     min-height: 100dvh;
-    background: var(--color-bg);
+    background: transparent;
     color: var(--color-fg);
     font-family: var(--font-sans);
     font-size: 15px;
@@ -136,6 +171,12 @@
     line-height: 1.15;
     text-wrap: balance;
   }
+  /* Display face for page headings (Bricolage: narrower wdth, optical size auto) */
+  h1, h2 {
+    font-family: var(--font-display);
+    font-variation-settings: "wdth" 95;
+    font-optical-sizing: auto;
+  }
 
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]) {
@@ -151,19 +192,84 @@
     background: color-mix(in oklab, var(--color-accent) 35%, transparent);
   }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  /* Thin themed scrollbars everywhere (carousels hide theirs via .no-scrollbar).
+     Standard props only for Firefox: in Chromium they would disable the ::-webkit styling below. */
+  @supports (-moz-appearance: none) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-surface-3) transparent;
+    }
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--color-line-strong); border-radius: 9999px; }
+  ::-webkit-scrollbar-corner { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-surface-3);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--color-accent) 60%, transparent);
+  }
+
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-variation-settings: normal;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: var(--color-muted);
+  }
 }
 
 /* ─── Components ───────────────────────────────────────────────────── */
 @layer components {
-  /* Matte card: 1px border + faint inner highlight, no heavy shadow */
+  /* Level-1 card: hairline border + inner top highlight */
   .card {
-    background: var(--color-surface);
+    background-color: var(--color-surface);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-card);
     box-shadow: var(--hl);
+  }
+  /* Hover state for interactive cards */
+  .card-hover {
+    transition:
+      transform 220ms var(--ease-out-quint),
+      border-color 180ms ease,
+      box-shadow 220ms ease,
+      background-color 180ms ease;
+  }
+  @media (hover: hover) {
+    .card-hover:hover {
+      border-color: var(--color-line-strong);
+      box-shadow: var(--hl), var(--lift);
+    }
+  }
+
+  /* Subject tint: hue from the slug hash, set as --tint-h on the element */
+  .tint {
+    background-image: radial-gradient(240px 160px at 100% 0%, hsl(var(--tint-h, 40) 80% 60% / var(--tint-a)), transparent 70%);
+  }
+  .tint-wide {
+    background-image: radial-gradient(420px 220px at 100% 0%, hsl(var(--tint-h, 40) 80% 60% / var(--tint-a)), transparent 70%);
+  }
+
+  /* Translucent chrome (blur dropped in lite mode, atmosphere.css) */
+  .glass {
+    background-color: color-mix(in oklab, var(--color-bg) 80%, transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+  }
+
+  /* 3D icon shadow */
+  .icon-drop {
+    filter: drop-shadow(0 14px 20px rgb(0 0 0 / 0.45));
+  }
+  :root:not(.dark) .icon-drop {
+    filter: drop-shadow(0 12px 16px rgb(80 60 20 / 0.22));
   }
 
   /* Tactile press feedback for tappables */
@@ -180,12 +286,6 @@
     transform: scale(0.98);
   }
 
-  /* Staggered entrance: set style={{ '--i': n }} on each child */
-  .rise {
-    animation: fade-up 320ms var(--ease-out-quint) backwards;
-    animation-delay: calc(var(--i, 0) * 40ms);
-  }
-
   /* Keyboard-key look: darker bottom edge */
   .keycap {
     display: inline-flex;
@@ -196,7 +296,7 @@
     padding: 0 0.375rem;
     border-radius: 7px;
     border: 1px solid var(--color-line-strong);
-    border-bottom-width: 3px;
+    border-bottom: 2px solid color-mix(in oklab, var(--color-bg) 70%, black);
     background: var(--color-surface-2);
     color: var(--color-fg);
     font-family: var(--font-mono);
@@ -240,6 +340,28 @@
   animation: vt-in 220ms var(--ease-out-quint) both;
 }
 
+/* Theme switch: the new theme grows as a circle from the click point (--vt-x / --vt-y) */
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%)); }
+  to { clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%)); }
+}
+html.theme-reveal * {
+  view-transition-name: none !important;
+}
+html.theme-reveal::view-transition-old(root),
+html.theme-reveal::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.theme-reveal::view-transition-new(root) {
+  animation: theme-reveal 500ms ease-out;
+}
+
+/* Never let a running transition swallow taps: clicks go straight to the live DOM */
+::view-transition {
+  pointer-events: none;
+}
+
 /* Question-to-question: only the card slides, the rest swaps instantly */
 .vt-question {
   view-transition-name: question;
@@ -249,33 +371,61 @@ html[data-q-dir]::view-transition-new(root) {
   animation: none;
 }
 html[data-q-dir]::view-transition-group(question) {
-  animation-duration: 240ms;
+  animation-duration: 220ms;
 }
 html[data-q-dir="next"]::view-transition-old(question) {
-  animation: q-out-left 180ms ease-in both;
+  animation: q-out-left 160ms ease-in both;
 }
 html[data-q-dir="next"]::view-transition-new(question) {
-  animation: q-in-right 240ms var(--ease-out-quint) both;
+  animation: q-in-right 220ms var(--ease-out-quint) both;
 }
 html[data-q-dir="prev"]::view-transition-old(question) {
-  animation: q-out-right 180ms ease-in both;
+  animation: q-out-right 160ms ease-in both;
 }
 html[data-q-dir="prev"]::view-transition-new(question) {
-  animation: q-in-left 240ms var(--ease-out-quint) both;
+  animation: q-in-left 220ms var(--ease-out-quint) both;
 }
 
 /* ─── Lite mode (html[data-lite], low-end devices / Data Saver) ────────
-   No keyframe animations or stagger, no transform transitions, no splash,
-   no confetti, no view-transition animations. Colour fades stay. */
+   Keeps cheap motion: ≤150ms opacity fades, colour/border transitions, the keycap
+   flash, the tab-dot slide and a 300ms ring draw. Drops: glow/grain + blur
+   (atmosphere.css), Lenis, view transitions, confetti, shimmer, stagger delays,
+   hover lifts / transforms; count-ups snap (useCountUp). */
 html[data-lite] *,
 html[data-lite] ::before,
 html[data-lite] ::after {
-  animation: none !important;
   animation-delay: 0s !important;
-  transition-property: color, background-color, border-color, opacity !important;
+  transition-property: color, background-color, border-color, opacity, fill, stroke, stroke-dashoffset !important;
+  transition-duration: 150ms !important;
 }
-html[data-lite] .press:active:not(:disabled):not([aria-disabled="true"]) {
-  transform: none;
+/* Entrances become a plain 150ms fade (no movement, no stagger) */
+html[data-lite] :is(.rise, .slide-up, .animate-fade-up, .animate-pop, .animate-sheet-up, .animate-fade-in) {
+  animation: lite-fade 150ms ease-out backwards !important;
+}
+html[data-lite] .ring-arc {
+  animation-duration: 300ms !important;
+}
+html[data-lite] .tab-dot {
+  transition-property: left !important;
+  transition-duration: 240ms !important;
+}
+/* Decorative loops, sweeps, shake and XP pop off (colours still apply instantly) */
+html[data-lite] .xp-pop {
+  display: none;
+}
+html[data-lite] :is(.bar-grow, .animate-ping, .shake, .attn-shake),
+html[data-lite] .credit-sheen::after {
+  animation: none !important;
+}
+/* No hover lifts / press transforms */
+html[data-lite] :is(.press, .hover-lift, .lift-card):is(:hover, :active) {
+  transform: none !important;
+}
+html[data-lite] [data-quiz-option]:hover {
+  translate: none !important;
+}
+html[data-lite] nav[aria-label="Main"] :active {
+  scale: none !important;
 }
 html[data-lite] .preloader,
 html[data-lite] .confetti {

@@ -22,7 +22,7 @@ export function FilterChip({ active, className, children, type = 'button', ...pr
       aria-pressed={active}
       className={cn(
         'press inline-flex min-h-11 shrink-0 items-center rounded-full border px-4 text-sm font-semibold whitespace-nowrap',
-        active ? 'border-accent bg-accent text-accent-ink' : 'border-line bg-surface text-muted hover:text-fg hover:border-line-strong',
+        active ? 'border-fg bg-fg text-bg' : 'border-line bg-surface text-muted hover:text-fg hover:border-line-strong hover:bg-surface-2',
         className,
       )}
       {...props}

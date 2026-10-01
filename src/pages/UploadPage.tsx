@@ -84,7 +84,7 @@ export function UploadPage() {
   const isReady = parsed !== null && errors.length === 0
 
   return (
-    <Page>
+    <Page width="narrow">
       <PageHeader title="Add a subject" subtitle="Upload a JSON file to add your own subject to the library." />
 
       <div className="space-y-4">

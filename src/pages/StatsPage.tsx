@@ -79,7 +79,7 @@ function StatsView({ token }: { token: string }) {
   if (data === null) return <NotFoundPage />
   if (data === undefined) {
     return (
-      <Page wide>
+      <Page>
         <div className="h-8 w-40 animate-pulse rounded-btn bg-surface-2" />
         <div className="mt-5 h-48 animate-pulse rounded-card bg-surface-2" />
       </Page>
@@ -94,7 +94,7 @@ function StatsView({ token }: { token: string }) {
   }
 
   return (
-    <Page wide>
+    <Page>
       <PageHeader
         eyebrow="Owner"
         title="Stats"

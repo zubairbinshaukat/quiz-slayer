@@ -1,7 +1,23 @@
 import { usePlayer } from '../../hooks/usePlayer'
 import { openLinkSheet } from '../../lib/linkUi'
-import { Button } from '../ui/Button'
-import { Icon } from '../ui/Icon'
+import { cn } from '../../lib/utils'
+import { Icon, type IconName } from '../ui/Icon'
+
+function LinkRow({ icon, label, onClick }: { icon: IconName; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="press flex min-h-12 w-full items-center gap-3 px-4 py-2.5 text-left text-[15px] font-semibold hover:bg-surface-3"
+    >
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-surface-3 text-fg" aria-hidden="true">
+        <Icon name={icon} size={18} />
+      </span>
+      <span className="min-w-0 flex-1">{label}</span>
+      <Icon name="forward" size={18} className="shrink-0 text-muted" />
+    </button>
+  )
+}
 
 /** Settings → Devices: link status and the two link entry points (gone once 2 devices are linked). */
 export function DevicesSetting({ onNavigate }: { onNavigate: () => void }) {
@@ -14,31 +30,27 @@ export function DevicesSetting({ onNavigate }: { onNavigate: () => void }) {
   }
 
   return (
-    <div className="py-4 first:pt-1 last:pb-1">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold">Devices</p>
-        <span className={full ? 'inline-flex items-center gap-1 text-[13px] font-semibold text-success' : 'text-[13px] font-semibold text-muted'}>
-          {full && <Icon name="check" size={14} strokeWidth={3} />}
-          {full ? '2 of 2 devices — linked' : '1 of 2 devices'}
-        </span>
-      </div>
-      <p className="mt-0.5 text-[13px] leading-snug text-muted">
-        {full
-          ? 'Your points and rank are shared by both devices. Linking is permanent.'
-          : 'Share your points and rank with one other device. Optional, and it can’t be undone.'}
-      </p>
-      {!full && (
-        <div className="mt-2.5 flex flex-col gap-2">
-          <Button variant="secondary" className="w-full justify-start" onClick={() => open('approve')}>
-            <Icon name="plus" size={18} />
-            Link a new device to this one
-          </Button>
-          <Button variant="ghost" className="w-full justify-start" onClick={() => open('join')}>
-            <Icon name="forward" size={18} />
-            I’m new here — link my other device
-          </Button>
+    <>
+      <div className="px-4 py-3.5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[15px] font-semibold">Linked devices</p>
+          <span className={cn('inline-flex items-center gap-1 text-[13px] font-semibold', full ? 'text-success' : 'text-muted')}>
+            {full && <Icon name="check" size={14} strokeWidth={3} />}
+            {full ? '2 of 2 — linked' : '1 of 2'}
+          </span>
         </div>
+        <p className="mt-0.5 text-[13px] leading-snug text-muted">
+          {full
+            ? 'Your points and rank are shared by both devices. Linking is permanent.'
+            : 'Share your points and rank with one other device. Optional, and it can’t be undone.'}
+        </p>
+      </div>
+      {!full && (
+        <>
+          <LinkRow icon="plus" label="Link a new device to this one" onClick={() => open('approve')} />
+          <LinkRow icon="refresh" label="I’m new here — link my other device" onClick={() => open('join')} />
+        </>
       )}
-    </div>
+    </>
   )
 }

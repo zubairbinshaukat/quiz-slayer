@@ -23,7 +23,7 @@ export function LinkBanner({ attempts }: { attempts: number }) {
   }
 
   return (
-    <div className="card mt-5 flex items-center gap-1 py-1 pr-1 pl-3.5 animate-fade-up md:hidden">
+    <div className="card flex items-center gap-1 py-1 pr-1 pl-3.5 animate-fade-up md:hidden">
       <button
         type="button"
         onClick={() => openLinkSheet({ kind: 'join' })}

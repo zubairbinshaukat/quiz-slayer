@@ -6,7 +6,7 @@ import { Avatar } from './Avatar'
 /** "Playing as" strip: choose a name once, then it shows as locked. */
 export function PlayerNameRow({ player, onEdit }: { player: PlayerInfo; onEdit: () => void }) {
   return (
-    <div className="card mb-5 flex items-center gap-3 py-2 pr-2 pl-3">
+    <div className="card flex items-center gap-3 py-2 pr-2 pl-3">
       <Avatar name={player.name} size={32} />
       <p className="min-w-0 flex-1 text-sm">
         <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted">Playing as</span>

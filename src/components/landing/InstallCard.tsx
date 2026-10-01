@@ -1,6 +1,7 @@
-import { useState, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useInstallPrompt } from '../../hooks/useInstallPrompt'
 import { INSTALL_DISMISSED_KEY } from '../../lib/storageKeys'
+import { cn } from '../../lib/utils'
 import { Button, IconButton } from '../ui/Button'
 import { Icon, type IconName } from '../ui/Icon'
 import { Icon3D } from '../ui/Icon3D'
@@ -30,8 +31,8 @@ function IosStep({ n, icon, children }: { n: number; icon: IconName; children: R
   )
 }
 
-/** Landing "install the app" card. Hidden once installed or for 30 days after dismissal. */
-export function InstallCard() {
+/** Dashboard "install the app" card (rail on desktop, under the hero on mobile). Hidden once installed or for 30 days after dismissal. */
+export function InstallCard({ className }: { className?: string }) {
   const { canPrompt, installed, ios, prompt } = useInstallPrompt()
   const [dismissed, setDismissed] = useState(recentlyDismissed)
   const [iosOpen, setIosOpen] = useState(false)
@@ -48,18 +49,19 @@ export function InstallCard() {
   return (
     <section
       aria-labelledby="install-heading"
-      className="card relative mt-5 overflow-hidden border-accent/30 p-4 animate-fade-up sm:p-5"
+      className={cn('card relative overflow-hidden p-5', className)}
+      style={{ '--tint-h': 210 } as CSSProperties}
     >
-      <div className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full bg-accent/10 blur-2xl" aria-hidden="true" />
+      <div className="tint pointer-events-none absolute inset-0" aria-hidden="true" />
       <IconButton label="Dismiss install card for 30 days" onClick={dismiss} className="absolute right-1.5 top-1.5">
         <Icon name="close" size={18} />
       </IconButton>
 
       <div className="relative flex gap-4">
-        <Icon3D name="flash" variant="premium" size={64} eager className="shrink-0" />
+        <Icon3D name="rocket" size={60} eager shadow className="shrink-0" />
         <div className="min-w-0 flex-1 pr-8">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-fg">Free app</p>
-          <h2 id="install-heading" className="mt-0.5 text-lg">Install Quiz Slayer</h2>
+          <p className="eyebrow">Free app</p>
+          <h2 id="install-heading" className="mt-0.5 text-lg font-bold">Install Quiz Slayer</h2>
           <ul className="mt-2 space-y-1">
             {BENEFITS.map((b) => (
               <li key={b} className="flex items-center gap-2 text-sm">
@@ -74,12 +76,12 @@ export function InstallCard() {
       <div className="relative mt-4">
         {canPrompt ? (
           // Any Chromium browser (Chrome, Edge, Brave, Opera, Samsung Internet) once beforeinstallprompt fired
-          <Button className="w-full sm:w-auto" onClick={() => void prompt()}>
+          <Button className="w-full" onClick={() => void prompt()}>
             <Icon name="download" size={18} strokeWidth={2.5} />
             Install
           </Button>
         ) : ios ? (
-          <Button className="w-full sm:w-auto" onClick={() => setIosOpen(true)}>
+          <Button className="w-full" onClick={() => setIosOpen(true)}>
             <Icon name="plusSquare" size={18} strokeWidth={2.5} />
             How to install
           </Button>

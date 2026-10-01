@@ -10,20 +10,20 @@ function ReviewItem({ question, answer, index }: { question: Question; answer: A
   const correct = answer === question.correctIndex
   const skipped = answer === null
   return (
-    <li className="card cv-row-lg overflow-hidden">
+    <li className="card card-hover cv-row-lg overflow-hidden">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="press flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left"
+        className="press flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left hover:bg-surface-2"
       >
         <span
           className={cn(
-            'flex size-7 shrink-0 items-center justify-center rounded-full',
-            correct ? 'bg-success/15 text-success' : skipped ? 'bg-surface-2 text-muted' : 'bg-danger/15 text-danger',
+            'keycap size-8 shrink-0 text-[13px]',
+            correct ? 'border-success bg-success text-bg' : skipped ? 'text-muted' : 'border-danger bg-danger text-bg',
           )}
         >
-          <Icon name={correct ? 'check' : 'x'} size={14} strokeWidth={3} />
+          <span aria-hidden="true">{answer === null ? '–' : (OPTION_LETTERS[answer] ?? answer + 1)}</span>
           <span className="sr-only">{correct ? 'Correct' : skipped ? 'Skipped' : 'Wrong'}</span>
         </span>
         <span className="min-w-0 flex-1">
@@ -82,7 +82,7 @@ export function QuestionReview({ questions, answers }: { questions: Question[]; 
   return (
     <section aria-labelledby="review-heading">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 id="review-heading" className="text-xl">Review</h2>
+        <h2 id="review-heading" className="text-lg font-bold tracking-[-0.01em] lg:text-xl">Review</h2>
         <div className="flex gap-2">
           <FilterChip active={filter === 'all'} onClick={() => setFilter('all')}>All {questions.length}</FilterChip>
           <FilterChip active={filter === 'wrong'} onClick={() => setFilter('wrong')}>Wrong {wrongCount}</FilterChip>

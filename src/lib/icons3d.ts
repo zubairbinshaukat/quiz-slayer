@@ -15,6 +15,7 @@ export const SUBJECT_ICONS: readonly Icon3DName[] = [
   'chart', 'rocket', 'pencil', 'file-text', 'magic-trick', 'flash', 'target', 'chat',
 ]
 
-export function icon3dSrc(name: Icon3DName, style: Icon3DStyle = 'clay', density: 1 | 2 = 2): string {
+/** `premium` (full colour) is the app style; `clay` is kept only as an asset option. */
+export function icon3dSrc(name: Icon3DName, style: Icon3DStyle = 'premium', density: 1 | 2 = 2): string {
   return `/icons3d/${name}-${style}${density === 1 ? '@1x' : ''}.webp`
 }

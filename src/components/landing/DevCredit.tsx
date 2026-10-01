@@ -1,29 +1,64 @@
+import { DEV_LINKS, DEV_NAME, DEV_SITE_URL } from '../../lib/links'
+import { cn } from '../../lib/utils'
 import { Icon } from '../ui/Icon'
+import { Icon3D } from '../ui/Icon3D'
+import { ZubyrMark } from '../brand/ZubyrMark'
 
-export function DevCredit() {
+/** Credit card at the bottom of the dashboard (end of the right rail on desktop). The card links to the portfolio. */
+export function DevCredit({ className }: { className?: string }) {
   return (
-    <footer className="mt-14 flex justify-center border-t border-line pt-8">
+    <footer className={cn('credit-card card hover-lift relative p-5 hover:border-line-strong', className)} aria-label="Credits">
+      <span className="credit-sheen" aria-hidden="true" />
+      {/* Stretched link: the whole card opens the portfolio; the pills sit above it (z-10) */}
       <a
-        href="https://www.zubyr.dev"
+        href={DEV_SITE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="press group flex min-h-11 items-center gap-3 rounded-full py-1.5 pl-1.5 pr-4 hover:bg-surface-2"
-      >
-        <img
-          src="https://avatars.githubusercontent.com/u/145450776?v=4"
-          alt=""
-          width={40}
-          height={40}
-          loading="lazy"
-          decoding="async"
-          className="size-10 rounded-full object-cover ring-2 ring-accent/60"
-        />
-        <span className="text-left">
-          <span className="block text-[11px] font-medium uppercase tracking-wider text-muted">Built by</span>
-          <span className="block text-sm font-bold group-hover:text-accent-fg">Zubair Bin Shaukat</span>
-        </span>
-        <Icon name="forward" size={16} className="text-muted" />
-      </a>
+        className="absolute inset-0 z-[1] rounded-card"
+        aria-label={`${DEV_NAME} — portfolio (opens in a new tab)`}
+      />
+      <Icon3D name="magic-trick" size={72} shadow className="pointer-events-none absolute -top-5 -right-2" />
+
+      <div className="pointer-events-none relative flex items-center gap-4">
+        <ZubyrMark size={44} className="shrink-0 text-fg" />
+        <div className="min-w-0 flex-1 pr-12">
+          <p className="eyebrow">Built by</p>
+          <p className="mt-0.5 truncate text-[17px] font-extrabold leading-tight tracking-[-0.01em]">{DEV_NAME}</p>
+          <p className="mt-0.5 truncate text-[13px] text-muted">Designed &amp; built Quiz Slayer</p>
+        </div>
+      </div>
+
+      {/* [ Portfolio ──── ↗ ] [GH] [in] */}
+      <nav aria-label="Developer links" className="relative mt-4 flex gap-2">
+        {DEV_LINKS.map((link) => {
+          const primary = link.icon === 'user'
+          return (
+            <a
+              key={link.label}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              aria-label={`${link.label} (opens in a new tab)`}
+              title={primary ? undefined : link.label}
+              className={cn(
+                'hover-lift relative z-10 inline-flex h-11 items-center rounded-[14px] active:scale-[0.98]',
+                primary
+                  ? 'min-w-0 flex-1 gap-2 bg-accent/12 px-3.5 text-sm font-bold text-accent-fg shadow-[0_6px_18px_-10px_rgb(245_183_58/0.55)] hover:bg-accent/20 [:root:not(.dark)_&]:bg-accent/18 [:root:not(.dark)_&]:hover:bg-accent/25'
+                  : 'w-11 shrink-0 justify-center border border-line bg-surface-2 text-muted hover:border-line-strong hover:text-fg',
+              )}
+            >
+              <Icon name={link.icon} size={primary ? 17 : 18} className="shrink-0" />
+              {primary && (
+                <>
+                  <span className="min-w-0 flex-1 truncate">{link.label}</span>
+                  <Icon name="arrowUpRight" size={16} strokeWidth={2.5} className="shrink-0" />
+                </>
+              )}
+            </a>
+          )
+        })}
+      </nav>
     </footer>
   )
 }

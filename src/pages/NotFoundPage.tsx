@@ -11,7 +11,7 @@ export function NotFoundPage() {
   usePageMeta({ title: 'Page not found', path: '/404' })
   const nav = useNav()
   return (
-    <Page>
+    <Page width="narrow">
       <div className="flex flex-col items-center pt-10 text-center">
         <Icon3D name="target" size={88} eager />
         <p className="mt-5 font-mono text-sm font-semibold text-muted">404</p>

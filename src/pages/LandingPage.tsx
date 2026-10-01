@@ -1,13 +1,21 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { DashboardHero } from '../components/dashboard/DashboardHero'
+import { LeaderboardMini } from '../components/dashboard/LeaderboardMini'
+import { ContinueCard, QuickStartCard } from '../components/dashboard/ResumeCard'
+import { StatTiles } from '../components/dashboard/StatTiles'
+import { StreakCard } from '../components/dashboard/StreakCard'
 import { AddSubjectCard } from '../components/landing/AddSubjectCard'
 import { DevCredit } from '../components/landing/DevCredit'
-import { GreetingRow } from '../components/landing/GreetingRow'
 import { InstallCard } from '../components/landing/InstallCard'
 import { LinkBanner } from '../components/landing/LinkBanner'
 import { SubjectCard } from '../components/landing/SubjectCard'
 import { Page } from '../components/layout/Page'
 import { QuizSetupSheet } from '../components/quiz/QuizSetupSheet'
-import { StatStrip } from '../components/ui/StatStrip'
+import { Icon } from '../components/ui/Icon'
+import { useLeaderboard } from '../hooks/useLeaderboard'
+import { useLiteMode } from '../hooks/useLiteMode'
+import { DESKTOP_QUERY, useMediaQuery } from '../hooks/useMediaQuery'
 import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
 import { useQuizHistory } from '../hooks/useQuizHistory'
@@ -16,11 +24,14 @@ import { ROUTES } from '../lib/constants'
 import { convexEnabled } from '../lib/convex'
 import { getMasteredCount, getTotalMistakes } from '../lib/mastery'
 import { getMistakeIds, getSubjectStats } from '../lib/mistakes'
+import { getSavedProgress } from '../lib/quizProgress'
 import { usePageMeta } from '../lib/seo'
-import { computeStreak } from '../lib/streak'
+import { computeBestStreak, computeStreak, currentWeek } from '../lib/streak'
 import { allSubjectQuestions } from '../lib/subjectUtils'
 import { shuffleArray } from '../lib/utils'
-import type { HistoryEntry, Question, QuizMode, Subject } from '../types'
+import type { HistoryEntry, Question, QuizMode, SavedProgress, Subject } from '../types'
+
+const QUICK_COUNT = 10
 
 interface SubjectView {
   subject: Subject
@@ -42,14 +53,29 @@ function buildView(subject: Subject, history: HistoryEntry[]): SubjectView {
   }
 }
 
-const CAROUSEL = 'no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-1 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0'
-const CAROUSEL_ITEM = 'w-[74%] max-w-[290px] shrink-0 snap-start md:w-auto md:max-w-none'
+/** Most recently started quiz that was left mid-way (any subject or quick quiz). */
+function latestSavedProgress(subjects: Subject[]): SavedProgress | null {
+  let latest: SavedProgress | null = null
+  for (const s of subjects) {
+    const p = getSavedProgress(s.slug)
+    if (!p || p.questions.length === 0 || !p.answers.some((a) => a !== null)) continue
+    if (!latest || p.startTime > latest.startTime) latest = p
+  }
+  return latest
+}
+
+const CAROUSEL =
+  'no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pt-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 lg:grid-cols-3'
+const CAROUSEL_ITEM = 'w-[78vw] max-w-[340px] shrink-0 snap-start md:w-auto md:max-w-none'
 
 export function LandingPage() {
   usePageMeta({ path: '/' })
   const { subjects, quizzes, getSubjectBySlug } = useSubjectData()
   const { history, loading: historyLoading } = useQuizHistory()
-  const { startQuiz } = useQuiz()
+  const { startQuiz, rehydrateFromProgress } = useQuiz()
+  const board = useLeaderboard()
+  const desktop = useMediaQuery(DESKTOP_QUERY)
+  const { lite } = useLiteMode()
   const nav = useNav()
 
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null)
@@ -58,13 +84,26 @@ export function LandingPage() {
   const subjectViews = useMemo(() => subjects.map((s) => buildView(s, history)), [subjects, history])
   const quizViews = useMemo(() => quizzes.map((s) => buildView(s, history)), [quizzes, history])
   const streak = useMemo(() => computeStreak(history), [history])
-  const avgScore = history.length ? Math.round(history.reduce((sum, e) => sum + e.score, 0) / history.length) : 0
+  const bestStreak = useMemo(() => computeBestStreak(history), [history])
+  const week = useMemo(() => currentWeek(history), [history])
   const mistakesTotal = useMemo(() => getTotalMistakes(history), [history])
+  const saved = useMemo(() => latestSavedProgress([...subjects, ...quizzes]), [subjects, quizzes])
+
+  // Hero line: progress in the subject played last (or the first subject)
+  const focus = useMemo(() => {
+    const last = [...history].sort((a, b) => b.dateTaken.localeCompare(a.dateTaken))[0]
+    return subjectViews.find((v) => v.subject.slug === last?.slug) ?? subjectViews[0] ?? null
+  }, [history, subjectViews])
 
   function begin(subject: Subject, questions: Question[], mode: QuizMode = 'quiz') {
     if (questions.length === 0) return
     startQuiz(subject, questions, mode)
     nav(ROUTES.QUIZ_PATH(subject.slug))
+  }
+
+  function resume(progress: SavedProgress) {
+    rehydrateFromProgress(progress)
+    nav(ROUTES.QUIZ_PATH(progress.slug))
   }
 
   function handleConfirm(questions: Question[], mode: 'quiz' | 'exam') {
@@ -80,7 +119,7 @@ export function LandingPage() {
       <SubjectCard
         key={subject.slug}
         className={CAROUSEL_ITEM}
-        index={index}
+        index={index + 5}
         subject={subject.subject}
         slug={subject.slug}
         questionCount={subject.questionCount}
@@ -93,42 +132,81 @@ export function LandingPage() {
     )
   }
 
+  const name = board.player?.nameChosen ? board.player.name : null
+  const subline =
+    history.length > 0 && focus ? (
+      <>
+        You've cleared <span className="font-semibold text-fg">{Math.round(focus.mastery * focus.subject.questionCount)}</span> of{' '}
+        {focus.subject.questionCount} questions in <span className="font-semibold text-fg">{focus.subject.subject}</span>
+      </>
+    ) : (
+      'Short, sharp MCQ rounds with instant feedback. Pick a subject and start your streak today.'
+    )
+  const quick = subjects[0]
+
   return (
-    <Page wide>
-      <GreetingRow streak={streak} />
+    <Page>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-10">
+        <div className="min-w-0 space-y-5">
+          <DashboardHero name={name} subline={subline} streak={streak} week={week} />
 
-      {convexEnabled && !historyLoading && <LinkBanner attempts={history.length} />}
+          {convexEnabled && !historyLoading && <LinkBanner attempts={history.length} />}
+          {!desktop && <InstallCard />}
 
-      <InstallCard />
+          {saved ? (
+            <ContinueCard
+              slug={saved.slug}
+              subject={saved.subject}
+              current={saved.currentIndex}
+              total={saved.questions.length}
+              answered={saved.answers.filter((a) => a !== null).length}
+              onResume={() => resume(saved)}
+            />
+          ) : (
+            quick && (
+              <QuickStartCard
+                slug={quick.slug}
+                subject={quick.subject}
+                count={Math.min(QUICK_COUNT, quick.questionCount)}
+                onStart={() => begin(quick, shuffleArray(quick.questions).slice(0, QUICK_COUNT))}
+              />
+            )
+          )}
 
-      <StatStrip
-        className="mt-5"
-        stats={[
-          { label: 'Attempts', value: history.length },
-          { label: 'Avg score', value: history.length ? `${avgScore}%` : '—' },
-          { label: 'Mistakes', value: mistakesTotal, tone: mistakesTotal > 0 ? 'text-danger' : undefined },
-        ]}
-      />
+          <StatTiles history={history} mistakes={mistakesTotal} />
 
-      <section aria-labelledby="subjects-heading" className="mt-8">
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 id="subjects-heading" className="text-xl">Subjects</h2>
-          <span className="text-sm text-muted md:hidden">Swipe for more</span>
+          <section aria-labelledby="subjects-heading" className="pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="subjects-heading" className="text-lg font-bold tracking-[-0.01em] lg:text-xl">Subjects</h2>
+              <Link
+                to={ROUTES.UPLOAD}
+                viewTransition={!lite}
+                className="press -mr-2 inline-flex min-h-10 items-center gap-1.5 rounded-btn px-3 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-fg"
+              >
+                <Icon name="plus" size={16} strokeWidth={2.5} /> Add subject
+              </Link>
+            </div>
+            <div className={CAROUSEL}>
+              {subjectViews.map((view, i) => renderCard(view, i, false))}
+              <AddSubjectCard className={CAROUSEL_ITEM} index={subjectViews.length + 5} />
+            </div>
+          </section>
+
+          {quizViews.length > 0 && (
+            <section aria-labelledby="quizzes-heading" className="pt-4">
+              <h2 id="quizzes-heading" className="text-lg font-bold tracking-[-0.01em] lg:text-xl">Quick quizzes</h2>
+              <div className={CAROUSEL}>{quizViews.map((view, i) => renderCard(view, i, true))}</div>
+            </section>
+          )}
         </div>
-        <div className={CAROUSEL}>
-          {subjectViews.map((view, i) => renderCard(view, i, false))}
-          <AddSubjectCard className={CAROUSEL_ITEM} index={subjectViews.length} />
-        </div>
-      </section>
 
-      {quizViews.length > 0 && (
-        <section aria-labelledby="quizzes-heading" className="mt-8">
-          <h2 id="quizzes-heading" className="mb-3 text-xl">Quick quizzes</h2>
-          <div className={CAROUSEL}>{quizViews.map((view, i) => renderCard(view, i, true))}</div>
-        </section>
-      )}
-
-      <DevCredit />
+        <aside className="space-y-5" aria-label="Streak and leaderboard">
+          {desktop && <StreakCard streak={streak} best={bestStreak} week={week} />}
+          <LeaderboardMini board={board} />
+          {desktop && <InstallCard />}
+          <DevCredit />
+        </aside>
+      </div>
 
       <QuizSetupSheet
         key={selectedSlug ?? 'none'}

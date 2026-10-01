@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { FeedbackSheet, ShowFeedbackButton } from '../components/quiz/Feedback'
 import { QuestionCard } from '../components/quiz/QuestionCard'
-import { QuestionPalette } from '../components/quiz/QuestionPalette'
-import { QuizBottomBar } from '../components/quiz/QuizBottomBar'
+import { QuizBody } from '../components/quiz/QuizBody'
+import { QuizBottomBar, QuizNavRow } from '../components/quiz/QuizBottomBar'
 import { QuizHeader } from '../components/quiz/QuizHeader'
+import type { QuestionStatus } from '../components/quiz/QuizProgress'
 import { ResumeSheet, ShortcutsSheet, SubmitSheet } from '../components/quiz/QuizSheets'
-import type { QuestionStatus } from '../components/quiz/SegmentedProgress'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
 import { useQuizKeyboard } from '../hooks/useQuizKeyboard'
@@ -13,6 +15,8 @@ import { useSound } from '../hooks/useSound'
 import { useSubjectData } from '../hooks/useSubjectData'
 import { ROUTES } from '../lib/constants'
 import { EXAM_SECONDS_PER_QUESTION } from '../lib/examState'
+import { haptic } from '../lib/haptics'
+import { addXp, XP_PER_CORRECT } from '../lib/xp'
 import { clearProgress, getSavedProgress } from '../lib/quizProgress'
 import { usePageMeta } from '../lib/seo'
 import { shuffleArray } from '../lib/utils'
@@ -40,6 +44,10 @@ export function QuizPage() {
   const [helpOpen, setHelpOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [flash, setFlash] = useState({ index: -1, n: 0 })
+  // Question answered in this view (drives the one-time shake / "+10 XP" pop) and the mobile wrong-answer sheet
+  const [freshIndex, setFreshIndex] = useState(-1)
+  const [explainIndex, setExplainIndex] = useState(-1)
+  const mobile = useMediaQuery('(max-width: 767px)')
 
   // Re-hydrate after a refresh; route to results once submitted
   useEffect(() => {
@@ -85,10 +93,20 @@ export function QuizPage() {
     withQuestionTransition(index > currentIndex ? 'next' : 'prev', () => goToQuestion(index))
   }
 
+  // Synchronous reveal: the state update, haptic and sound all fire in the same tick (no delay, no queue)
   function select(i: number) {
     if (!question || locked) return
     answerQuestion(currentIndex, i)
-    if (!exam) playSound(i === question.correctIndex ? 'Correct' : 'Incorrect')
+    if (exam) {
+      haptic('tap')
+      return
+    }
+    const correct = i === question.correctIndex
+    setFreshIndex(currentIndex)
+    haptic(correct ? 'correct' : 'wrong')
+    playSound(correct ? 'Correct' : 'Incorrect')
+    if (correct) addXp(XP_PER_CORRECT)
+    if (mobile) setExplainIndex(currentIndex)
   }
 
   function requestSubmit(forceConfirm: boolean) {
@@ -107,6 +125,13 @@ export function QuizPage() {
     setExpanded((prev) => ({ ...prev, [currentIndex]: !prev[currentIndex] }))
   }
 
+  const tap = (fn: () => void) => () => {
+    haptic('tap')
+    fn()
+  }
+  const goPrev = tap(() => goTo(currentIndex - 1))
+  const goNext = tap(next)
+
   useQuizKeyboard(
     {
       optionCount: question?.options.length ?? 0,
@@ -115,10 +140,10 @@ export function QuizPage() {
         setFlash((f) => ({ index: i, n: f.n + 1 }))
         select(i)
       },
-      onNext: next,
-      onPrev: () => goTo(currentIndex - 1),
+      onNext: goNext,
+      onPrev: goPrev,
       onSubmit: () => requestSubmit(true),
-      onToggleMore: toggleMore,
+      onToggleMore: tap(toggleMore),
       onHelp: () => setHelpOpen(true),
     },
     active,
@@ -148,6 +173,15 @@ export function QuizPage() {
 
   if (!question) return <main id="main" className="min-h-dvh" aria-busy="true" />
 
+  const navProps = {
+    canPrev: currentIndex > 0,
+    canAdvance,
+    isLast,
+    onPrev: goPrev,
+    onNext: goNext,
+    onSubmit: () => requestSubmit(false),
+  }
+
   return (
     <>
       <QuizHeader
@@ -162,30 +196,45 @@ export function QuizPage() {
         onHelp={() => setHelpOpen(true)}
       />
 
-      <main id="main" className="mx-auto w-full max-w-[640px] px-4 pt-5 pb-[calc(112px+env(safe-area-inset-bottom))]">
+      <QuizBody statuses={statuses} current={currentIndex} onJump={goTo} onHelp={() => setHelpOpen(true)}>
         <QuestionCard
           question={question}
           index={currentIndex}
+          total={questions.length}
+          subject={subject ?? ''}
+          slug={slug ?? ''}
           answer={currentAnswer}
           exam={exam}
           expanded={!!expanded[currentIndex]}
           flash={flash}
+          fresh={freshIndex === currentIndex}
           onSelect={select}
           onToggleMore={toggleMore}
+          footer={<QuizNavRow {...navProps} />}
         />
+        {mobile && !exam && currentAnswer !== null && explainIndex !== currentIndex && (
+          <ShowFeedbackButton onClick={() => setExplainIndex(currentIndex)} />
+        )}
+      </QuizBody>
 
-        {questions.length > 1 && <QuestionPalette statuses={statuses} current={currentIndex} onJump={goTo} />}
-      </main>
+      <QuizBottomBar {...navProps} />
 
-      <QuizBottomBar
-        canPrev={currentIndex > 0}
-        canAdvance={canAdvance}
-        isLast={isLast}
-        onPrev={() => goTo(currentIndex - 1)}
-        onNext={next}
-        onSubmit={() => requestSubmit(false)}
-      />
-
+      {!exam && currentAnswer !== null && (
+        <FeedbackSheet
+          key={currentIndex}
+          open={mobile && explainIndex === currentIndex}
+          question={question}
+          correct={currentAnswer === question.correctIndex}
+          expanded={!!expanded[currentIndex]}
+          onToggle={toggleMore}
+          isLast={isLast}
+          onClose={() => setExplainIndex(-1)}
+          onNext={() => {
+            setExplainIndex(-1)
+            goNext()
+          }}
+        />
+      )}
       <ShortcutsSheet open={helpOpen} onClose={() => setHelpOpen(false)} />
       <SubmitSheet
         open={confirmOpen}

@@ -6,7 +6,7 @@ import { IconButton } from '../ui/Button'
 import { Icon } from '../ui/Icon'
 import { ElapsedTimer } from './ElapsedTimer'
 import { ExamCountdown } from './ExamCountdown'
-import { SegmentedProgress, type QuestionStatus } from './SegmentedProgress'
+import { QuizProgress, type QuestionStatus } from './QuizProgress'
 import type { QuizMode } from '../../types'
 
 interface QuizHeaderProps {
@@ -22,13 +22,21 @@ interface QuizHeaderProps {
   onHelp: () => void
 }
 
+const MODE_CHIP: Record<QuizMode, { label: string; className: string }> = {
+  quiz: { label: 'Practice', className: 'border border-line bg-surface-2 text-muted' },
+  exam: { label: 'Exam', className: 'bg-info/12 text-info' },
+  retry: { label: 'Retry', className: 'bg-danger/12 text-danger' },
+}
+
+/** Focus-mode top bar: exit, subject + mode, timer, sound; progress dots underneath. */
 export function QuizHeader({ subject, mode, exitTo, current, statuses, startTime, deadline, onExpire, onHelp }: QuizHeaderProps) {
   const { soundEnabled, toggleSound } = useSound()
   const { lite } = useLiteMode()
+  const chip = MODE_CHIP[mode]
   return (
-    <header className="pt-safe sticky top-0 z-30 border-b border-line bg-bg">
-      <div className="mx-auto max-w-[640px] px-2 pb-3 sm:px-4">
-        <div className="flex h-14 items-center gap-1">
+    <header className="glass pt-safe sticky top-0 z-30 border-b border-line">
+      <div className="mx-auto max-w-[1088px] px-2 pb-3.5 sm:px-4 lg:px-5">
+        <div className="flex h-14 items-center gap-1 md:h-16">
           <Link
             to={exitTo}
             viewTransition={!lite}
@@ -38,18 +46,9 @@ export function QuizHeader({ subject, mode, exitTo, current, statuses, startTime
           >
             <Icon name="back" size={22} />
           </Link>
-          <div className="min-w-0 flex-1 px-1">
-            <p className="flex items-center gap-2 truncate text-sm font-semibold">
-              <span className="truncate">{subject}</span>
-              {mode !== 'quiz' && (
-                <Pill className={mode === 'exam' ? 'bg-info/12 text-info' : 'bg-danger/12 text-danger'}>
-                  {mode === 'exam' ? 'Exam' : 'Retry'}
-                </Pill>
-              )}
-            </p>
-            <p className="font-mono text-xs text-muted">
-              Question {current + 1}/{statuses.length}
-            </p>
+          <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
+            <p className="truncate text-[15px] font-bold tracking-[-0.01em]">{subject}</p>
+            <Pill className={`shrink-0 ${chip.className}`}>{chip.label}</Pill>
           </div>
           {deadline ? <ExamCountdown deadline={deadline} onExpire={onExpire ?? (() => {})} /> : <ElapsedTimer startTime={startTime} />}
           {mode !== 'exam' && (
@@ -57,12 +56,15 @@ export function QuizHeader({ subject, mode, exitTo, current, statuses, startTime
               <Icon name={soundEnabled ? 'soundOn' : 'soundOff'} />
             </IconButton>
           )}
-          <IconButton label="Keyboard shortcuts (?)" onClick={onHelp} className="max-md:hidden">
+          <IconButton label="Keyboard shortcuts (?)" onClick={onHelp} className="max-md:hidden lg:hidden">
             <Icon name="keyboard" />
           </IconButton>
         </div>
-        <div className="px-2">
-          <SegmentedProgress statuses={statuses} current={current} />
+        <div className="flex items-center gap-3 px-2.5 lg:px-1">
+          <QuizProgress statuses={statuses} current={current} />
+          <span className="shrink-0 font-mono text-xs font-semibold text-muted">
+            <span className="text-fg">{current + 1}</span>/{statuses.length}
+          </span>
         </div>
       </div>
     </header>

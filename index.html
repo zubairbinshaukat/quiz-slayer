@@ -37,9 +37,10 @@
     <script>
       // Apply the saved theme before first paint (dark-first; avoids a light/dark flash)
       try {
-        if (localStorage.getItem('quiz-theme') === 'light') {
+        var t = localStorage.getItem('quiz-theme')
+        if (t === 'light' || (t === 'system' && matchMedia('(prefers-color-scheme: light)').matches)) {
           document.documentElement.classList.remove('dark')
-          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F7F5F0')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F6F4EE')
         }
       } catch (e) {}
     </script>

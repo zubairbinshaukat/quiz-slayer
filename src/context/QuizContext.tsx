@@ -6,6 +6,7 @@ import { recordExamResult } from '../lib/examState'
 import { clearProgress, writeProgress } from '../lib/quizProgress'
 import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
 import { shuffleArray } from '../lib/utils'
+import { addXp, XP_PER_CORRECT } from '../lib/xp'
 import { isRecord, type AnalyticsSnapshot, type Answer, type Question, type QuizMode, type SavedProgress, type SubjectMeta } from '../types'
 import { readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
 import { QuizContext, type QuizState } from './quizContextDef'
@@ -166,6 +167,8 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       // didSave persists in the closure across both invocations)
       if (!didSave) {
         didSave = true
+        // Cosmetic XP: practice/retry award per answer as it's revealed; exams reveal (and award) on submit
+        if (prev.mode === 'exam') addXp(correct * XP_PER_CORRECT)
         // Timed exams feed adaptive mastery: correct ids drop out, wrong ids repeat
         if (prev.mode === 'exam' && prev.slug) recordExamResult(prev.slug, prev.questions, prev.answers, score)
         void saveQuizResult({

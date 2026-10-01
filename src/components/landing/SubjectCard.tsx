@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { getSubjectIcon } from '../../lib/subjectUtils'
+import { getSubjectHue, getSubjectIcon } from '../../lib/subjectUtils'
 import { cn } from '../../lib/utils'
 import { Icon } from '../ui/Icon'
 import { Icon3D } from '../ui/Icon3D'
@@ -20,14 +20,15 @@ export interface SubjectCardProps {
   className?: string
 }
 
+/** Tinted subject tile: mastery ring, overflowing 3D icon, name, meta, progress and a "to fix" chip. */
 export function SubjectCard({
   subject, slug, questionCount, best, mastery, mistakes, index = 0, onStart, onPracticeMistakes, className,
 }: SubjectCardProps) {
   const pct = Math.round(mastery * 100)
   return (
     <article
-      className={cn('card press rise relative flex min-h-[232px] flex-col p-4 hover:border-line-strong', className)}
-      style={{ '--i': index } as CSSProperties}
+      className={cn('card tint lift-card rise relative flex min-h-[220px] flex-col p-5', className)}
+      style={{ '--i': index, '--tint-h': getSubjectHue(slug) } as CSSProperties}
     >
       {/* Stretched primary action: the whole card starts the quiz */}
       <button
@@ -37,32 +38,53 @@ export function SubjectCard({
         aria-label={`Practice ${subject}, ${questionCount} questions`}
       />
 
-      <div className="pointer-events-none relative flex items-start justify-between">
-        <ProgressRing value={mastery} size={46} stroke={3} label={`${pct}% mastered`}>
-          <span className="text-[11px] font-bold">{pct}%</span>
-        </ProgressRing>
-        <Icon3D name={getSubjectIcon(slug)} size={76} className="-mr-1.5 -mt-1.5" />
-      </div>
+      <Icon3D
+        name={getSubjectIcon(slug)}
+        size={104}
+        shadow
+        className="lift-icon pointer-events-none absolute -top-3 -right-2"
+      />
 
-      <div className="pointer-events-none relative mt-auto pt-4">
-        <h3 className="line-clamp-2 text-lg leading-snug">{subject}</h3>
+      <ProgressRing value={mastery} size={44} stroke={3.5} gradient label={`${pct}% mastered`} className="pointer-events-none relative">
+        <span className="font-mono text-[11px] font-bold">{pct}%</span>
+      </ProgressRing>
+
+      <div className="pointer-events-none relative mt-auto pt-6">
+        <h3 className="font-display line-clamp-2 pr-2 text-lg font-bold leading-snug tracking-[-0.02em]">{subject}</h3>
         <p className="mt-1 text-sm text-muted">
           {questionCount} questions
           <span aria-hidden="true"> · </span>
           {best === null ? 'Not attempted' : <>Best <span className="font-semibold text-fg">{best}%</span></>}
         </p>
+        <div className="mt-3 h-1 overflow-hidden rounded-full bg-surface-3" aria-hidden="true">
+          <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
+        </div>
       </div>
 
-      {mistakes > 0 && onPracticeMistakes && (
-        <button
-          type="button"
-          onClick={onPracticeMistakes}
-          className="press relative z-10 mt-3 inline-flex min-h-11 items-center justify-center gap-1.5 rounded-btn border border-line bg-surface-2 px-3 text-sm font-semibold hover:border-danger/40"
+      <div className="relative mt-3 flex min-h-8 items-center justify-between gap-2">
+        {mistakes > 0 && onPracticeMistakes ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              onPracticeMistakes()
+            }}
+            className="lift-chip press relative z-10 inline-flex min-h-8 items-center gap-1.5 rounded-full border border-danger/30 bg-danger/12 px-3 text-xs font-bold text-danger hover:bg-danger/20"
+            aria-label={`Retry ${mistakes} mistake${mistakes === 1 ? '' : 's'} in ${subject}`}
+          >
+            <Icon name="refresh" size={13} strokeWidth={2.5} />
+            {mistakes} to fix
+          </button>
+        ) : (
+          <span />
+        )}
+        <span
+          aria-hidden="true"
+          className="lift-cta pointer-events-none inline-flex min-h-8 items-center gap-1 rounded-full bg-accent px-3 text-xs font-bold text-accent-ink"
         >
-          <Icon name="refresh" size={16} className="text-danger" />
-          Practice mistakes ({mistakes})
-        </button>
-      )}
+          Start <Icon name="forward" size={13} strokeWidth={3} />
+        </span>
+      </div>
     </article>
   )
 }

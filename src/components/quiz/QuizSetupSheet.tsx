@@ -8,7 +8,7 @@ import {
   getExamState,
   selectExamQuestions,
 } from '../../lib/examState'
-import { getSubjectIcon } from '../../lib/subjectUtils'
+import { getSubjectHue, getSubjectIcon } from '../../lib/subjectUtils'
 import { formatClock, shuffleArray } from '../../lib/utils'
 import { Button } from '../ui/Button'
 import { Icon } from '../ui/Icon'
@@ -27,7 +27,7 @@ interface QuizSetupSheetProps {
   onConfirm: (questions: Question[], mode: 'quiz' | 'exam') => void
 }
 
-const LEGEND = 'mb-2 text-xs font-semibold uppercase tracking-wider text-muted'
+const LEGEND = 'eyebrow mb-2'
 
 export function QuizSetupSheet({ subject, isOpen, onClose, onConfirm }: QuizSetupSheetProps) {
   const [mode, setMode] = useState<SetupMode>('practice')
@@ -87,8 +87,11 @@ export function QuizSetupSheet({ subject, isOpen, onClose, onConfirm }: QuizSetu
         </Button>
       }
     >
-      <div className="mb-5 flex items-center justify-center">
-        <Icon3D name={mode === 'exam' ? 'clock' : getSubjectIcon(subject.slug)} size={88} eager />
+      <div
+        className="mx-auto mb-5 flex w-64 items-center justify-center py-3"
+        style={{ backgroundImage: `radial-gradient(closest-side, hsl(${getSubjectHue(subject.slug)} 80% 60% / var(--tint-a)), transparent 70%)` }}
+      >
+        <Icon3D name={mode === 'exam' ? 'clock' : getSubjectIcon(subject.slug)} size={96} eager shadow />
       </div>
 
       <fieldset className="mb-5">

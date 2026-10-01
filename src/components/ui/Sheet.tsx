@@ -105,7 +105,7 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
         className={cn(
           'relative flex max-h-[88dvh] w-full flex-col overflow-hidden border border-line bg-surface outline-none',
           'rounded-t-sheet animate-sheet-up md:max-w-[440px] md:rounded-sheet md:animate-pop',
-          'shadow-[var(--hl)]',
+          'shadow-[var(--hl),var(--float)]',
           className,
         )}
       >

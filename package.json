@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "icons": "node scripts/gen-icons.mjs",
+    "emoji:fetch": "node scripts/fetch-emoji.mjs",
     "banks:push": "tsx scripts/push-banks.mts"
   },
   "dependencies": {

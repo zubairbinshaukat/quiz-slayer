@@ -7,7 +7,7 @@
 
 /** Quiz-in-progress snapshot, suffixed with the subject slug. */
 export const PROGRESS_KEY_PREFIX = 'quiz-progress-'
-/** 'dark' | 'light' (also read by the pre-paint script in index.html). */
+/** 'dark' | 'light' | 'system' (also read by the pre-paint script in index.html). */
 export const THEME_KEY = 'quiz-theme'
 /** 'true' | 'false' */
 export const SOUND_KEY = 'sound-enabled'
@@ -15,7 +15,7 @@ export const SOUND_KEY = 'sound-enabled'
 export const EXAM_STATE_KEY_PREFIX = 'exam-state-'
 /** Anonymous device identifier used by the leaderboard. */
 export const DEVICE_ID_KEY = 'qs-device-id'
-/** '1' once the leaderboard name prompt has been shown. */
+/** sessionStorage '1' once "Keep random name" was chosen this session (older builds stored it in localStorage). */
 export const NAME_PROMPTED_KEY = 'qs-name-prompted'
 /** Display name for the offline (local-only) leaderboard. */
 export const PLAYER_NAME_KEY = 'qs-player-name'
@@ -35,6 +35,8 @@ export const IDENTITY_VERSION_KEY = 'qs-identity-v'
 export const LINK_BANNER_DISMISSED_KEY = 'qs-link-banner-dismissed'
 /** '1' once this install has been counted (iOS standalone launch / appinstalled). */
 export const INSTALL_COUNTED_KEY = 'qs-install-counted'
+/** Cosmetic local XP total (+10 per correct answer). Separate from leaderboard points. */
+export const XP_KEY = 'qs-xp'
 /** Owner stats session token (hidden /stats page). */
 export const ADMIN_TOKEN_KEY = 'qs-admin-token'
 
@@ -46,6 +48,8 @@ export const SESSION_KEY = 'quiz-session'
 export const ANALYTICS_KEY = 'quiz-analytics'
 /** Set once the splash has played this session. */
 export const PRELOADED_KEY = 'qs-preloaded'
+/** '1' after one automatic reload for a failed chunk load; cleared once the app renders. */
+export const RELOADED_ONCE_KEY = 'qs-reloaded-once'
 /** Set once this session's anonymous visit was counted. */
 export const VISIT_TRACKED_KEY = 'qs-visit-tracked'
 
