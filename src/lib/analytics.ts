@@ -14,7 +14,8 @@ import { INSTALL_COUNTED_KEY, VISIT_TRACKED_KEY } from './storageKeys'
 
 type VisitArgs = FunctionArgs<typeof api.analytics.trackVisit>
 
-function classify(): Pick<VisitArgs, 'deviceType' | 'os' | 'browser'> {
+/** Coarse device / OS / browser categories from the user agent (the string itself is never sent). */
+export function classifyDevice(): Pick<VisitArgs, 'deviceType' | 'os' | 'browser'> {
   const ua = navigator.userAgent
   const ios = isIOS()
   const android = /android/i.test(ua)
@@ -64,7 +65,7 @@ async function trackVisit(): Promise<void> {
   ssSet(VISIT_TRACKED_KEY, '1') // set first: one attempt per session, even if it fails
   await client.mutation(api.analytics.trackVisit, {
     deviceHash: hash,
-    ...classify(),
+    ...classifyDevice(),
     installed: isStandalone(),
     firstVisit: isNewDevice(),
   })

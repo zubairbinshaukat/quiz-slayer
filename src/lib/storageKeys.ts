@@ -23,6 +23,10 @@ export const PLAYER_NAME_KEY = 'qs-player-name'
 export const LITE_MODE_KEY = 'qs-lite-mode'
 /** Epoch ms when the install card was dismissed. */
 export const INSTALL_DISMISSED_KEY = 'qs-install-dismissed'
+/** '1' once the app is known to be installed on this device (standalone launch, appinstalled, related-apps check). */
+export const INSTALLED_KEY = 'qs-installed'
+/** `${slug}@${startTime}` of the unfinished quiz whose home "Continue" card was dismissed. */
+export const RESUME_DISMISSED_KEY = 'qs-resume-dismissed'
 /** Removed: the leaderboard no longer renders a cached board offline. Deleted on startup. */
 export const RETIRED_LEADERBOARD_CACHE_KEY = 'qs-leaderboard-cache'
 /** 32-hex player secret: identifies this device's player on the server. Never shown. */

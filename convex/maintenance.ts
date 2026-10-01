@@ -1,4 +1,6 @@
+import { v } from 'convex/values'
 import { internalMutation } from './_generated/server'
+import { deletePlayerData } from './lib/playerStore'
 
 const HOUR = 60 * 60 * 1000
 const BATCH = 500
@@ -35,5 +37,16 @@ export const cleanup = internalMutation({
       for (const row of rows) await ctx.db.delete(row._id)
     }
     return null
+  },
+})
+
+/** CLI: `npx convex run maintenance:deletePlayer '{"playerId":"..."}'` removes a player and all their data. */
+export const deletePlayer = internalMutation({
+  args: { playerId: v.id('players') },
+  handler: async (ctx, { playerId }) => {
+    const player = await ctx.db.get(playerId)
+    if (!player) return null
+    await deletePlayerData(ctx, playerId)
+    return player.name
   },
 })

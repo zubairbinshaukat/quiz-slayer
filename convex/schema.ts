@@ -3,6 +3,19 @@ import { v } from 'convex/values'
 
 export const attemptMode = v.union(v.literal('quiz'), v.literal('exam'), v.literal('retry'))
 
+// Coarse device categories (shared by analytics counters and the owner's player view)
+export const deviceType = v.union(v.literal('mobile'), v.literal('tablet'), v.literal('desktop'))
+export const deviceOs = v.union(v.literal('ios'), v.literal('android'), v.literal('windows'), v.literal('mac'), v.literal('linux'), v.literal('otherOs'))
+export const deviceBrowser = v.union(v.literal('chrome'), v.literal('safari'), v.literal('firefox'), v.literal('edge'), v.literal('otherBrowser'))
+
+/** What a device reports about itself with each finished quiz (no user agent string). */
+export const deviceInfo = v.object({
+  deviceType,
+  os: deviceOs,
+  browser: deviceBrowser,
+  installed: v.boolean(),
+})
+
 /** Answer key for one question. Question text never leaves the client bundle. */
 export const bankQuestion = v.object({
   id: v.string(),
@@ -36,6 +49,9 @@ export default defineSchema({
   playerDevices: defineTable({
     deviceId: v.string(),
     playerId: v.id('players'),
+    /** Latest self-report from this device (owner stats page only). */
+    info: v.optional(deviceInfo),
+    lastSeenAt: v.optional(v.number()),
   })
     .index('by_deviceId', ['deviceId'])
     .index('by_player', ['playerId']),
@@ -193,7 +209,8 @@ export default defineSchema({
     .index('by_token', ['token'])
     .index('by_expiresAt', ['expiresAt']),
 
-  // ─── App-wide switches set from the owner stats page (one row per key) ──
+  // ─── Retired: held the demo-leaderboard switch. Nothing reads or writes it; kept so
+  // deployments that still have a row keep validating. ──
   appSettings: defineTable({
     key: v.literal('demoLeaderboard'),
     on: v.boolean(),

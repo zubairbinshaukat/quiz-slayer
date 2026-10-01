@@ -1,16 +1,10 @@
 import { query } from './_generated/server'
 
 /**
- * Public app-wide switches (no secrets). `demoLeaderboard` is undefined until the owner sets it,
- * so the client can fall back to its own default (on in dev builds, off in production).
+ * Retired with the demo leaderboard. Kept because installed apps still running an older
+ * cached build subscribe to it from the leaderboard; removing it would crash their board.
  */
 export const get = query({
   args: {},
-  handler: async (ctx) => {
-    const demo = await ctx.db
-      .query('appSettings')
-      .withIndex('by_key', (q) => q.eq('key', 'demoLeaderboard'))
-      .unique()
-    return { demoLeaderboard: demo?.on }
-  },
+  handler: async () => ({ demoLeaderboard: false }),
 })

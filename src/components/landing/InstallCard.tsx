@@ -31,13 +31,17 @@ function IosStep({ n, icon, children }: { n: number; icon: IconName; children: R
   )
 }
 
-/** Dashboard "install the app" card (rail on desktop, under the hero on mobile). Hidden once installed or for 30 days after dismissal. */
+/**
+ * Dashboard "install the app" card (rail on desktop, under the hero on mobile). Shown only when
+ * installing is actually possible: Chromium offered its prompt (it never does once the app is
+ * installed) or iOS Safari. Hidden once installed or for 30 days after dismissal.
+ */
 export function InstallCard({ className }: { className?: string }) {
   const { canPrompt, installed, ios, prompt } = useInstallPrompt()
   const [dismissed, setDismissed] = useState(recentlyDismissed)
   const [iosOpen, setIosOpen] = useState(false)
 
-  if (installed || dismissed) return null
+  if (installed || dismissed || !(canPrompt || ios)) return null
 
   function dismiss() {
     try {
@@ -80,17 +84,11 @@ export function InstallCard({ className }: { className?: string }) {
             <Icon name="download" size={18} strokeWidth={2.5} />
             Install
           </Button>
-        ) : ios ? (
+        ) : (
           <Button className="w-full" onClick={() => setIosOpen(true)}>
             <Icon name="plusSquare" size={18} strokeWidth={2.5} />
             How to install
           </Button>
-        ) : (
-          // The prompt event may still arrive; the store re-renders this card into the Install button when it does
-          <p className="flex items-center gap-2 text-sm text-muted">
-            <Icon name="info" size={16} className="shrink-0" />
-            Use your browser menu → Apps → Install Quiz Slayer
-          </p>
         )}
       </div>
 

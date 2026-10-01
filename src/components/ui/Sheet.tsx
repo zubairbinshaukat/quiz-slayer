@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useSyncExternalStore, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useLenis } from '../../lib/lenis'
 import { cn } from '../../lib/utils'
@@ -21,6 +21,34 @@ interface SheetProps {
 
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'
 
+/** Less than this is browser chrome (URL bar) rather than an on-screen keyboard. */
+const KEYBOARD_MIN_PX = 120
+
+function subscribeViewport(onChange: () => void): () => void {
+  const vv = window.visualViewport
+  if (!vv) return () => {}
+  vv.addEventListener('resize', onChange)
+  vv.addEventListener('scroll', onChange)
+  return () => {
+    vv.removeEventListener('resize', onChange)
+    vv.removeEventListener('scroll', onChange)
+  }
+}
+
+/**
+ * "top height" of the area left visible by the on-screen keyboard, or '' when none is open.
+ * Mobile browsers (and installed PWAs) shrink only the visual viewport for the keyboard, so a
+ * `fixed bottom-0` sheet would otherwise sit underneath it.
+ */
+function keyboardViewport(): string {
+  const vv = window.visualViewport
+  if (!vv || vv.scale > 1.01) return '' // pinch-zoom also shrinks the visual viewport
+  if (window.innerHeight - vv.height < KEYBOARD_MIN_PX) return ''
+  return `${Math.round(vv.offsetTop)} ${Math.round(vv.height)}`
+}
+
+const noKeyboard = () => ''
+
 /** Bottom sheet on mobile, centred dialog from md up. Portalled, focus-trapped, scroll-locked. */
 export function Sheet({ open, onClose, title, description, children, footer, className, hideClose, dismissible = true }: SheetProps) {
   const panelRef = useRef<HTMLDivElement>(null)
@@ -29,6 +57,7 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
   const lenis = useLenis()
   const closeRef = useRef(onClose)
   const dismissRef = useRef(dismissible)
+  const keyboard = useSyncExternalStore(subscribeViewport, keyboardViewport, noKeyboard)
 
   useEffect(() => {
     closeRef.current = onClose
@@ -87,8 +116,17 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
 
   if (!open) return null
 
+  // Keyboard open: fit the overlay to the visible area so the sheet rides on top of the keyboard
+  let overlayStyle: CSSProperties | undefined
+  let panelStyle: CSSProperties | undefined
+  if (keyboard) {
+    const [top, height] = keyboard.split(' ').map(Number)
+    overlayStyle = { top, height, bottom: 'auto' }
+    panelStyle = { maxHeight: height - 8 }
+  }
+
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6" data-lenis-prevent>
+    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-6" style={overlayStyle} data-lenis-prevent>
       <div
         className="absolute inset-0 animate-fade-in bg-[var(--scrim)]"
         onClick={dismissible ? onClose : undefined}
@@ -102,6 +140,7 @@ export function Sheet({ open, onClose, title, description, children, footer, cla
         aria-describedby={description ? descId : undefined}
         tabIndex={-1}
         onKeyDown={trapTab}
+        style={panelStyle}
         className={cn(
           'relative flex max-h-[88dvh] w-full flex-col overflow-hidden border border-line bg-surface outline-none',
           'rounded-t-sheet animate-sheet-up md:max-w-[440px] md:rounded-sheet md:animate-pop',

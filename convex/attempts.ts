@@ -1,8 +1,8 @@
 import { ConvexError, v } from 'convex/values'
 import { mutation, type MutationCtx } from './_generated/server'
 import type { Doc, Id } from './_generated/dataModel'
-import { attemptMode } from './schema'
-import { ensurePlayerRow, getStats } from './lib/playerStore'
+import { attemptMode, deviceInfo } from './schema'
+import { ensurePlayerRow, getDeviceRow, getStats } from './lib/playerStore'
 import { assertDeviceId, assertSecret, round2 } from './lib/util'
 
 const MAX_QUESTIONS_PER_ATTEMPT = 500
@@ -78,6 +78,8 @@ export const recordAttempt = mutation({
     questionIds: v.array(v.string()),
     timeTaken: v.number(),
     createdAt: v.number(),
+    /** Absent on attempts queued by older app versions. */
+    device: v.optional(deviceInfo),
   },
   handler: async (ctx, args) => {
     const { secret, deviceId, attemptId, answers, questionIds } = args
@@ -101,6 +103,10 @@ export const recordAttempt = mutation({
     }
 
     const player = await ensurePlayerRow(ctx, secret, deviceId)
+    const deviceRow = await getDeviceRow(ctx, deviceId)
+    if (deviceRow && deviceRow.playerId === player._id) {
+      await ctx.db.patch(deviceRow._id, { lastSeenAt: Date.now(), ...(args.device ? { info: args.device } : {}) })
+    }
     const bank = await ctx.db
       .query('questionBanks')
       .withIndex('by_slug', (q) => q.eq('slug', args.slug))

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { DashboardHero } from '../components/dashboard/DashboardHero'
 import { LeaderboardMini } from '../components/dashboard/LeaderboardMini'
-import { ContinueCard, QuickStartCard } from '../components/dashboard/ResumeCard'
+import { ContinueCard } from '../components/dashboard/ResumeCard'
 import { StatTiles } from '../components/dashboard/StatTiles'
 import { StreakCard } from '../components/dashboard/StreakCard'
 import { AddSubjectCard } from '../components/landing/AddSubjectCard'
@@ -26,12 +26,12 @@ import { getMasteredCount, getTotalMistakes } from '../lib/mastery'
 import { getMistakeIds, getSubjectStats } from '../lib/mistakes'
 import { getSavedProgress } from '../lib/quizProgress'
 import { usePageMeta } from '../lib/seo'
+import { lsGet, lsSet } from '../lib/storage'
+import { RESUME_DISMISSED_KEY } from '../lib/storageKeys'
 import { computeBestStreak, computeStreak, currentWeek } from '../lib/streak'
 import { allSubjectQuestions } from '../lib/subjectUtils'
 import { shuffleArray } from '../lib/utils'
 import type { HistoryEntry, Question, QuizMode, SavedProgress, Subject } from '../types'
-
-const QUICK_COUNT = 10
 
 interface SubjectView {
   subject: Subject
@@ -64,6 +64,11 @@ function latestSavedProgress(subjects: Subject[]): SavedProgress | null {
   return latest
 }
 
+/** Identifies one unfinished quiz, so dismissing its card doesn't hide the next one. */
+function resumeKey(p: SavedProgress): string {
+  return `${p.slug}@${p.startTime}`
+}
+
 const CAROUSEL =
   'no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pt-4 pb-2 md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 lg:grid-cols-3'
 const CAROUSEL_ITEM = 'w-[78vw] max-w-[340px] shrink-0 snap-start md:w-auto md:max-w-none'
@@ -88,6 +93,7 @@ export function LandingPage() {
   const week = useMemo(() => currentWeek(history), [history])
   const mistakesTotal = useMemo(() => getTotalMistakes(history), [history])
   const saved = useMemo(() => latestSavedProgress([...subjects, ...quizzes]), [subjects, quizzes])
+  const [dismissedResume, setDismissedResume] = useState(() => lsGet(RESUME_DISMISSED_KEY))
 
   // Hero line: progress in the subject played last (or the first subject)
   const focus = useMemo(() => {
@@ -142,7 +148,6 @@ export function LandingPage() {
     ) : (
       'Short, sharp MCQ rounds with instant feedback. Pick a subject and start your streak today.'
     )
-  const quick = subjects[0]
 
   return (
     <Page>
@@ -153,7 +158,7 @@ export function LandingPage() {
           {convexEnabled && !historyLoading && <LinkBanner attempts={history.length} />}
           {!desktop && <InstallCard />}
 
-          {saved ? (
+          {saved && resumeKey(saved) !== dismissedResume && (
             <ContinueCard
               slug={saved.slug}
               subject={saved.subject}
@@ -161,16 +166,11 @@ export function LandingPage() {
               total={saved.questions.length}
               answered={saved.answers.filter((a) => a !== null).length}
               onResume={() => resume(saved)}
+              onDismiss={() => {
+                lsSet(RESUME_DISMISSED_KEY, resumeKey(saved))
+                setDismissedResume(resumeKey(saved))
+              }}
             />
-          ) : (
-            quick && (
-              <QuickStartCard
-                slug={quick.slug}
-                subject={quick.subject}
-                count={Math.min(QUICK_COUNT, quick.questionCount)}
-                onStart={() => begin(quick, shuffleArray(quick.questions).slice(0, QUICK_COUNT))}
-              />
-            )
           )}
 
           <StatTiles history={history} mistakes={mistakesTotal} />

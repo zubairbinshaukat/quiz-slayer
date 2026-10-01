@@ -2,6 +2,7 @@ import { v } from 'convex/values'
 import { internal } from './_generated/api'
 import { internalMutation, mutation, type MutationCtx } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
+import { deviceBrowser as browser, deviceOs as os, deviceType } from './schema'
 
 /**
  * Anonymous, aggregate-only usage counters. No IP, location, user agent string
@@ -20,9 +21,6 @@ const EMPTY: Counters = {
   installedSessions: 0, installs_ios: 0, installs_android: 0, installs_desktop: 0,
 }
 
-const deviceType = v.union(v.literal('mobile'), v.literal('tablet'), v.literal('desktop'))
-const os = v.union(v.literal('ios'), v.literal('android'), v.literal('windows'), v.literal('mac'), v.literal('linux'), v.literal('otherOs'))
-const browser = v.union(v.literal('chrome'), v.literal('safari'), v.literal('firefox'), v.literal('edge'), v.literal('otherBrowser'))
 const platform = v.union(v.literal('ios'), v.literal('android'), v.literal('desktop'))
 
 const HASH_PATTERN = /^[0-9a-f]{16}$/

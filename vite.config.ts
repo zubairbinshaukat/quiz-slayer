@@ -55,6 +55,8 @@ export default defineConfig(({ mode }) => {
           background_color: '#0B0B0F',
           display: 'standalone',
           start_url: '/',
+          // Lets the browser tab ask (navigator.getInstalledRelatedApps) whether this app is installed
+          related_applications: [{ platform: 'webapp', url: 'https://quiz.zubyr.dev/manifest.webmanifest' }],
           icons: [
             { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
             { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },

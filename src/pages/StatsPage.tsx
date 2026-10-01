@@ -3,16 +3,16 @@ import { useMutation, useQuery } from 'convex/react'
 import type { FunctionReturnType } from 'convex/server'
 import { api } from '../../convex/_generated/api'
 import { Page, PageHeader } from '../components/layout/Page'
+import { PlayersPanel } from '../components/stats/PlayersPanel'
 import { SplitTable, type SplitGroup } from '../components/stats/SplitTable'
 import { VisitsChart, type DayPoint } from '../components/stats/VisitsChart'
 import { Button } from '../components/ui/Button'
+import { Segmented } from '../components/ui/Segmented'
 import { StatStrip } from '../components/ui/StatStrip'
-import { Switch } from '../components/ui/Switch'
 import { useNav } from '../hooks/useNav'
 import { clearAdminToken, useAdminToken } from '../lib/admin'
 import { ROUTES } from '../lib/constants'
 import { convexEnabled } from '../lib/convex'
-import { DEMO_LEADERBOARD_DEFAULT } from '../lib/leaderboardDemo'
 import { usePageMeta } from '../lib/seo'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -62,75 +62,14 @@ function splits(days: Day[]): SplitGroup[] {
   ]
 }
 
-/** Owner switch for the fake leaderboard (everyone sees the change live). */
-function DemoBoardSwitch({ token }: { token: string }) {
-  const setting = useQuery(api.settings.get)
-  const setDemo = useMutation(api.admin.setDemoLeaderboard)
-  const [error, setError] = useState(false)
-  const on = setting?.demoLeaderboard ?? DEMO_LEADERBOARD_DEFAULT
-
-  async function toggle(next: boolean) {
-    setError(false)
-    const res = await setDemo({ token, on: next }).catch(() => null)
-    if (!res?.ok) setError(true)
-  }
-
-  return (
-    <section className="card mt-5 flex items-center gap-4 p-4" aria-labelledby="demo-board-heading">
-      <div className="min-w-0 flex-1">
-        <h2 id="demo-board-heading" className="text-base">Demo leaderboard</h2>
-        <p className="mt-0.5 text-sm text-muted">
-          {on ? 'Showing fake players to everyone. Turn off to show the real board.' : 'Off: everyone sees the real board.'}
-        </p>
-        {error && <p className="mt-1 text-sm font-semibold text-danger">Couldn’t save. Check your connection.</p>}
-      </div>
-      <Switch checked={on} onChange={(next) => void toggle(next)} label="Demo leaderboard" disabled={setting === undefined} />
-    </section>
-  )
-}
-
-function StatsView({ token }: { token: string }) {
-  const nav = useNav()
-  const data = useQuery(api.admin.stats, { token })
-  // Must agree with NotFoundPage's own meta when the session is rejected
-  usePageMeta(data === null ? { title: 'Page not found', path: '/404' } : { title: 'Stats', path: '/stats' })
-  const logout = useMutation(api.admin.logout)
-
-  // Expired or revoked session: forget it (the page renders NotFound)
-  useEffect(() => {
-    if (data === null) clearAdminToken()
-  }, [data])
-
-  const recent = useMemo(() => (data ? data.days.slice(-CHART_DAYS) : []), [data])
+function TrafficPanel({ data }: { data: Stats }) {
+  const recent = useMemo(() => data.days.slice(-CHART_DAYS), [data])
   const chart = useMemo(() => lastDays(recent, CHART_DAYS), [recent])
   const split = useMemo(() => splits(recent), [recent])
-
-  if (data === null) return <NotFoundPage />
-  if (data === undefined) {
-    return (
-      <Page>
-        <div className="h-8 w-40 animate-pulse rounded-btn bg-surface-2" />
-        <div className="mt-5 h-48 animate-pulse rounded-card bg-surface-2" />
-      </Page>
-    )
-  }
-
   const t = data.totals
-  async function signOut() {
-    await logout({ token }).catch(() => {})
-    clearAdminToken()
-    nav(ROUTES.HOME, { replace: true })
-  }
 
   return (
-    <Page>
-      <PageHeader
-        eyebrow="Owner"
-        title="Stats"
-        subtitle={`Anonymous aggregate counts · ${data.dayCount} day${data.dayCount === 1 ? '' : 's'} recorded`}
-        action={<Button variant="ghost" size="sm" onClick={() => void signOut()}>Sign out</Button>}
-      />
-
+    <div>
       <StatStrip
         stats={[
           { label: 'Visits', value: t.visits ?? 0 },
@@ -147,8 +86,6 @@ function StatsView({ token }: { token: string }) {
         ]}
       />
 
-      <DemoBoardSwitch token={token} />
-
       <div className="mt-5">
         <VisitsChart points={chart} />
       </div>
@@ -158,8 +95,67 @@ function StatsView({ token }: { token: string }) {
       </div>
 
       <p className="mt-4 text-xs text-muted">
-        Splits count each device once per day. Installed-app sessions: {t.installedSessions ?? 0}. Totals are all-time.
+        Anonymous counts · {data.dayCount} day{data.dayCount === 1 ? '' : 's'} recorded. Splits count each device once per day.
+        Installed-app sessions: {t.installedSessions ?? 0}. Totals are all-time.
       </p>
+    </div>
+  )
+}
+
+type Tab = 'players' | 'traffic'
+
+function StatsView({ token }: { token: string }) {
+  const nav = useNav()
+  const [tab, setTab] = useState<Tab>('players')
+  const data = useQuery(api.admin.stats, { token })
+  const players = useQuery(api.admin.players, { token })
+  // Must agree with NotFoundPage's own meta when the session is rejected
+  const rejected = data === null || players === null
+  usePageMeta(rejected ? { title: 'Page not found', path: '/404' } : { title: 'Stats', path: '/stats' })
+  const logout = useMutation(api.admin.logout)
+
+  // Expired or revoked session: forget it (the page renders NotFound)
+  useEffect(() => {
+    if (rejected) clearAdminToken()
+  }, [rejected])
+
+  if (rejected) return <NotFoundPage />
+  if (data === undefined || players === undefined) {
+    return (
+      <Page>
+        <div className="h-8 w-40 animate-pulse rounded-btn bg-surface-2" />
+        <div className="mt-5 h-48 animate-pulse rounded-card bg-surface-2" />
+      </Page>
+    )
+  }
+
+  async function signOut() {
+    await logout({ token }).catch(() => {})
+    clearAdminToken()
+    nav(ROUTES.HOME, { replace: true })
+  }
+
+  return (
+    <Page>
+      <PageHeader
+        eyebrow="Owner"
+        title="Stats"
+        subtitle="Live from the server. Updates as players finish quizzes."
+        action={<Button variant="ghost" size="sm" onClick={() => void signOut()}>Sign out</Button>}
+      />
+
+      <Segmented
+        label="Stats view"
+        value={tab}
+        onChange={setTab}
+        className="mb-5 md:max-w-[360px]"
+        options={[
+          { value: 'players', label: `Players · ${players.length}` },
+          { value: 'traffic', label: 'Traffic' },
+        ]}
+      />
+
+      {tab === 'players' ? <PlayersPanel token={token} players={players} /> : <TrafficPanel data={data} />}
     </Page>
   )
 }

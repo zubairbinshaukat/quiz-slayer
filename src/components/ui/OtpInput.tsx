@@ -106,7 +106,11 @@ export function OtpInput({
         onChange={handleChange}
         onPaste={handlePaste}
         onSelect={pinCaret}
-        onFocus={() => setFocused(true)}
+        onFocus={() => {
+          setFocused(true)
+          // Once the keyboard has slid up and the sheet has resized, keep the boxes in view
+          window.setTimeout(() => inputRef.current?.scrollIntoView({ block: 'nearest' }), 350)
+        }}
         onBlur={() => setFocused(false)}
         disabled={disabled}
         aria-label={label}

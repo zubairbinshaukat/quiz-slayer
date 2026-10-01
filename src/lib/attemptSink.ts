@@ -1,7 +1,9 @@
 import { ConvexError } from 'convex/values'
 import type { FunctionArgs } from 'convex/server'
 import { api } from '../../convex/_generated/api'
+import { classifyDevice } from './analytics'
 import { convexClient } from './convex'
+import { isStandalone } from './installPrompt'
 import { addToOutbox, clearOutbox, deleteOutboxItem, getOutbox } from './db'
 import { getDeviceId } from './deviceId'
 import { ensurePlayer } from './identity'
@@ -37,6 +39,7 @@ function buildAttemptArgs(entry: HistoryEntry, deviceId: string): RecordAttemptA
     questionIds,
     timeTaken: Math.max(0, Math.round(entry.timeTaken)),
     createdAt: Date.parse(entry.dateTaken) || Date.now(),
+    device: { ...classifyDevice(), installed: isStandalone() },
   }
 }
 

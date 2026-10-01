@@ -1,6 +1,8 @@
 import { v } from 'convex/values'
 import { mutation, query, type QueryCtx } from './_generated/server'
-import type { Doc } from './_generated/dataModel'
+import type { Doc, Id } from './_generated/dataModel'
+import { MIN_ANSWERED } from './leaderboard'
+import { deletePlayerData } from './lib/playerStore'
 import { assertDeviceId, randomHex, readEnv, safeEqual } from './lib/util'
 
 /**
@@ -67,18 +69,129 @@ export const logout = mutation({
   },
 })
 
-/** Shows or hides the fake demo leaderboard for everyone (read by settings.get). */
-export const setDemoLeaderboard = mutation({
-  args: { token: v.string(), on: v.boolean() },
-  handler: async (ctx, { token, on }) => {
+function accuracyOf(answered: number, correct: number): number {
+  return answered > 0 ? Math.round((correct / answered) * 1000) / 10 : 0
+}
+
+function deviceView(d: Doc<'playerDevices'>) {
+  return { info: d.info ?? null, lastSeenAt: d.lastSeenAt ?? null }
+}
+
+/**
+ * Every player with their server-side totals (what the leaderboard uses; clearing history
+ * on a device never touches these). Rank follows leaderboard.top's ordering; null = unranked.
+ */
+export const players = query({
+  args: { token: v.string() },
+  handler: async (ctx, { token }) => {
+    if (!(await validSession(ctx, token))) return null
+
+    const [players, stats, devices] = await Promise.all([
+      ctx.db.query('players').collect(),
+      ctx.db.query('playerStats').collect(),
+      ctx.db.query('playerDevices').collect(),
+    ])
+    const statsBy = new Map(stats.map((s) => [s.playerId, s]))
+    const devicesBy = new Map<Id<'players'>, Doc<'playerDevices'>[]>()
+    for (const d of devices) devicesBy.set(d.playerId, [...(devicesBy.get(d.playerId) ?? []), d])
+
+    const rows = players.map((p) => {
+      const s = statsBy.get(p._id)
+      const devs = devicesBy.get(p._id) ?? []
+      const seen = Math.max(s?.lastActiveAt ?? 0, ...devs.map((d) => d.lastSeenAt ?? 0))
+      const answered = s?.answered ?? 0
+      return {
+        id: p._id as string,
+        name: p.name,
+        nameChosen: p.nameChosen,
+        createdAt: p.createdAt,
+        lastActiveAt: seen > 0 ? seen : null,
+        deviceCount: p.deviceCount,
+        devices: devs.map(deviceView),
+        points: s?.points ?? 0,
+        answered,
+        correct: s?.correct ?? 0,
+        wrong: s?.wrong ?? 0,
+        attempts: s?.attempts ?? 0,
+        mastered: s?.mastered ?? 0,
+        accuracy: accuracyOf(answered, s?.correct ?? 0),
+        rank: null as number | null,
+      }
+    })
+
+    const ranked = rows
+      .filter((r) => r.answered >= MIN_ANSWERED)
+      .sort((a, b) => b.points - a.points || b.accuracy - a.accuracy || a.attempts - b.attempts)
+    ranked.forEach((r, i) => (r.rank = i + 1))
+    return rows
+  },
+})
+
+/** Owner removes a player (test accounts, spam names) with all of their server data. */
+export const removePlayer = mutation({
+  args: { token: v.string(), playerId: v.string() },
+  handler: async (ctx, { token, playerId }) => {
     if (!(await validSession(ctx, token))) return { ok: false as const }
-    const row = await ctx.db
-      .query('appSettings')
-      .withIndex('by_key', (q) => q.eq('key', 'demoLeaderboard'))
-      .unique()
-    if (row) await ctx.db.patch(row._id, { on })
-    else await ctx.db.insert('appSettings', { key: 'demoLeaderboard', on })
+    const id = ctx.db.normalizeId('players', playerId)
+    if (id && (await ctx.db.get(id))) await deletePlayerData(ctx, id)
     return { ok: true as const }
+  },
+})
+
+const PLAYER_ATTEMPTS = 200
+
+/** One player's devices, per-subject totals and most recent attempts (ranked and practice-only). */
+export const player = query({
+  args: { token: v.string(), playerId: v.string() },
+  handler: async (ctx, { token, playerId }) => {
+    if (!(await validSession(ctx, token))) return null
+    const id = ctx.db.normalizeId('players', playerId)
+    const p = id ? await ctx.db.get(id) : null
+    if (!id || !p) return null
+
+    const [attempts, devices] = await Promise.all([
+      ctx.db.query('attempts').withIndex('by_player', (q) => q.eq('playerId', id)).order('desc').take(PLAYER_ATTEMPTS),
+      ctx.db.query('playerDevices').withIndex('by_player', (q) => q.eq('playerId', id)).collect(),
+    ])
+    // Device ids stay server-side: attempts point at a device by its position in `devices`
+    const deviceIndex = new Map(devices.map((d, i) => [d.deviceId, i]))
+
+    const subjects = new Map<string, { slug: string; subject: string; attempts: number; answered: number; correct: number; wrong: number; points: number; ranked: boolean; lastAt: number }>()
+    for (const a of attempts) {
+      const s = subjects.get(a.slug) ?? { slug: a.slug, subject: a.subject, attempts: 0, answered: 0, correct: 0, wrong: 0, points: 0, ranked: a.ranked, lastAt: 0 }
+      s.attempts++
+      s.answered += a.answered
+      s.correct += a.correct
+      s.wrong += a.wrong
+      s.points = Math.round((s.points + a.points) * 100) / 100
+      s.lastAt = Math.max(s.lastAt, a.createdAt)
+      subjects.set(a.slug, s)
+    }
+
+    return {
+      id: p._id as string,
+      name: p.name,
+      devices: devices.map(deviceView),
+      subjects: [...subjects.values()].sort((a, b) => b.lastAt - a.lastAt),
+      attemptsShown: attempts.length,
+      attemptsLimit: PLAYER_ATTEMPTS,
+      attempts: attempts.map((a) => ({
+        id: a._id as string,
+        slug: a.slug,
+        subject: a.subject,
+        mode: a.mode,
+        ranked: a.ranked,
+        total: a.questionIds.length,
+        answered: a.answered,
+        correct: a.correct,
+        wrong: a.wrong,
+        points: a.points,
+        newlyMastered: a.newlyMastered,
+        timeTaken: a.timeTaken,
+        createdAt: a.createdAt,
+        device: deviceIndex.get(a.deviceId) ?? null,
+      })),
+    }
   },
 })
 
