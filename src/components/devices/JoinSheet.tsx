@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { usePlayer } from '../../hooks/usePlayer'
@@ -6,139 +6,92 @@ import { discardQueuedAttempts } from '../../lib/attemptSink'
 import { convexClient, withTimeout } from '../../lib/convex'
 import { getDeviceId } from '../../lib/deviceId'
 import { adoptPlayerSecret } from '../../lib/identity'
-import { linkUrl } from '../../lib/linkUi'
-import { formatClock } from '../../lib/utils'
+import { prefersShowingQr } from '../../lib/linkUi'
 import { Button } from '../ui/Button'
 import { Icon } from '../ui/Icon'
 import { Sheet } from '../ui/Sheet'
-import { QrCode } from './QrCode'
+import { EnterCode } from './EnterCode'
+import { LINK_NETWORK, LINK_OFFLINE, ReplaceProgress, ShowCode, type CheckResult, type CreateResult } from './ShowCode'
 
-type Step =
-  | { s: 'creating' }
-  | { s: 'confirmReplace' }
-  | { s: 'showing'; code: string; expiresAt: number }
-  | { s: 'expired' }
-  | { s: 'done' }
-  | { s: 'error'; message: string }
+const POLL_TIMEOUT_MS = 8000
 
-const POLL_MS = 2000
-const OFFLINE = 'Linking needs a connection. Connect and try again.'
-const CREATE_ERRORS = {
+const CODE_ERRORS: Record<string, string> = {
   rate_limited: 'Too many codes for now. Wait a few minutes and try again.',
   already_linked: 'This device is already linked to another device.',
+}
+
+const CLAIM_ERRORS = {
+  invalid: 'That code didn’t match. Check the digits on your other device.',
+  expired: 'That code has expired. Show a new one on your other device.',
+  full: 'Your other device already has 2 devices linked. That’s the limit.',
+  self: 'This device is already linked to your other device.',
+  already_linked: CODE_ERRORS.already_linked,
+  rate_limited: 'Too many wrong codes. Try again in 15 minutes.',
 } as const
 
-/** New device: show a code + QR, wait for the other device to approve, then adopt its player. */
-export function JoinSheet({ onClose }: { onClose: () => void }) {
+/**
+ * New device joins an existing one, then adopts its player. Laptops show a code
+ * QR for the other device to scan; phones scan (or type) the invite shown on the other device.
+ */
+export function JoinSheet({ initialCode, onClose }: { initialCode?: string; onClose: () => void }) {
   const createCode = useMutation(api.link.createCode)
   const redeem = useMutation(api.link.redeem)
+  const claimInvite = useMutation(api.link.claimInvite)
   const { player } = usePlayer()
   const deviceId = useMemo(() => getDeviceId(), [])
-  const [step, setStep] = useState<Step>(() => (navigator.onLine ? { s: 'creating' } : { s: 'error', message: OFFLINE }))
-  const [now, setNow] = useState(() => Date.now())
-  const request = useRef(0)
+  const [showing, setShowing] = useState(() => !initialCode && prefersShowingQr())
+  const [replaceCode, setReplaceCode] = useState<string | null>(null)
+  const [replacing, setReplacing] = useState(false)
+  const [claimError, setClaimError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
 
-  const create = useCallback(
-    async (replace: boolean) => {
-      const id = ++request.current
-      try {
-        const res = await withTimeout(createCode({ deviceId, replace }))
-        if (id !== request.current) return
-        if (res.ok) setStep({ s: 'showing', code: res.code, expiresAt: res.expiresAt })
-        else if (res.reason === 'has_progress') setStep({ s: 'confirmReplace' })
-        else setStep({ s: 'error', message: CREATE_ERRORS[res.reason] })
-      } catch {
-        if (id === request.current) setStep({ s: 'error', message: navigator.onLine ? 'Couldn’t reach the server. Try again.' : OFFLINE })
+  async function claim(code: string, replace = false): Promise<string | null> {
+    try {
+      if (!navigator.onLine) return LINK_OFFLINE
+      if (replace) await discardQueuedAttempts()
+      const res = await withTimeout(claimInvite({ deviceId, code, replace }))
+      if (res.ok) {
+        adoptPlayerSecret(res.secret)
+        setDone(true)
+      } else if (res.reason === 'has_progress') {
+        setReplaceCode(code)
+      } else {
+        return CLAIM_ERRORS[res.reason]
       }
-    },
-    [createCode, deviceId],
-  )
-
-  // Deferred so StrictMode's mount/unmount/mount sends only one request
-  useEffect(() => {
-    if (!navigator.onLine) return
-    const t = window.setTimeout(() => void create(false), 0)
-    return () => window.clearTimeout(t)
-  }, [create])
-
-  const code = step.s === 'showing' ? step.code : null
-  useEffect(() => {
-    if (!code || !convexClient) return
-    const client = convexClient
-    let busy = false
-    const tick = window.setInterval(() => setNow(Date.now()), 1000)
-    const poll = window.setInterval(async () => {
-      if (busy || !navigator.onLine) return
-      busy = true
-      try {
-        const res = await withTimeout(client.query(api.link.poll, { deviceId, code }), POLL_MS * 4)
-        if (res.status === 'linked') {
-          window.clearInterval(poll)
-          const { secret } = await withTimeout(redeem({ deviceId, code, handoff: res.handoff }))
-          adoptPlayerSecret(secret)
-          setStep({ s: 'done' })
-        } else if (res.status !== 'pending') {
-          window.clearInterval(poll)
-          setStep({ s: 'expired' })
-        }
-      } catch { /* transient: try again next tick */ } finally {
-        busy = false
-      }
-    }, POLL_MS)
-    return () => {
-      window.clearInterval(tick)
-      window.clearInterval(poll)
+      return null
+    } catch {
+      return LINK_NETWORK
     }
-  }, [code, deviceId, redeem])
-
-  function restart(replace: boolean) {
-    setStep({ s: 'creating' })
-    void (replace ? discardQueuedAttempts() : Promise.resolve()).then(() => create(replace))
   }
 
-  const title = step.s === 'done' ? 'Linked!' : step.s === 'confirmReplace' ? 'Replace this device’s progress?' : 'Link to your other device'
+  async function confirmReplace(code: string) {
+    setReplacing(true)
+    const message = await claim(code, true)
+    setReplacing(false)
+    if (message) {
+      setClaimError(message)
+      setReplaceCode(null)
+    }
+  }
 
-  return (
-    <Sheet open onClose={onClose} title={title}>
-      {step.s === 'creating' && <div className="mx-auto h-[300px] max-w-[260px] animate-pulse rounded-card bg-surface-2" aria-label="Creating a code" />}
+  async function create(replace: boolean): Promise<CreateResult> {
+    return await withTimeout(createCode({ deviceId, replace }))
+  }
 
-      {step.s === 'showing' && (
-        <div className="flex flex-col items-center text-center">
-          <QrCode text={linkUrl(step.code)} size={200} />
-          <p className="mt-4 font-mono text-4xl font-bold tracking-[0.18em]" aria-label={`Code ${step.code.split('').join(' ')}`}>
-            {step.code.slice(0, 3)} {step.code.slice(3)}
-          </p>
-          <p className="mt-3 max-w-[36ch] text-sm text-muted">
-            On your other device open <span className="font-semibold text-fg">Settings → Devices → Link a new device to this one</span>, then scan the QR or type the code.
-          </p>
-          <p className="mt-3 inline-flex items-center gap-2 text-sm text-muted" role="status">
-            <span className="size-2 animate-pulse rounded-full bg-accent" aria-hidden="true" />
-            Waiting for approval · expires in {formatClock(Math.max(0, (step.expiresAt - now) / 1000))}
-          </p>
-        </div>
-      )}
+  async function check(code: string): Promise<CheckResult> {
+    if (!convexClient) throw new Error('Convex is off')
+    const res = await withTimeout(convexClient.query(api.link.poll, { deviceId, code }), POLL_TIMEOUT_MS)
+    if (res.status === 'linked') {
+      const { secret } = await withTimeout(redeem({ deviceId, code, handoff: res.handoff }))
+      adoptPlayerSecret(secret)
+      return 'linked'
+    }
+    return res.status === 'pending' ? 'pending' : 'gone'
+  }
 
-      {step.s === 'confirmReplace' && (
-        <div>
-          <p className="flex items-start gap-3 rounded-card border border-danger/30 bg-danger/8 p-3.5 text-sm leading-relaxed">
-            <Icon name="alert" size={20} className="mt-0.5 shrink-0 text-danger" />
-            This device already has its own progress. Linking will replace it with your other device&apos;s progress.
-          </p>
-          <div className="mt-4 flex flex-col gap-2">
-            <Button variant="danger" size="lg" className="w-full" onClick={() => restart(true)}>Replace my progress</Button>
-            <Button variant="ghost" className="w-full" onClick={onClose} data-autofocus>Cancel</Button>
-          </div>
-        </div>
-      )}
-
-      {step.s === 'expired' && (
-        <div className="text-center">
-          <p className="text-sm text-muted">That code expired.</p>
-          <Button className="mt-3 w-full" onClick={() => restart(false)}>Get a new code</Button>
-        </div>
-      )}
-
-      {step.s === 'done' && (
+  if (done) {
+    return (
+      <Sheet open onClose={onClose} title="Linked!">
         <div className="text-center">
           <span className="mx-auto flex size-14 items-center justify-center rounded-full bg-success/15 text-success" aria-hidden="true">
             <Icon name="check" size={28} strokeWidth={3} />
@@ -148,16 +101,44 @@ export function JoinSheet({ onClose }: { onClose: () => void }) {
           </p>
           <Button className="mt-4 w-full" onClick={onClose} data-autofocus>Done</Button>
         </div>
-      )}
+      </Sheet>
+    )
+  }
 
-      {step.s === 'error' && (
-        <div className="text-center">
-          <p role="alert" className="flex items-start justify-center gap-2 text-sm text-muted">
-            <Icon name="wifiOff" size={18} className="mt-0.5 shrink-0" />
-            {step.message}
-          </p>
-          <Button variant="secondary" className="mt-3 w-full" onClick={() => restart(false)}>Try again</Button>
+  return (
+    <Sheet
+      open
+      onClose={onClose}
+      title="Link to your other device"
+      description={
+        showing || replaceCode || initialCode
+          ? undefined
+          : 'On the device you already play on, open Settings → Devices → “Link a new device to this one” to show a QR.'
+      }
+    >
+      {replaceCode ? (
+        <ReplaceProgress busy={replacing} onReplace={() => void confirmReplace(replaceCode)} onCancel={onClose} />
+      ) : showing ? (
+        <div>
+          <ShowCode create={create} check={check} errors={CODE_ERRORS} opens="approve" onLinked={() => setDone(true)} onCancel={onClose}>
+            On your other device open <span className="font-semibold text-fg">Settings → Devices → Link a new device to this one</span>,
+            then scan this QR or type the code.
+          </ShowCode>
+          <Button variant="ghost" className="mt-3 w-full" onClick={() => setShowing(false)}>
+            Scan or type my other device’s code instead
+          </Button>
         </div>
+      ) : (
+        <EnterCode
+          key={claimError ?? 'enter'}
+          kind="join"
+          initialCode={initialCode}
+          initialError={claimError}
+          hint="Type the code shown on your other device."
+          submitLabel="Link this device"
+          onSubmit={(code) => claim(code)}
+          onShowQr={() => setShowing(true)}
+        />
       )}
     </Sheet>
   )

@@ -119,6 +119,30 @@ export default defineSchema({
     at: v.number(),
   }).index('by_player_at', ['playerId', 'at']),
 
+  /**
+   * The reverse direction: the EXISTING device shows a 6-digit invite (e.g. on a
+   * laptop screen) and the NEW device scans or types it to join that player.
+   */
+  linkInvites: defineTable({
+    /** 6 digits */
+    code: v.string(),
+    playerId: v.id('players'),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+    claimedAt: v.optional(v.number()),
+  })
+    .index('by_code', ['code'])
+    .index('by_player', ['playerId', 'createdAt'])
+    .index('by_expiresAt', ['expiresAt']),
+
+  /** Failed invite claims (wrong codes), per device and app-wide, for rate limiting guessing. */
+  inviteFailures: defineTable({
+    deviceId: v.string(),
+    at: v.number(),
+  })
+    .index('by_device_at', ['deviceId', 'at'])
+    .index('by_at', ['at']),
+
   // ─── Anonymous analytics (never shown in the app) ───────────────────────
   dailyStats: defineTable({
     /** UTC 'YYYY-MM-DD' */

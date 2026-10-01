@@ -35,6 +35,9 @@ docs/
 /*.png
 /*.jpg
 
+# Promo film pipeline (local only)
+promo/
+
 # Local AI-assistant settings and skills
 .claude/settings.local.json
 .agents/

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { parseLinkPayload } from '../../lib/linkUi'
+import { parseLinkPayload, type LinkKind } from '../../lib/linkUi'
 import { Icon } from '../ui/Icon'
 
 interface DetectedBarcode {
@@ -17,7 +17,7 @@ const SCAN_INTERVAL_MS = 250
  * is requested when this mounts (i.e. only after the user tapped "Scan QR")
  * and released on unmount.
  */
-export function QrScanner({ onCode }: { onCode: (code: string) => void }) {
+export function QrScanner({ kind, onCode }: { kind: LinkKind; onCode: (code: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const onCodeRef = useRef(onCode)
   const [error, setError] = useState<string | null>(null)
@@ -46,13 +46,13 @@ export function QrScanner({ onCode }: { onCode: (code: string) => void }) {
           try {
             const found = await detector.detect(videoRef.current)
             for (const b of found) {
-              const code = parseLinkPayload(b.rawValue)
-              if (code) {
+              const code = parseLinkPayload(b.rawValue, kind)
+              if (code && code !== 'wrong_way') {
                 stopped = true
                 onCodeRef.current(code)
                 return
               }
-              setHint('That QR code isn’t a Quiz Slayer link code.')
+              setHint(code === 'wrong_way' ? 'That QR is meant to be scanned by your other device.' : 'That QR code isn’t a Quiz Slayer link code.')
             }
           } catch { /* frame not ready */ }
           if (!stopped) timer = window.setTimeout(() => void tick(), SCAN_INTERVAL_MS)
@@ -71,7 +71,7 @@ export function QrScanner({ onCode }: { onCode: (code: string) => void }) {
       window.clearTimeout(timer)
       stream?.getTracks().forEach((t) => t.stop())
     }
-  }, [])
+  }, [kind])
 
   if (error) {
     return (

@@ -1,19 +1,17 @@
-import { useId, useState } from 'react'
+import { useState } from 'react'
 import { useMutation } from 'convex/react'
 import { api } from '../../../convex/_generated/api'
 import { usePlayer } from '../../hooks/usePlayer'
-import { withTimeout } from '../../lib/convex'
+import { convexClient, withTimeout } from '../../lib/convex'
 import { ensurePlayer } from '../../lib/identity'
-import { canScanQr } from '../../lib/linkUi'
+import { prefersShowingQr } from '../../lib/linkUi'
 import { Button } from '../ui/Button'
 import { Icon } from '../ui/Icon'
-import { OtpInput } from '../ui/OtpInput'
 import { Sheet } from '../ui/Sheet'
-import { QrScanner } from './QrScanner'
+import { EnterCode } from './EnterCode'
+import { LINK_NETWORK, LINK_OFFLINE, ShowCode, type CheckResult, type CreateResult } from './ShowCode'
 
-type ApproveFailure = 'no_player' | 'full' | 'rate_limited' | 'invalid' | 'expired' | 'self' | 'has_progress'
-
-const FAILURE_TEXT: Record<ApproveFailure | 'offline' | 'network', string> = {
+const APPROVE_ERRORS = {
   invalid: 'That code didn’t match. Check the digits on your other device.',
   expired: 'That code has expired. Get a new one on your other device.',
   full: 'You already have 2 devices linked. That’s the limit.',
@@ -21,42 +19,53 @@ const FAILURE_TEXT: Record<ApproveFailure | 'offline' | 'network', string> = {
   has_progress: 'That device has its own progress. On it, accept replacing its progress, then try a new code.',
   rate_limited: 'Too many wrong codes. Try again in 15 minutes.',
   no_player: 'Couldn’t set up your player. Try again.',
-  offline: 'Linking needs a connection. Connect and try again.',
-  network: 'Couldn’t reach the server. Try again.',
+} as const
+
+const INVITE_ERRORS: Record<string, string> = {
+  full: APPROVE_ERRORS.full,
+  no_player: APPROVE_ERRORS.no_player,
+  rate_limited: 'Too many codes for now. Wait a few minutes and try again.',
 }
 
-/** Existing device: approve the 6-digit code shown on the new device (scan or type it). */
+async function requireSecret(): Promise<string> {
+  const secret = await ensurePlayer()
+  if (!secret) throw new Error('No connection')
+  return secret
+}
+
+/**
+ * Existing device links a new one. Laptops show an invite QR for the new device
+ * to scan; phones scan (or type) the code shown on the new device.
+ */
 export function ApproveSheet({ initialCode, onClose }: { initialCode?: string; onClose: () => void }) {
-  const hintId = useId()
   const approve = useMutation(api.link.approve)
+  const createInvite = useMutation(api.link.createInvite)
   const { deviceCount } = usePlayer()
-  const [mode, setMode] = useState<'choose' | 'scan' | 'code'>(initialCode ? 'code' : 'choose')
-  const [code, setCode] = useState(initialCode ?? '')
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [showing, setShowing] = useState(() => !initialCode && prefersShowingQr())
   const [done, setDone] = useState(false)
 
-  async function submit(value: string) {
-    if (busy || value.length !== 6) return
-    setBusy(true)
-    setError(null)
+  async function submit(code: string): Promise<string | null> {
     try {
-      if (!navigator.onLine) throw new Error(FAILURE_TEXT.offline)
+      if (!navigator.onLine) return LINK_OFFLINE
       const secret = await ensurePlayer()
-      if (!secret) throw new Error(FAILURE_TEXT.network)
-      const res = await withTimeout(approve({ secret, code: value }))
-      if (res.ok) setDone(true)
-      else {
-        setError(FAILURE_TEXT[res.reason])
-        setCode('')
-        if (mode === 'scan') setMode('code')
-      }
-    } catch (err) {
-      const known: string[] = Object.values(FAILURE_TEXT)
-      setError(err instanceof Error && known.includes(err.message) ? err.message : FAILURE_TEXT.network)
-    } finally {
-      setBusy(false)
+      if (!secret) return LINK_NETWORK
+      const res = await withTimeout(approve({ secret, code }))
+      if (!res.ok) return APPROVE_ERRORS[res.reason]
+      setDone(true)
+      return null
+    } catch {
+      return LINK_NETWORK
     }
+  }
+
+  async function create(): Promise<CreateResult> {
+    return await withTimeout(createInvite({ secret: await requireSecret() }))
+  }
+
+  async function check(code: string): Promise<CheckResult> {
+    if (!convexClient) throw new Error('Convex is off')
+    const res = await withTimeout(convexClient.query(api.link.inviteStatus, { secret: await requireSecret(), code }))
+    return res.status === 'linked' ? 'linked' : res.status === 'pending' ? 'pending' : 'gone'
   }
 
   if (done) {
@@ -64,66 +73,43 @@ export function ApproveSheet({ initialCode, onClose }: { initialCode?: string; o
       <Sheet open onClose={onClose} title="Linked!" footer={<Button className="w-full" onClick={onClose} data-autofocus>Done</Button>}>
         <div className="flex items-start gap-3 rounded-card border border-success/30 bg-success/8 p-3.5 text-sm">
           <Icon name="check" size={20} strokeWidth={3} className="mt-0.5 shrink-0 text-success" />
-          <p>Your other device will switch to your progress in a moment. You now have 2 of 2 devices.</p>
+          <p>Your other device now shares your points and rank. You have 2 of 2 devices.</p>
         </div>
       </Sheet>
     )
   }
 
-  const full = deviceCount >= 2
+  // While an invite is shown, the count turns 2 as soon as it's claimed: let the poll finish into "Linked!"
+  const full = deviceCount >= 2 && !showing
   return (
     <Sheet
       open
       onClose={onClose}
       title="Link a new device"
-      description="On the new device, open Settings → Devices → “I’m new here” to show a code."
-      footer={
-        mode === 'code' && !full ? (
-          <Button size="lg" className="w-full" disabled={busy || code.length !== 6} onClick={() => void submit(code)}>
-            {busy ? 'Linking…' : 'Link this device'}
-          </Button>
-        ) : undefined
-      }
+      description={full || showing ? undefined : 'On the new device, open Settings → Devices → “I’m new here” to show a code.'}
     >
       {full ? (
         <p className="card p-3.5 text-sm text-muted">You already have 2 of 2 devices linked. Devices can’t be unlinked.</p>
-      ) : mode === 'scan' ? (
-        <div className="space-y-3">
-          <QrScanner onCode={(c) => { setCode(c); setMode('code'); void submit(c) }} />
-          <Button variant="ghost" className="w-full" onClick={() => setMode('code')}>Enter code instead</Button>
-        </div>
-      ) : mode === 'code' ? (
+      ) : showing ? (
         <div>
-          <OtpInput
-            label="6-digit link code"
-            value={code}
-            onChange={(v) => { setCode(v); setError(null) }}
-            onComplete={(v) => { if (v !== initialCode) void submit(v) }}
-            disabled={busy}
-            invalid={!!error}
-            autoFocus={!initialCode}
-            describedBy={hintId}
-          />
-          <p id={hintId} className="mt-3 text-center text-sm text-muted">
-            {initialCode ? 'Check this matches the code on your new device.' : 'Type the code shown on your new device.'}
-          </p>
-          {canScanQr && (
-            <Button variant="ghost" className="mt-2 w-full" onClick={() => { setError(null); setMode('scan') }}>
-              Scan QR instead
-            </Button>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2.5">
-          {canScanQr && (
-            <Button size="lg" className="w-full" onClick={() => setMode('scan')} data-autofocus>Scan QR</Button>
-          )}
-          <Button size="lg" variant={canScanQr ? 'secondary' : 'primary'} className="w-full" onClick={() => setMode('code')}>
-            {canScanQr ? 'Enter code instead' : 'Enter code'}
+          <ShowCode create={create} check={check} errors={INVITE_ERRORS} opens="join" onLinked={() => setDone(true)} onCancel={onClose}>
+            Scan this QR with the new device’s camera, or type the code there in{' '}
+            <span className="font-semibold text-fg">Settings → Devices → I’m new here</span>.
+          </ShowCode>
+          <Button variant="ghost" className="mt-3 w-full" onClick={() => setShowing(false)}>
+            Scan or type the new device’s code instead
           </Button>
         </div>
+      ) : (
+        <EnterCode
+          kind="approve"
+          initialCode={initialCode}
+          hint="Type the code shown on your new device."
+          submitLabel="Link this device"
+          onSubmit={submit}
+          onShowQr={() => setShowing(true)}
+        />
       )}
-      {error && <p role="alert" className="mt-3 text-center text-sm font-semibold text-danger">{error}</p>}
     </Sheet>
   )
 }

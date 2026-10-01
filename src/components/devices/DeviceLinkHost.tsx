@@ -13,7 +13,7 @@ export function DeviceLinkHost() {
   return (
     <Suspense fallback={null}>
       {sheet.kind === 'join' ? (
-        <JoinSheet onClose={closeLinkSheet} />
+        <JoinSheet key={sheet.code ?? 'manual'} initialCode={sheet.code} onClose={closeLinkSheet} />
       ) : (
         <ApproveSheet key={sheet.code ?? 'manual'} initialCode={sheet.code} onClose={closeLinkSheet} />
       )}

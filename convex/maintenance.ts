@@ -12,6 +12,14 @@ export const cleanup = internalMutation({
       .query('linkCodes')
       .withIndex('by_expiresAt', (q) => q.lt('expiresAt', now - HOUR))
       .take(BATCH)
+    const invites = await ctx.db
+      .query('linkInvites')
+      .withIndex('by_expiresAt', (q) => q.lt('expiresAt', now - HOUR))
+      .take(BATCH)
+    const inviteFailures = await ctx.db
+      .query('inviteFailures')
+      .withIndex('by_at', (q) => q.lt('at', now - 24 * HOUR))
+      .take(BATCH)
     const sessions = await ctx.db
       .query('adminSessions')
       .withIndex('by_expiresAt', (q) => q.lt('expiresAt', now))
@@ -23,7 +31,7 @@ export const cleanup = internalMutation({
     // linkAttempts has no time-only index; rows are tiny and only written on wrong codes
     const linkFailures = (await ctx.db.query('linkAttempts').take(BATCH)).filter((r) => r.at < now - 24 * HOUR)
 
-    for (const rows of [codes, sessions, adminFailures, linkFailures]) {
+    for (const rows of [codes, invites, inviteFailures, sessions, adminFailures, linkFailures]) {
       for (const row of rows) await ctx.db.delete(row._id)
     }
     return null
