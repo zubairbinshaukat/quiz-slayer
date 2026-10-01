@@ -34,7 +34,7 @@
 
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
-  /* Headings. Falls back to Geist until @fontsource-variable/bricolage-grotesque is installed + imported. */
+  /* Headings, score numerals, podium names (self-hosted, imported in main.tsx) */
   --font-display: "Bricolage Grotesque Variable", "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 16px;
@@ -171,11 +171,9 @@
     line-height: 1.15;
     text-wrap: balance;
   }
-  /* Display face for page headings (Bricolage: narrower wdth, optical size auto) */
+  /* Display face for page headings (weight axis only: the wdth/opsz files are 2-3x the bytes) */
   h1, h2 {
     font-family: var(--font-display);
-    font-variation-settings: "wdth" 95;
-    font-optical-sizing: auto;
   }
 
   button:not(:disabled),

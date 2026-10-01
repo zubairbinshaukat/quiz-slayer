@@ -49,7 +49,7 @@ export const AVATAR_POOL: EmojiDef[] = [
   { asset: 'Crown', char: '👑' }, { asset: 'Brain', char: '🧠' }, { asset: 'Alien', char: '👽' },
   { asset: 'Robot', char: '🤖' }, { asset: 'Ghost', char: '👻' }, { asset: 'Unicorn', char: '🦄' },
   { asset: 'Grinning cat', char: '😺' }, { asset: 'Cat face', char: '🐱' }, { asset: 'Smiling cat with heart-eyes', char: '😻' },
-  { asset: 'Cat with wry smile', char: '😼' }, { asset: 'Dragon face', char: '🐲' }, { asset: 'T-Rex', char: '🦖' },
+  { asset: 'Cat with wry smile', char: '😼' }, { asset: 'Dragon face', char: '🐲' }, { asset: 'T-rex', char: '🦖' },
   { asset: 'Octopus', char: '🐙' }, { asset: 'Butterfly', char: '🦋' }, { asset: 'Lady beetle', char: '🐞' },
   { asset: 'Honeybee', char: '🐝' }, { asset: 'Rainbow', char: '🌈' }, { asset: 'Sun with face', char: '🌞' },
   { asset: 'Comet', char: '☄️' }, { asset: 'High voltage', char: '⚡' }, { asset: 'Gem stone', char: '💎' },
