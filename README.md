@@ -5,19 +5,11 @@
 <p align="left">
 	<img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
 	<img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite" />
-	<img src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-	<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+	<img src="https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
 	<img src="https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white" alt="React Router" />
-	<img src="https://img.shields.io/badge/Convex-backend-EE342F?logo=convex&logoColor=white" alt="Convex" />
-	<img src="https://img.shields.io/badge/PWA-vite--plugin--pwa-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
+	<img src="https://img.shields.io/badge/Framer_Motion-12-0055FF?logo=framer&logoColor=white" alt="Framer Motion" />
 	<img src="https://img.shields.io/badge/IndexedDB-idb-2563EB?logo=databricks&logoColor=white" alt="idb" />
 </p>
-
-- **TypeScript** (strict) — `npm run typecheck`
-- **Tailwind CSS 4** via `@tailwindcss/vite` (theme tokens in `src/styles/index.css`)
-- **Lenis** smooth scrolling
-- **PWA** via `vite-plugin-pwa` (installable, offline precache, update prompt)
-- **Convex** backend scaffolding in `convex/` (players, attempts, leaderboard). Optional: set `VITE_CONVEX_URL` (see `.env.example`); the app runs fully local without it.
 
 
 <p align="center">
@@ -66,35 +58,7 @@ Other scripts:
 npm run build
 npm run preview
 npm run lint
-npm run banks:push   # upload built-in answer keys to Convex (see below)
 ```
-
-### Running without Convex
-
-The app works fully without a backend: leave `VITE_CONVEX_URL` unset. Quizzes, history,
-mistakes, streaks and custom subjects are local (IndexedDB / localStorage) either way;
-without Convex the global leaderboard, device linking and visit counting are disabled
-(the leaderboard page shows only this device's own stats).
-
-With Convex (`VITE_CONVEX_URL` set, see `.env.example`):
-
-- Run `npx convex dev --once` after any change in `convex/`.
-- Set `BANKS_ADMIN_KEY` in the Convex dashboard (Settings → Environment Variables) and the
-  same value in `.env.local`, then run `npm run banks:push` whenever a built-in subject in
-  `src/data` changes. The server grades attempts against these answer keys; subjects without
-  a bank (custom uploads) are stored as practice only and never ranked.
-- Set `ADMIN_PIN` (6 digits) in the dashboard to enable the owner's hidden stats page.
-
-## Privacy
-
-- **Anonymous visit counts only.** Once per session the app sends coarse categories
-  (mobile/tablet/desktop, OS family, browser family, installed or not) and a truncated
-  SHA-256 hash of a random device id, used only to count unique visitors per day and
-  deleted after 30 days. No IP address, location, user-agent string or personal data is
-  stored, and nothing is shown in the app.
-- **No accounts.** The leaderboard identifies you by a random secret stored on your device.
-- **Device linking is optional.** Linking shares one player between at most two of your
-  devices; it is permanent and never merges or transfers points.
 
 ## Exact route behavior
 
@@ -103,9 +67,7 @@ With Convex (`VITE_CONVEX_URL` set, see `.env.example`):
 - `/analytics` → Last completed quiz analytics.
 - `/history` → Stored quiz attempts.
 - `/upload` → JSON upload for custom subjects.
-- `/leaderboard` → Global leaderboard (needs a connection when Convex is enabled).
-- `/link?c=123456` → Opens the "link a new device" approval with the code filled in.
-- Any unknown route (`*`) → "Page not found".
+- Any unknown route (`*`) → redirects to landing UI (renders landing page component).
 
 ## Exact quiz lifecycle
 
