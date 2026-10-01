@@ -70,7 +70,7 @@ export function useQuizKeyboard(handlers: QuizKeyHandlers, enabled: boolean): vo
       if (/^[1-9]$/.test(key)) index = Number(key) - 1
       else if (/^[a-e]$/i.test(key)) index = key.toLowerCase().charCodeAt(0) - 97
 
-      // E doubles as "Know more" once answered (or when there is no option E)
+      // E doubles as "Read full explanation" once answered (or when there is no option E)
       if (key.toLowerCase() === 'e' && (h.answered || h.optionCount < 5)) {
         e.preventDefault()
         h.onToggleMore()

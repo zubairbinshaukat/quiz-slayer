@@ -90,6 +90,7 @@ export function QuizPage() {
 
   function goTo(index: number) {
     if (index === currentIndex || index < 0 || index >= questions.length) return
+    setFreshIndex(-1) // coming back to an answered question must not replay the shake / XP pop
     withQuestionTransition(index > currentIndex ? 'next' : 'prev', () => goToQuestion(index))
   }
 
@@ -121,7 +122,7 @@ export function QuizPage() {
   }
 
   function toggleMore() {
-    if (exam || currentAnswer === null || !question?.explanation) return
+    if (exam || currentAnswer === null || !question) return
     setExpanded((prev) => ({ ...prev, [currentIndex]: !prev[currentIndex] }))
   }
 
@@ -231,7 +232,9 @@ export function QuizPage() {
           onClose={() => setExplainIndex(-1)}
           onNext={() => {
             setExplainIndex(-1)
-            goNext()
+            // "See results" goes straight there once everything is answered (no extra confirm)
+            if (isLast) tap(() => requestSubmit(false))()
+            else goNext()
           }}
         />
       )}

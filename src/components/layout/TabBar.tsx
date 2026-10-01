@@ -84,7 +84,7 @@ export function TabBar() {
                   <span
                     aria-hidden="true"
                     className={cn(
-                      'tab-raised absolute -top-[18px] left-1/2 flex size-[60px] -translate-x-1/2 items-center justify-center overflow-visible rounded-full',
+                      'absolute -top-[18px] left-1/2 flex size-[60px] -translate-x-1/2 items-center justify-center overflow-visible rounded-full',
                       'border-4 border-bg bg-[radial-gradient(circle_at_35%_30%,#ffd27a,#f5b73a_55%,#d9921c)] shadow-[0_10px_28px_-6px_rgb(245_183_58/0.65)]',
                       PRESS,
                     )}

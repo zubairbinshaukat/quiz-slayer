@@ -12,6 +12,8 @@ const PATHS = {
   moon: 'M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z',
   back: 'M15 18l-6-6 6-6',
   forward: 'M9 18l6-6-6-6',
+  arrowLeft: 'M19 12H5m6-6-6 6 6 6',
+  arrowRight: 'M5 12h14m-6-6 6 6-6 6',
   close: 'M18 6 6 18M6 6l12 12',
   check: 'M20 6 9 17l-5-5',
   x: 'M18 6 6 18M6 6l12 12',

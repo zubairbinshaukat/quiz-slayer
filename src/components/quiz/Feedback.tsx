@@ -122,7 +122,7 @@ export function FeedbackSheet({ open, isLast, onClose, onNext, ...props }: Feedb
             </>
           ) : (
             <>
-              Next question <Icon name="forward" size={18} strokeWidth={2.5} />
+              Next question <Icon name="arrowRight" size={18} strokeWidth={2.5} />
             </>
           )}
         </Button>

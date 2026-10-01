@@ -17,6 +17,8 @@ export interface ShareCardData {
 // Fixed brand colours: the image looks the same whatever theme the viewer uses
 const C = { bg: '#0B0B0F', surface: '#141419', line: 'rgba(255,255,255,0.08)', fg: '#F4F4F5', muted: '#9A9AA3', accent: '#F5B73A' }
 const ART = 1080
+// Same display face as the on-page score (ScoreHero)
+const DISPLAY_FONT = "'Bricolage Grotesque Variable', 'Geist Variable', system-ui, sans-serif"
 
 /** The 1080×1080 artwork (inline styles only, so html-to-image renders it faithfully). */
 function ShareCardArt({ data, ref }: { data: ShareCardData; ref?: Ref<HTMLDivElement> }) {
@@ -37,7 +39,7 @@ function ShareCardArt({ data, ref }: { data: ShareCardData; ref?: Ref<HTMLDivEle
         <img src={icon3dSrc(grade.icon, 'premium')} width={180} height={180} alt="" style={{ filter: 'drop-shadow(0 30px 40px rgba(0,0,0,0.55))' }} />
       </div>
       <p style={{ marginTop: 8, fontSize: 44, fontWeight: 600, color: C.muted, letterSpacing: '-0.01em' }}>{subject}</p>
-      <p style={{ fontSize: 260, fontWeight: 800, lineHeight: 0.9, letterSpacing: '-0.05em', color: tone, marginTop: 16, fontVariantNumeric: 'tabular-nums' }}>
+      <p style={{ fontFamily: DISPLAY_FONT, fontSize: 260, fontWeight: 800, lineHeight: 0.9, letterSpacing: '-0.05em', color: tone, marginTop: 16, fontVariantNumeric: 'tabular-nums' }}>
         {score}<span style={{ fontSize: 140 }}>%</span>
       </p>
       <p style={{ marginTop: 20, fontSize: 48, fontWeight: 800, letterSpacing: '-0.02em' }}>{grade.label}</p>

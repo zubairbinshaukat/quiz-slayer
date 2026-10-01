@@ -16,7 +16,7 @@ export interface DevLink {
 
 const ALL_LINKS: DevLink[] = [
   { label: 'Portfolio', href: DEV_SITE_URL, icon: 'user', hint: 'zubyr.dev' },
-  { label: 'GitHub', href: GITHUB_REPO_URL, icon: 'github', hint: 'Source code on GitHub' },
+  { label: 'GitHub', href: GITHUB_REPO_URL, icon: 'github', hint: 'Source on GitHub' },
   { label: 'LinkedIn', href: LINKEDIN_URL, icon: 'linkedin', hint: 'Connect on LinkedIn' },
 ]
 

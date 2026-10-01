@@ -17,7 +17,7 @@ export function QuizNavRow({ canPrev, canAdvance, isLast, onPrev, onNext, onSubm
   return (
     <div className="flex items-center justify-between gap-3">
       <Button variant="ghost" size="lg" className="rounded-full px-4" onClick={onPrev} disabled={!canPrev}>
-        <Icon name="back" size={18} />
+        <Icon name="arrowLeft" size={18} />
         Previous
         <span className="keycap" aria-hidden="true">⌫</span>
       </Button>
@@ -30,7 +30,7 @@ export function QuizNavRow({ canPrev, canAdvance, isLast, onPrev, onNext, onSubm
       ) : (
         <Button size="lg" className={`rounded-full px-6 ${NEXT_SHADOW}`} onClick={onNext} disabled={!canAdvance}>
           Next question
-          <Icon name="forward" size={18} strokeWidth={2.5} />
+          <Icon name="arrowRight" size={18} strokeWidth={2.5} />
           <span className="keycap border-accent-ink/20 bg-accent-ink/10 text-accent-ink" aria-hidden="true">↵</span>
         </Button>
       )}
@@ -44,7 +44,7 @@ export function QuizBottomBar({ canPrev, canAdvance, isLast, onPrev, onNext, onS
     <div className="glass fixed inset-x-0 bottom-0 z-30 border-t border-line pt-3 pb-[calc(12px+env(safe-area-inset-bottom))] md:hidden">
       <div className="mx-auto flex max-w-[720px] gap-3 px-4">
         <Button variant="ghost" size="lg" className="flex-1 rounded-full border border-line" onClick={onPrev} disabled={!canPrev}>
-          <Icon name="back" size={18} />
+          <Icon name="arrowLeft" size={18} />
           Previous
         </Button>
         {isLast ? (
@@ -55,7 +55,7 @@ export function QuizBottomBar({ canPrev, canAdvance, isLast, onPrev, onNext, onS
         ) : (
           <Button size="lg" className={`flex-[1.6] rounded-full ${NEXT_SHADOW}`} onClick={onNext} disabled={!canAdvance}>
             Next question
-            <Icon name="forward" size={18} strokeWidth={2.5} />
+            <Icon name="arrowRight" size={18} strokeWidth={2.5} />
           </Button>
         )}
       </div>

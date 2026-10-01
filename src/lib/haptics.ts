@@ -1,5 +1,3 @@
-import { isLiteActive } from './liteMode'
-
 export type HapticKind = 'tap' | 'correct' | 'wrong'
 
 const PATTERNS: Record<HapticKind, number | number[]> = {
@@ -9,11 +7,11 @@ const PATTERNS: Record<HapticKind, number | number[]> = {
 }
 
 /**
- * Short vibration feedback. No-op where the Vibration API is missing (iOS Safari, desktop)
- * and in lite mode. Independent of the sound setting. Never throws.
+ * Short vibration feedback. No-op where the Vibration API is missing (iOS Safari, desktop).
+ * Stays on in lite mode (it costs nothing and budget Android phones are the ones that auto-enable lite).
+ * Independent of the sound setting. Never throws.
  */
 export function haptic(kind: HapticKind): void {
-  if (isLiteActive()) return
   if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return
   try {
     navigator.vibrate(PATTERNS[kind])

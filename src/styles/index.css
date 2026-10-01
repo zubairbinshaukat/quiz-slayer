@@ -117,6 +117,12 @@
   70% { opacity: 1; }
   100% { transform: translate(var(--confetti-drift, 0px), 115vh) rotate(var(--confetti-rotate, 360deg)); opacity: 0; }
 }
+/* Burst from a point: shoot out to (--confetti-x, --confetti-y), then fall */
+@keyframes confetti-burst {
+  0% { transform: translate(0, 0) rotate(0deg) scale(0.4); opacity: 1; animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  30% { transform: translate(var(--confetti-x, 0px), var(--confetti-y, -120px)) rotate(calc(var(--confetti-rotate, 360deg) * 0.4)) scale(1); opacity: 1; animation-timing-function: ease-in; }
+  100% { transform: translate(calc(var(--confetti-x, 0px) * 1.3), calc(var(--confetti-y, -120px) + 60vh)) rotate(var(--confetti-rotate, 360deg)) scale(1); opacity: 0; }
+}
 @keyframes key-flash {
   0% { background: var(--color-accent); color: var(--color-accent-ink); transform: translateY(1px); border-bottom-width: 1px; }
   100% { transform: translateY(0); }
@@ -411,13 +417,14 @@ html[data-lite] .tab-dot {
 html[data-lite] .xp-pop {
   display: none;
 }
-html[data-lite] :is(.bar-grow, .animate-ping, .shake, .attn-shake),
+html[data-lite] :is(.bar-grow, .animate-ping, .animate-pulse, .shake, .attn-shake),
 html[data-lite] .credit-sheen::after {
   animation: none !important;
 }
 /* No hover lifts / press transforms */
 html[data-lite] :is(.press, .hover-lift, .lift-card):is(:hover, :active) {
   transform: none !important;
+  scale: none !important;
 }
 html[data-lite] [data-quiz-option]:hover {
   translate: none !important;

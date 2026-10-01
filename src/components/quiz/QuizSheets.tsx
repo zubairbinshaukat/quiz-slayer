@@ -8,7 +8,7 @@ const SHORTCUTS: { keys: string[]; action: string }[] = [
   { keys: ['↵'], action: 'Next question' },
   { keys: ['⌫'], action: 'Previous question' },
   { keys: ['←', '→'], action: 'Previous / next' },
-  { keys: ['E'], action: 'Toggle “Know more” (practice)' },
+  { keys: ['E'], action: 'Read full explanation (practice)' },
   { keys: ['Ctrl', '↵'], action: 'Submit quiz' },
   { keys: ['?'], action: 'Show this sheet' },
 ]

@@ -16,6 +16,8 @@ const SLOTS = [
 ] as const
 
 const CONFETTI_AT_MS = 1350
+/** Longest burst piece (4.2s × 0.7 + delay) has faded by then */
+const CONFETTI_MS = 3400
 
 function Crown() {
   return (
@@ -41,19 +43,29 @@ export function Coin({ size = 14 }: { size?: number }) {
 /** Top three on 3D blocks with a staged entrance (blocks spring up, avatars drop, names fade, confetti). */
 export function Podium({ rows, meId }: { rows: Row[]; meId?: string }) {
   const listRef = useRef<HTMLOListElement>(null)
-  const [celebrate, setCelebrate] = useState(false)
+  // Viewport centre of the #1 avatar while the confetti is flying
+  const [burst, setBurst] = useState<{ x: number; y: number } | null>(null)
   const hasWinner = rows.some((r) => r.rank === 1)
 
   useEffect(() => {
     replayPodium(listRef.current)
     if (!hasWinner || isLiteActive() || prefersReducedMotion()) return
-    const t = window.setTimeout(() => setCelebrate(true), CONFETTI_AT_MS)
-    return () => window.clearTimeout(t)
+    let done = 0
+    const start = window.setTimeout(() => {
+      const rect = listRef.current?.querySelector('[data-podium-first]')?.getBoundingClientRect()
+      if (!rect) return
+      setBurst({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 })
+      done = window.setTimeout(() => setBurst(null), CONFETTI_MS)
+    }, CONFETTI_AT_MS)
+    return () => {
+      window.clearTimeout(start)
+      window.clearTimeout(done)
+    }
   }, [hasWinner])
 
   return (
     <>
-      {celebrate && <Confetti count={48} />}
+      {burst && <Confetti count={48} origin={burst} />}
       <ol ref={listRef} className="podium grid grid-cols-3 items-end gap-2.5 pt-2 sm:gap-4" aria-label="Top three">
         {SLOTS.map(({ rank, height, avatar, color, delay }) => {
           const row = rows.find((r) => r.rank === rank)
@@ -69,13 +81,15 @@ export function Podium({ rows, meId }: { rows: Row[]; meId?: string }) {
               <div className="podium-avatar flex flex-col items-center">
                 {first && <Crown />}
                 {row ? (
-                  <Avatar name={row.name} size={avatar} ring={color} />
+                  <span data-podium-first={first || undefined} className="flex">
+                    <Avatar name={row.name} size={avatar} ring={color} />
+                  </span>
                 ) : (
                   <span className="rounded-full border-2 border-dashed border-line-strong bg-surface-2" style={{ width: avatar, height: avatar }} aria-hidden="true" />
                 )}
               </div>
               <div className="podium-meta flex w-full flex-col items-center">
-                <p className="font-display mt-3 w-full truncate px-1 text-center text-[15px] font-bold">
+                <p className="font-display mt-3 w-full truncate px-1 text-center text-[15px] font-extrabold tracking-[-0.02em]">
                   {row ? row.name : <span className="font-semibold text-muted">Open spot</span>}
                   {row && row.id === meId && <span className="font-semibold text-muted"> (you)</span>}
                 </p>

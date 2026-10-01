@@ -5,7 +5,7 @@ const HINTS: { keys: string[]; label: string }[] = [
   { keys: ['1', '2', '3', '4', '5'], label: 'Pick an option' },
   { keys: ['Enter'], label: 'Next question' },
   { keys: ['Backspace'], label: 'Previous' },
-  { keys: ['E'], label: 'Know more' },
+  { keys: ['E'], label: 'Full explanation' },
   { keys: ['?'], label: 'All shortcuts' },
 ]
 

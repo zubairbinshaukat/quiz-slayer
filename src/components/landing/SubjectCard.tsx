@@ -50,7 +50,7 @@ export function SubjectCard({
       </ProgressRing>
 
       <div className="pointer-events-none relative mt-auto pt-6">
-        <h3 className="font-display line-clamp-2 pr-2 text-lg font-bold leading-snug tracking-[-0.02em]">{subject}</h3>
+        <h3 className="font-display line-clamp-2 pr-2 text-lg font-extrabold leading-snug tracking-[-0.02em]">{subject}</h3>
         <p className="mt-1 text-sm text-muted">
           {questionCount} questions
           <span aria-hidden="true"> · </span>
