@@ -11,11 +11,19 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800, stale-while-revalidate=2592000" }]
     },
     {
-      "source": "/(logo-3d-96.webp|logo-3d-384.webp|sounds/.*)",
+      "source": "/(logo-3d-96\\.webp|logo-3d-384\\.webp)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
     },
     {
-      "source": "/(sw.js|workbox-(.*).js|manifest.webmanifest|index.html)",
+      "source": "/sounds/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/(sw\\.js|manifest\\.webmanifest|index\\.html)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/workbox-(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     }
   ],
