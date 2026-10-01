@@ -4,6 +4,15 @@ The revamp agent was interrupted by a laptop shutdown on 2026-10-01. Work on dis
 on branch `v2`. On resume, verify each item below against the code and screenshots; finish what is missing.
 Spec: `docs/design/ui-spec.md`. Checks must pass: `npm run typecheck`, `npm run lint`, `npm run build`.
 
+## Agent's final status (reported before shutdown)
+Everything below was reported DONE except these, which are the first things to do on resume:
+1. `npm i @fontsource-variable/bricolage-grotesque` + import in `src/main.tsx` (heading rules already reference `--font-display`).
+2. `npm run emoji:fetch` (script exists, never run) → populate `public/emoji3d/`, record any 404 substitutions.
+3. `npm run build` was NOT run on the final state; typecheck + lint passed. Run all three and fix.
+4. Missing screenshots: history desktop, settings sheet (both widths), light dashboard, lite dashboard, error page,
+   theme-survives-reload check. Desktop shots are ~1385px wide (Chrome window limit), acceptable.
+5. Leaderboard shots used demo data (Convex socket didn't connect from that Chrome profile). Demo flag is dev-only.
+
 ## Base brief
 - [ ] Full spec implemented: atmosphere layers, 3 surface levels, subject tints, desktop icon sidebar + two-column
       dashboard with right rail, premium (full-colour) 3dicons, dot progress, visible share card, streak dots, light = cream
