@@ -28,11 +28,10 @@ function Tip({ children }: { children: ReactNode }) {
 
 interface SidebarProps {
   onOpenSettings: () => void
-  onLogoTap: () => void
 }
 
 /** Desktop (≥1024px) icon rail: logo, primary destinations, settings at the bottom. */
-export function Sidebar({ onOpenSettings, onLogoTap }: SidebarProps) {
+export function Sidebar({ onOpenSettings }: SidebarProps) {
   const { pathname } = useLocation()
   const { lite } = useLiteMode()
 
@@ -41,7 +40,6 @@ export function Sidebar({ onOpenSettings, onLogoTap }: SidebarProps) {
       <Link
         to={ROUTES.HOME}
         viewTransition={!lite}
-        onClick={onLogoTap}
         aria-label="Quiz Slayer home"
         className={ITEM}
       >

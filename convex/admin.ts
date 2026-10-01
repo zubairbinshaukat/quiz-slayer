@@ -67,6 +67,21 @@ export const logout = mutation({
   },
 })
 
+/** Shows or hides the fake demo leaderboard for everyone (read by settings.get). */
+export const setDemoLeaderboard = mutation({
+  args: { token: v.string(), on: v.boolean() },
+  handler: async (ctx, { token, on }) => {
+    if (!(await validSession(ctx, token))) return { ok: false as const }
+    const row = await ctx.db
+      .query('appSettings')
+      .withIndex('by_key', (q) => q.eq('key', 'demoLeaderboard'))
+      .unique()
+    if (row) await ctx.db.patch(row._id, { on })
+    else await ctx.db.insert('appSettings', { key: 'demoLeaderboard', on })
+    return { ok: true as const }
+  },
+})
+
 type DayRow = Omit<Doc<'dailyStats'>, '_id' | '_creationTime'>
 
 /** Last 60 days (oldest first) plus all-time totals; null for a missing or expired token. */

@@ -5,7 +5,7 @@ import type { FunctionReturnType } from 'convex/server'
 import { api } from '../../convex/_generated/api'
 import { convexEnabled } from '../lib/convex'
 import { getDeviceId } from '../lib/deviceId'
-import { demoLeaderboardActive, withDemoBoard } from '../lib/leaderboardDemo'
+import { DEMO_LEADERBOARD_DEFAULT, withDemoBoard } from '../lib/leaderboardDemo'
 import { ensurePlayer, usePlayerSecret } from '../lib/identity'
 import { previewRandomName } from '../lib/randomName'
 import { accuracy, computePoints, MIN_ANSWERED_FOR_BOARD } from '../lib/ranking'
@@ -169,12 +169,12 @@ function useConvexLeaderboard(): UseLeaderboardResult {
   }
 }
 
-const useRealLeaderboard: () => UseLeaderboardResult = convexEnabled ? useConvexLeaderboard : useLocalLeaderboard
-
-// TODO(owner): remove demo data (see lib/leaderboardDemo.ts; dev builds only)
-function useDemoLeaderboard(): UseLeaderboardResult {
-  return withDemoBoard(useRealLeaderboard())
+/** The real board, or the fake demo board while the owner has it switched on (stats page). */
+function useConvexLeaderboardWithDemo(): UseLeaderboardResult {
+  const real = useConvexLeaderboard()
+  const demo = useQuery(api.settings.get)?.demoLeaderboard ?? DEMO_LEADERBOARD_DEFAULT
+  return demo ? withDemoBoard(real) : real
 }
 
 /** Leaderboard data source. Picked once per load (convexEnabled is a build-time constant). */
-export const useLeaderboard: () => UseLeaderboardResult = demoLeaderboardActive ? useDemoLeaderboard : useRealLeaderboard
+export const useLeaderboard: () => UseLeaderboardResult = convexEnabled ? useConvexLeaderboardWithDemo : useLocalLeaderboard

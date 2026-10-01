@@ -7,10 +7,12 @@ import { SplitTable, type SplitGroup } from '../components/stats/SplitTable'
 import { VisitsChart, type DayPoint } from '../components/stats/VisitsChart'
 import { Button } from '../components/ui/Button'
 import { StatStrip } from '../components/ui/StatStrip'
+import { Switch } from '../components/ui/Switch'
 import { useNav } from '../hooks/useNav'
-import { clearAdminToken, getAdminToken } from '../lib/admin'
+import { clearAdminToken, useAdminToken } from '../lib/admin'
 import { ROUTES } from '../lib/constants'
 import { convexEnabled } from '../lib/convex'
+import { DEMO_LEADERBOARD_DEFAULT } from '../lib/leaderboardDemo'
 import { usePageMeta } from '../lib/seo'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -58,6 +60,33 @@ function splits(days: Day[]): SplitGroup[] {
       ],
     },
   ]
+}
+
+/** Owner switch for the fake leaderboard (everyone sees the change live). */
+function DemoBoardSwitch({ token }: { token: string }) {
+  const setting = useQuery(api.settings.get)
+  const setDemo = useMutation(api.admin.setDemoLeaderboard)
+  const [error, setError] = useState(false)
+  const on = setting?.demoLeaderboard ?? DEMO_LEADERBOARD_DEFAULT
+
+  async function toggle(next: boolean) {
+    setError(false)
+    const res = await setDemo({ token, on: next }).catch(() => null)
+    if (!res?.ok) setError(true)
+  }
+
+  return (
+    <section className="card mt-5 flex items-center gap-4 p-4" aria-labelledby="demo-board-heading">
+      <div className="min-w-0 flex-1">
+        <h2 id="demo-board-heading" className="text-base">Demo leaderboard</h2>
+        <p className="mt-0.5 text-sm text-muted">
+          {on ? 'Showing fake players to everyone. Turn off to show the real board.' : 'Off: everyone sees the real board.'}
+        </p>
+        {error && <p className="mt-1 text-sm font-semibold text-danger">Couldn’t save. Check your connection.</p>}
+      </div>
+      <Switch checked={on} onChange={(next) => void toggle(next)} label="Demo leaderboard" disabled={setting === undefined} />
+    </section>
+  )
 }
 
 function StatsView({ token }: { token: string }) {
@@ -118,6 +147,8 @@ function StatsView({ token }: { token: string }) {
         ]}
       />
 
+      <DemoBoardSwitch token={token} />
+
       <div className="mt-5">
         <VisitsChart points={chart} />
       </div>
@@ -135,7 +166,8 @@ function StatsView({ token }: { token: string }) {
 
 /** Hidden owner page. Without a valid session it is indistinguishable from an unknown route. */
 export function StatsPage() {
-  const [token] = useState(getAdminToken)
+  // Reactive: signing in from this very page (the 404's secret gesture) swaps in the stats
+  const token = useAdminToken()
   if (!convexEnabled || !token) return <NotFoundPage />
   return <StatsView token={token} />
 }

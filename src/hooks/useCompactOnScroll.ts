@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLenis } from 'lenis/react'
+import { useLenis } from '../lib/lenis'
 
 const THRESHOLD = 24
 

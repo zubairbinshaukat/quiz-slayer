@@ -14,7 +14,7 @@ const MESSAGES = {
   network: 'Couldn’t reach the server.',
 } as const
 
-/** Owner PIN prompt (opened by 7 quick taps on the logo). Convex builds only. */
+/** Owner PIN prompt (opened by 7 quick taps on the 404 page's 3D arrow). Convex builds only. */
 export function AdminPinSheet({ onClose }: { onClose: () => void }) {
   const nav = useNav()
   const login = useMutation(api.admin.login)

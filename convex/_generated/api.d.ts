@@ -20,6 +20,7 @@ import type * as lib_util from "../lib/util.js";
 import type * as link from "../link.js";
 import type * as maintenance from "../maintenance.js";
 import type * as players from "../players.js";
+import type * as settings from "../settings.js";
 
 import type {
   ApiFromModules,
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   link: typeof link;
   maintenance: typeof maintenance;
   players: typeof players;
+  settings: typeof settings;
 }>;
 
 /**

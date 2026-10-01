@@ -83,18 +83,6 @@ export async function getAllHistory(): Promise<HistoryEntry[]> {
   }
 }
 
-export async function getHistoryBySlug(slug: string): Promise<HistoryEntry[]> {
-  try {
-    const db = await getDB()
-    const index = db.transaction(DB_STORE).store.index('by_slug')
-    const entries = await index.getAll(slug)
-    return entries.sort(byDateDesc)
-  } catch (err) {
-    console.warn('IndexedDB: failed to read history by slug', err)
-    return []
-  }
-}
-
 export async function deleteHistoryEntry(id: number): Promise<void> {
   try {
     const db = await getDB()
@@ -140,16 +128,6 @@ export async function deleteCustomSubject(slug: string): Promise<void> {
     await db.delete(CUSTOM_SUBJECTS_STORE, slug)
   } catch (err) {
     console.warn('IndexedDB: failed to delete custom subject', err)
-  }
-}
-
-export async function getCustomSubjectSlugs(): Promise<Set<string>> {
-  try {
-    const db = await getDB()
-    const all = await db.getAllKeys(CUSTOM_SUBJECTS_STORE)
-    return new Set(all)
-  } catch {
-    return new Set()
   }
 }
 

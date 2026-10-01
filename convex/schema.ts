@@ -168,4 +168,10 @@ export default defineSchema({
   })
     .index('by_token', ['token'])
     .index('by_expiresAt', ['expiresAt']),
+
+  // ─── App-wide switches set from the owner stats page (one row per key) ──
+  appSettings: defineTable({
+    key: v.literal('demoLeaderboard'),
+    on: v.boolean(),
+  }).index('by_key', ['key']),
 })

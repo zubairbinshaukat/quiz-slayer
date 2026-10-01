@@ -3,8 +3,8 @@ import type { IconName } from '../components/ui/Icon'
 /** External links shown in the credit card and Settings → About. Empty href = hidden. */
 export const DEV_NAME = 'Zubair Bin Shaukat'
 export const DEV_SITE_URL = 'https://zubyr.dev'
-export const GITHUB_REPO_URL = 'https://github.com/zubairbinshaukat/quiz-slayer'
-export const LINKEDIN_URL: string = 'https://www.linkedin.com/in/zubairbinshaukat'
+const GITHUB_REPO_URL = 'https://github.com/zubairbinshaukat/quiz-slayer'
+const LINKEDIN_URL: string = 'https://www.linkedin.com/in/zubairbinshaukat'
 
 export interface DevLink {
   label: string

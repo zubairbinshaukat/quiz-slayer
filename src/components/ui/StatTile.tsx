@@ -19,11 +19,14 @@ export function StatTile({ label, value, tone, visual, footer, index = 0, classN
   return (
     <div className={cn('card rise flex min-w-0 flex-col gap-2.5 p-3.5 sm:p-4', className)} style={{ '--i': index } as CSSProperties}>
       <dt className="eyebrow truncate">{label}</dt>
-      <div className="mt-auto flex items-end justify-between gap-2">
-        <dd className={cn('text-2xl font-extrabold leading-none tracking-[-0.02em] tabular-nums sm:text-[28px]', tone)}>{value}</dd>
-        {visual && <span className="shrink-0" aria-hidden="true">{visual}</span>}
-      </div>
-      {footer}
+      {/* A <dl> group may only hold dt/dd, so the visual and footer live inside the dd */}
+      <dd className="mt-auto flex flex-col gap-2.5">
+        <span className="flex items-end justify-between gap-2">
+          <span className={cn('text-2xl font-extrabold leading-none tracking-[-0.02em] tabular-nums sm:text-[28px]', tone)}>{value}</span>
+          {visual && <span className="shrink-0" aria-hidden="true">{visual}</span>}
+        </span>
+        {footer}
+      </dd>
     </div>
   )
 }

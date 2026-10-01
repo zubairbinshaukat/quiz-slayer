@@ -1,269 +1,173 @@
-<h1 align="center">Quiz Slayer</h1>
+<div align="center">
 
-## Tech stack
+<img src="./public/og-image.png" alt="Quiz Slayer" width="720" />
 
-<p align="left">
-	<img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React" />
-	<img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite" />
-	<img src="https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
-	<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
-	<img src="https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white" alt="React Router" />
-	<img src="https://img.shields.io/badge/Convex-backend-EE342F?logo=convex&logoColor=white" alt="Convex" />
-	<img src="https://img.shields.io/badge/PWA-vite--plugin--pwa-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
-	<img src="https://img.shields.io/badge/IndexedDB-idb-2563EB?logo=databricks&logoColor=white" alt="idb" />
-</p>
+# Quiz Slayer
 
-- **TypeScript** (strict) — `npm run typecheck`
-- **Tailwind CSS 4** via `@tailwindcss/vite` (theme tokens in `src/styles/index.css`)
-- **Lenis** smooth scrolling
-- **PWA** via `vite-plugin-pwa` (installable, offline precache, update prompt)
-- **Convex** backend scaffolding in `convex/` (players, attempts, leaderboard). Optional: set `VITE_CONVEX_URL` (see `.env.example`); the app runs fully local without it.
+**Fast, offline-first MCQ practice for university exams.**
+Short rounds, instant feedback, mistake retries, streaks and a live leaderboard. Installable, and it works on a train with no signal.
 
+[**Open the app →**](https://quiz.zubyr.dev)
 
-<p align="center">
-	<img src="./public/og-image.png" alt="Quiz Slayer preview" width="3080" height="2206" />
-</p>
+<img src="https://img.shields.io/badge/Lighthouse_mobile-99-0cce6b?logo=lighthouse&logoColor=white" alt="Lighthouse mobile 99" />
+<img src="https://img.shields.io/badge/Lighthouse_desktop-100-0cce6b?logo=lighthouse&logoColor=white" alt="Lighthouse desktop 100" />
+<img src="https://img.shields.io/badge/offline-ready-f5b73a" alt="Offline ready" />
+<br />
+<img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" alt="React 19" />
+<img src="https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
+<img src="https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white" alt="Vite 7" />
+<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4" />
+<img src="https://img.shields.io/badge/Convex-realtime-EE342F" alt="Convex" />
+<img src="https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white" alt="PWA" />
 
-A React + Vite quiz app for university exam practice.
+</div>
 
-This README documents **exactly how the current code works** (routes, state flow, persistence, scoring, and custom subject upload).
+---
 
-## What this app does
+## Features
 
-- Shows built-in and custom quiz subjects on the landing page.
-- Lets the user choose:
-	- question source (**Professor** questions or **AI Practice** questions, when available), and
-	- question count (**All** or **Custom Count**).
-- Runs a quiz with per-question navigation and answer tracking.
-- Calculates score on submit and saves result history.
-- Shows analytics (score summary, breakdown, question-by-question review).
-- Supports dark/light theme toggle.
-- Supports uploading new subjects via JSON.
+- **Practice that sticks.** Quick 10-question rounds or full sets, with an explanation after every answer. **Retry mistakes** replays only the questions you got wrong.
+- **Mock exams.** A timed exam mode that leaves out questions you have already mastered.
+- **Keyboard first.** Answer, move and submit without touching the mouse (shortcuts below).
+- **Leaderboard with negative marking.** Points = first-time correct − wrong ÷ (options − 1), so guessing doesn't pay. The server grades every attempt against answer keys it holds, and the top three get a podium.
+- **No accounts.** Pick a name once, or keep the generated one (*Daring Falcon 76*). Your identity is a random secret on your device.
+- **Two devices, one player.** Link your phone and laptop with a QR code and a 6-digit code.
+- **Offline first.** Quizzes, history, streaks and XP all live on the device. Attempts made offline queue up and sync when you're back.
+- **Bring your own subject.** Upload a JSON file, or paste your notes into any AI chat using the built-in prompt and upload what it gives you.
+- **Feels premium on cheap phones.** A cinematic intro, view transitions and 3D icons, plus a **lite mode** that switches itself on for low-end devices, Data Saver or reduced motion.
+- **Share card.** Turn a result into an image for your group chat.
 
-## Built-in subjects (from `src/data/*.json`)
+### Keyboard shortcuts
 
-- Compiler Construction (`compiler-construction`): 145 `questions`, 0 `guess_questions`
-- Freelancing (`freelancing`): 15 `questions`, 50 `guess_questions`
-- Information Security & Cryptography (`information-security-cryptography`): 359 `questions`, 0 `guess_questions`
+| Key | Action |
+| --- | --- |
+| <kbd>1</kbd>–<kbd>5</kbd> | Pick an option |
+| <kbd>Enter</kbd> | Next question |
+| <kbd>Backspace</kbd> | Previous question |
+| <kbd>E</kbd> | Full explanation |
+| <kbd>?</kbd> | All shortcuts |
 
-## Run locally
+## Performance
 
-### Requirements
+Lab scores from Lighthouse 13 on the production build (simulated slow 4G and a mid-range phone for mobile):
 
-- Node.js 18+
-- npm
+| | Performance | FCP | LCP | TBT | CLS |
+| --- | --- | --- | --- | --- | --- |
+| Mobile | **97–100** | 1.1 s | 1.6 s | ≤ 80 ms | 0 |
+| Desktop | **100** | 0.3 s | 0.4 s | 0 ms | 0.004 |
 
-### Commands
+How it gets there:
+
+```mermaid
+flowchart LR
+  A[HTML arrives] --> B["Splash paints<br/>inline CSS + inline logo<br/>(FCP = LCP)"]
+  B --> C["JS, fonts and the opened<br/>route's chunk load in parallel"]
+  C --> D[App renders under the splash]
+  D --> E["Logo flies into the navbar<br/>(Web Animations FLIP)"]
+```
+
+- **The HTML alone paints the first screen.** The stylesheet is inlined, and a 160px copy of the logo is embedded at build time, so the splash shows with the first bytes and no request can hold it back.
+- **Paint first, then load.** JS and fonts are requested the moment the splash is on screen. The splash stays up only until the app has rendered, so you never see a blank or half-styled page.
+- **Route-aware preloading.** Whichever URL you open, its page chunk downloads alongside the main bundle, not after it.
+- **Lean main bundle.** Vendor code (React, Convex) sits in its own long-cached chunks. Smooth scrolling and device linking load on demand, and touch-only phones never download the smooth-scroll library at all.
+- **No layout shift.** History is read from IndexedDB in the route loader, so the first render already has your data.
+- **Caching.** Hashed assets are `immutable` for a year. A service worker precaches the whole app shell (~1 MB) after the first visit, and icons and avatars are cached the first time they appear.
+
+All of this lives in [`vite/perfHints.ts`](vite/perfHints.ts), the splash in [`index.html`](index.html) and the handoff animation in [`src/lib/splash.ts`](src/lib/splash.ts).
+
+## Getting started
+
+Requires **Node.js 20.19+** (or 22.12+).
 
 ```bash
+git clone https://github.com/zubairbinshaukat/quiz-slayer.git
+cd quiz-slayer
 npm install
 npm run dev
 ```
 
-Other scripts:
+That's it. Without a backend the app runs fully local: quizzes, history, mistakes, streaks and custom subjects all work. Only the global leaderboard, device linking and visit counting are switched off.
 
-```bash
-npm run build
-npm run preview
-npm run lint
-npm run banks:push   # upload built-in answer keys to Convex (see below)
-```
+### With the Convex backend
 
-### Running without Convex
+1. Copy `.env.example` to `.env.local` and set `VITE_CONVEX_URL` (create a deployment with `npx convex dev`).
+2. Run `npx convex dev --once` after any change in `convex/`.
+3. In the Convex dashboard (Settings → Environment Variables), set:
+   - `BANKS_ADMIN_KEY`: any long random string. Put the same value in `.env.local`, then run `npm run banks:push` to upload the answer keys. Re-run it whenever a subject in `src/data` changes.
+   - `ADMIN_PIN` (optional, 6 digits): unlocks the owner's hidden stats page.
 
-The app works fully without a backend: leave `VITE_CONVEX_URL` unset. Quizzes, history,
-mistakes, streaks and custom subjects are local (IndexedDB / localStorage) either way;
-without Convex the global leaderboard, device linking and visit counting are disabled
-(the leaderboard page shows only this device's own stats).
+### Scripts
 
-With Convex (`VITE_CONVEX_URL` set, see `.env.example`):
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server with hot reload |
+| `npm run build` | Type-check and production build (`dist/`) |
+| `npm run preview` | Serve the production build locally |
+| `npm run typecheck` | Type-check the app, config and scripts |
+| `npm run lint` | ESLint |
+| `npm run banks:push` | Upload built-in answer keys to Convex |
+| `npm run icons` | Regenerate favicons and PWA icons from `branding/` |
+| `npm run emoji:fetch` | Fetch the 3D emoji avatars |
 
-- Run `npx convex dev --once` after any change in `convex/`.
-- Set `BANKS_ADMIN_KEY` in the Convex dashboard (Settings → Environment Variables) and the
-  same value in `.env.local`, then run `npm run banks:push` whenever a built-in subject in
-  `src/data` changes. The server grades attempts against these answer keys; subjects without
-  a bank (custom uploads) are stored as practice only and never ranked.
-- Set `ADMIN_PIN` (6 digits) in the dashboard to enable the owner's hidden stats page.
+## Adding a subject
 
-## Privacy
-
-- **Anonymous visit counts only.** Once per session the app sends coarse categories
-  (mobile/tablet/desktop, OS family, browser family, installed or not) and a truncated
-  SHA-256 hash of a random device id, used only to count unique visitors per day and
-  deleted after 30 days. No IP address, location, user-agent string or personal data is
-  stored, and nothing is shown in the app.
-- **No accounts.** The leaderboard identifies you by a random secret stored on your device.
-- **Device linking is optional.** Linking shares one player between at most two of your
-  devices; it is permanent and never merges or transfers points.
-
-## Exact route behavior
-
-- `/` → Landing page with subject cards and quiz setup modal.
-- `/quiz/:slug` → Active quiz UI.
-- `/analytics` → Last completed quiz analytics.
-- `/history` → Stored quiz attempts.
-- `/upload` → JSON upload for custom subjects.
-- `/leaderboard` → Global leaderboard (needs a connection when Convex is enabled).
-- `/link?c=123456` → Opens the "link a new device" approval with the code filled in.
-- Any unknown route (`*`) → "Page not found".
-
-## Exact quiz lifecycle
-
-### 1) Subject selection and setup
-
-On landing page:
-
-1. User clicks a subject card.
-2. `QuizSetupModal` opens.
-3. If the subject has `guess_questions`, user can choose:
-	 - **Professor** (`subject.questions`), or
-	 - **AI Practice** (`subject.guessQuestions`).
-4. User chooses question count:
-	 - **All**: uses entire selected pool.
-	 - **Custom Count**: uses `min(customCount, poolSize)`.
-5. On start:
-	 - selected pool is shuffled via Fisher-Yates,
-	 - first `count` questions are taken,
-	 - quiz state is initialized in context,
-	 - user is navigated to `/quiz/:slug`.
-
-### 2) During quiz
-
-- `status` becomes `active`.
-- `answers` is initialized as an array of `null` values, length = selected question count.
-- User can:
-	- select one option per question,
-	- move previous/next,
-	- jump directly using Question Palette.
-
-### 3) Submit behavior
-
-When submit is pressed:
-
-- Correct answers are counted by comparing `answers[i]` to `questions[i].correctIndex`.
-- `total = questions.length`.
-- `score = Math.round((correct / total) * 100)`.
-- `timeTaken = Math.round((now - startTime) / 1000)` seconds.
-- Result is saved to IndexedDB history store with `dateTaken` ISO timestamp.
-- Context `status` becomes `completed`.
-- User is redirected to `/analytics`.
-
-## Important refresh behavior (current implementation)
-
-- Refresh on `/analytics` works because analytics data is also cached in `sessionStorage` key `quiz-analytics`.
-- Refresh on `/quiz/:slug` while quiz context is idle triggers `rehydrate(...)`.
-- Current `rehydrate(...)` behavior starts a new active quiz from **all shuffled `subject.questions`** for that slug.
-	- It does **not** restore previously selected custom count.
-	- It does **not** restore previously selected AI Practice set.
-	- It does **not** restore previous answers.
-
-## Persistence model
-
-### IndexedDB
-
-Database name: `quiz-practice-db` (version `2`)
-
-Stores:
-
-1. `quiz_history`
-	 - key: auto-increment `id`
-	 - indexes: `by_slug`, `by_date`
-	 - entry shape (saved):
-		 - `subject`, `slug`, `score`, `correct`, `total`, `answers`, `timeTaken`, `dateTaken`
-
-2. `custom_subjects`
-	 - key: `slug`
-	 - entry shape (saved):
-		 - uploaded subject fields + `isCustom: true`, `addedAt`
-
-### sessionStorage
-
-- `quiz-session`
-	- written at quiz start with `{ slug, startTime }`
-	- removed at submit/reset
-- `quiz-analytics`
-	- written at submit with `{ result, subject, questions, answers }`
-	- used by analytics page fallback on refresh
-	- removed on new quiz start/reset
-
-### localStorage
-
-- `quiz-theme`
-	- stores `light` or `dark`
-
-## Subject data model (upload + built-in)
-
-Expected JSON structure:
+Built-in subjects are JSON files in [`src/data`](src/data). Anyone can also upload one from the **Add subject** page, where it is stored on their device only:
 
 ```json
 {
-	"subject": "Machine Learning",
-	"slug": "machine-learning",
-	"description": "Optional one-line description",
-	"questions": [
-		{
-			"id": 1,
-			"text": "Question text?",
-			"options": ["A", "B", "C", "D"],
-			"correctIndex": 1
-		}
-	],
-	"guess_questions": [
-		{
-			"id": 1,
-			"text": "Practice question text?",
-			"options": ["A", "B", "C", "D"],
-			"correctIndex": 0
-		}
-	]
+  "subject": "Machine Learning",
+  "slug": "machine-learning",
+  "questions": [
+    {
+      "id": 1,
+      "text": "What is supervised learning?",
+      "options": ["Learning from labeled input-output pairs", "Clustering unlabeled data", "Learning by trial and error", "Compressing features"],
+      "correctIndex": 0,
+      "shortExplanation": "Supervised learning trains on labeled input-output pairs.",
+      "explanation": "Each training input has a known output, so the model learns the mapping between them."
+    }
+  ]
 }
 ```
 
-Validation rules enforced by upload page:
+`slug` uses lowercase letters, digits and dashes. Each question needs at least two options. Uploaded subjects are practice only: they are never ranked on the leaderboard.
 
-- `subject`: required non-empty string.
-- `slug`: required, must match `^[a-z0-9-]+$`.
-- `questions`: required, non-empty array.
-- For each question (including `guess_questions` if present):
-	- `text`: required string.
-	- `options`: required array with at least 2 items.
-	- `correctIndex`: number from `0` to `options.length - 1`.
+## Project structure
 
-Upload conflict behavior:
+```text
+src/
+  pages/          route screens (lazy-loaded per route)
+  components/     UI by feature: quiz, dashboard, leaderboard, devices, layout, ui
+  hooks/          React hooks (quiz flow, history, leaderboard, keyboard)
+  context/        quiz, theme, sound and lite-mode providers
+  lib/            storage, scoring, streaks, splash, sync outbox, helpers
+  data/           built-in question banks
+convex/           backend: players, attempts, leaderboard, device linking, stats
+vite/             build plugin for the first-load pipeline
+scripts/          icon generation, emoji fetch, answer-key upload
+branding/         logo sources
+```
 
-- If `slug` matches a built-in subject slug, upload is blocked.
-- If `slug` matches an existing custom subject, IndexedDB `put` overwrites that custom subject (same key).
+## Privacy
 
-## Subject loading order
+- **No accounts and no personal data.** The leaderboard knows you by a random secret on your device.
+- **Anonymous visit counts only.** Once per session the app sends coarse categories (mobile, tablet or desktop; OS and browser family; installed or not) and a truncated hash of a random device id, used only to count unique visitors per day and deleted after 30 days. No IP address, location or user-agent string is stored.
+- **Device linking is optional** and limited to two devices. It never merges or moves points.
 
-`useSubjectData()` loads subjects from two sources:
+## Deploying
 
-1. Built-in JSON files in `src/data/*.json`
-2. Custom subjects from IndexedDB
+The app is a static site and runs on any static host. [`vercel.json`](vercel.json) sets up the SPA rewrite and cache headers on Vercel. With Convex, use `npx convex deploy --cmd "npm run build"` as the build command and add `CONVEX_DEPLOY_KEY` to the project's environment variables.
 
-Then it merges and sorts alphabetically by subject name.
+## Credits
 
-If a custom subject uses a built-in slug, it is filtered out from the displayed list.
+- 3D icons by [3dicons.co](https://3dicons.co) (CC0)
+- Avatars from [Fluent Emoji](https://github.com/microsoft/fluentui-emoji) by Microsoft (MIT)
+- Fonts: [Geist](https://vercel.com/font) and [Bricolage Grotesque](https://fonts.google.com/specimen/Bricolage+Grotesque), self-hosted
 
-## UI notes
+---
 
-- Top navigation provides `History` and theme toggle.
-- Analytics page includes:
-	- score summary,
-	- correct/incorrect breakdown,
-	- question review,
-	- quick actions to return home or reset and try again.
-- History page supports:
-	- per-entry delete,
-	- clear all (with confirm state),
-	- subject filtering,
-	- aggregate stats (attempts and average score).
+<div align="center">
 
-## Project structure (high-level)
+Designed and built by [**Zubair Bin Shaukat**](https://zubyr.dev)
 
-- `src/pages`: route-level screens
-- `src/components`: UI + feature components
-- `src/context`: global quiz/theme providers
-- `src/hooks`: reusable app hooks
-- `src/lib`: constants, IndexedDB, utilities
-- `src/data`: built-in subject JSON files
+</div>

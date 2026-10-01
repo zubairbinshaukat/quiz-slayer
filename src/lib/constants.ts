@@ -31,7 +31,7 @@ export interface Grade {
   icon: Icon3DName
 }
 
-export const GRADE_MAP: Grade[] = [
+const GRADE_MAP: Grade[] = [
   { min: 90, label: 'Excellent', tone: 'success', icon: 'trophy' },
   { min: 75, label: 'Great', tone: 'info', icon: 'medal' },
   { min: 60, label: 'Good', tone: 'accent', icon: 'star' },

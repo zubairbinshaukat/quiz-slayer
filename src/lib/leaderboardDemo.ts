@@ -1,11 +1,9 @@
-// TODO(owner): remove demo data — set DEMO_LEADERBOARD to false (or delete this file and its one
-// import in hooks/useLeaderboard.ts) to restore the real board. Dev builds only: production never shows it.
+// Fake leaderboard for showing the design before real players exist. Switched on and off for
+// everyone from the owner stats page (Convex appSettings); until set, it is on in dev builds only.
 import type { MeRow, PlayerInfo, Row, UseLeaderboardResult } from '../hooks/leaderboardTypes'
 
-export const DEMO_LEADERBOARD = true
-
-/** Active only in `vite dev` with the flag on. */
-export const demoLeaderboardActive = import.meta.env.DEV && DEMO_LEADERBOARD
+/** Used while the owner has never touched the switch. */
+export const DEMO_LEADERBOARD_DEFAULT = import.meta.env.DEV
 
 const YOU_RANK = 6
 

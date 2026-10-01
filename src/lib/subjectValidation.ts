@@ -47,7 +47,7 @@ function validateQuestion(
   return errors
 }
 
-export function validateSubject(raw: unknown): ValidationResult {
+function validateSubject(raw: unknown): ValidationResult {
   const errors: string[] = []
   const data = isRecord(raw) ? raw : {}
 

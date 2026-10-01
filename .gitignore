@@ -29,3 +29,13 @@ dist-ssr
 
 # PWA dev service worker
 dev-dist
+
+# Working notes, design specs and screenshots stay local
+docs/
+/*.png
+/*.jpg
+
+# Local AI-assistant settings and skills
+.claude/settings.local.json
+.agents/
+skills-lock.json

@@ -1,6 +1,5 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
-import { Preloader } from './components/brand/Preloader'
 import { DeviceLinkHost } from './components/devices/DeviceLinkHost'
 import { Navbar } from './components/layout/Navbar'
 import { SettingsSheet } from './components/layout/SettingsSheet'
@@ -9,42 +8,32 @@ import { TabBar } from './components/layout/TabBar'
 import { UpdatePrompt } from './components/pwa/UpdatePrompt'
 import { QuizProvider } from './context/QuizContext'
 import { SoundProvider } from './context/SoundContext'
-import { useLiteMode } from './hooks/useLiteMode'
 import { convexEnabled } from './lib/convex'
+import { releaseSplash, replaySplash } from './lib/splash'
 import { RELOADED_ONCE_KEY } from './lib/storageKeys'
 import { cn } from './lib/utils'
-
-const AdminPinSheet = lazy(() => import('./components/admin/AdminPinSheet').then((m) => ({ default: m.AdminPinSheet })))
-
-const SECRET_TAPS = 7
-const SECRET_WINDOW_MS = 4000
 
 /** Root layout: providers + chrome. Quiz routes run in a chrome-less focus mode. */
 export function AppShell() {
   const { pathname } = useLocation()
-  const { lite } = useLiteMode()
   const focusMode = pathname.startsWith('/quiz/')
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [pinOpen, setPinOpen] = useState(false)
-  const taps = useRef<number[]>([])
 
-  // The shell rendered: a chunk-load auto-reload (ErrorPage) may happen again in future
+  // The shell rendered (the data router waits for the route chunk first): hand over from the
+  // index.html splash, and allow a chunk-load auto-reload (ErrorPage) again in future
   useEffect(() => {
+    releaseSplash()
     try {
       sessionStorage.removeItem(RELOADED_ONCE_KEY)
     } catch { /* ignore */ }
   }, [])
 
-  // Owner entry: 7 taps on the logo within 4 s opens the stats PIN prompt
-  function onLogoTap() {
-    if (!convexEnabled) return
-    const now = Date.now()
-    taps.current = [...taps.current.filter((t) => now - t < SECRET_WINDOW_MS), now]
-    if (taps.current.length >= SECRET_TAPS) {
-      taps.current = []
-      setPinOpen(true)
-    }
-  }
+  // Arriving on home from another page (back button, logo, Home tab) replays the splash's short cut
+  const prevPath = useRef(pathname)
+  useEffect(() => {
+    if (pathname === '/' && prevPath.current !== '/') replaySplash()
+    prevPath.current = pathname
+  }, [pathname])
 
   const openSettings = () => setSettingsOpen(true)
 
@@ -57,19 +46,13 @@ export function AppShell() {
         >
           Skip to content
         </a>
-        {!lite && <Preloader />}
-        {!focusMode && <Sidebar onOpenSettings={openSettings} onLogoTap={onLogoTap} />}
+        {!focusMode && <Sidebar onOpenSettings={openSettings} />}
         <div className={cn(!focusMode && 'lg:pl-[76px]')}>
-          {!focusMode && <Navbar onOpenSettings={openSettings} onLogoTap={onLogoTap} />}
+          {!focusMode && <Navbar onOpenSettings={openSettings} />}
           <Outlet />
         </div>
         {!focusMode && <TabBar />}
         <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        {pinOpen && (
-          <Suspense fallback={null}>
-            <AdminPinSheet onClose={() => setPinOpen(false)} />
-          </Suspense>
-        )}
         <UpdatePrompt />
         {convexEnabled && <DeviceLinkHost />}
         <ScrollRestoration />

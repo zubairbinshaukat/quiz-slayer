@@ -11,14 +11,13 @@ import { ThemeToggle } from './ThemeToggle'
 
 interface NavbarProps {
   onOpenSettings: () => void
-  onLogoTap: () => void
 }
 
 /**
  * Top bar below 1024px (the sidebar takes over on desktop). Mobile: wordmark + settings only;
  * tablet adds the destinations and quick toggles. Hidden on /quiz/*.
  */
-export function Navbar({ onOpenSettings, onLogoTap }: NavbarProps) {
+export function Navbar({ onOpenSettings }: NavbarProps) {
   const { pathname } = useLocation()
   const { soundEnabled, toggleSound } = useSound()
   const { lite } = useLiteMode()
@@ -26,7 +25,7 @@ export function Navbar({ onOpenSettings, onLogoTap }: NavbarProps) {
   return (
     <header className="glass pt-safe sticky top-0 z-40 border-b border-line lg:hidden [view-transition-name:navbar]">
       <div className="mx-auto flex h-14 max-w-[1260px] items-center justify-between gap-2 px-4 md:h-16 md:px-6">
-        <Link to={ROUTES.HOME} viewTransition={!lite} className="press -ml-1 flex items-center rounded-btn p-1 text-fg" aria-label="Quiz Slayer home" onClick={onLogoTap}>
+        <Link to={ROUTES.HOME} viewTransition={!lite} className="press -ml-1 flex items-center rounded-btn p-1 text-fg" aria-label="Quiz Slayer home">
           <LogoWordmark size={24} title="" />
         </Link>
 

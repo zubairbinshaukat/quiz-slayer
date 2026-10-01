@@ -16,13 +16,6 @@ export function shuffleArray<T>(arr: readonly T[]): T[] {
   return copy
 }
 
-/** Format seconds to mm:ss */
-export function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${String(s).padStart(2, '0')}`
-}
-
 /** Stopwatch format: mm:ss (h:mm:ss past an hour) */
 export function formatClock(seconds: number): string {
   const s = Math.max(0, Math.floor(seconds))

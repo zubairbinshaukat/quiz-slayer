@@ -6,7 +6,7 @@ export const XP_PER_CORRECT = 10
 
 const listeners = new Set<() => void>()
 
-export function getXp(): number {
+function getXp(): number {
   try {
     const n = Number(localStorage.getItem(XP_KEY))
     return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0

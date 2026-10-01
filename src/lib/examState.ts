@@ -5,7 +5,7 @@ import { isRecord, type ExamAttempt, type ExamState, type ExamStateUpdate, type 
 // ─── Timed exam rules ─────────────────────────────────────────────────────────
 
 /** Questions per timed exam (or the whole remaining pool if smaller). */
-export const EXAM_QUESTION_COUNT = 30
+const EXAM_QUESTION_COUNT = 30
 export const EXAM_SECONDS_PER_QUESTION = 90
 /** Score % needed to pass. */
 export const EXAM_PASS_THRESHOLD = 50
@@ -65,7 +65,7 @@ export function getExamState(subjectSlug: string): ExamState {
  * Merges one exam result into persistent state:
  * correct answers are mastered for good; wrong ones stay queued until answered correctly.
  */
-export function saveExamState(subjectSlug: string, updates: ExamStateUpdate): void {
+function saveExamState(subjectSlug: string, updates: ExamStateUpdate): void {
   try {
     const existing = getExamState(subjectSlug)
     const correctIds = uniqueIds([...existing.correctIds, ...updates.correctIds])

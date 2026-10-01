@@ -23,7 +23,7 @@ export function DevCredit({ className }: { className?: string }) {
         <ZubyrMark size={44} className="shrink-0 text-fg" />
         <div className="min-w-0 flex-1 pr-12">
           <p className="eyebrow">Built by</p>
-          <p className="mt-0.5 truncate text-[17px] font-extrabold leading-tight tracking-[-0.01em]">{DEV_NAME}</p>
+          <p className="font-display mt-0.5 truncate text-[18px] font-extrabold leading-tight tracking-[-0.02em]">{DEV_NAME}</p>
           <p className="mt-0.5 truncate text-[13px] text-muted">Designed &amp; built Quiz Slayer</p>
         </div>
       </div>

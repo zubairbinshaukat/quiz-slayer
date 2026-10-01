@@ -23,7 +23,7 @@ function newAttemptId(): string {
  * Maps a saved history entry to the backend's recordAttempt args: raw answers
  * plus question ids; the server grades them. Null for entries it would reject.
  */
-export function buildAttemptArgs(entry: HistoryEntry, deviceId: string): RecordAttemptArgs | null {
+function buildAttemptArgs(entry: HistoryEntry, deviceId: string): RecordAttemptArgs | null {
   const { questionIds, answers } = entry
   if (!questionIds || questionIds.length !== answers.length) return null
   if (answers.length === 0 || answers.length > MAX_ANSWERS) return null
@@ -82,7 +82,7 @@ async function flushOnce(): Promise<void> {
  * Sends queued attempts oldest first; deletes each on success, keeps it on failure.
  * Concurrent calls share one run; a call made mid-run schedules one more pass.
  */
-export function flushOutbox(): Promise<void> {
+function flushOutbox(): Promise<void> {
   if (!convexClient) return Promise.resolve()
   if (flushing) {
     flushAgain = true

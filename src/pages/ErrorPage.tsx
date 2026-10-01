@@ -3,6 +3,7 @@ import { isRouteErrorResponse, useRouteError } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
 import { Icon } from '../components/ui/Icon'
 import { Icon3D } from '../components/ui/Icon3D'
+import { releaseSplash } from '../lib/splash'
 import { RELOADED_ONCE_KEY } from '../lib/storageKeys'
 
 const CHUNK_ERROR = /dynamically imported module|Loading chunk|Failed to fetch/i
@@ -31,7 +32,10 @@ export function ErrorPage() {
   const autoReload = CHUNK_ERROR.test(message) && !reloadedOnce()
 
   useEffect(() => {
-    if (!autoReload) return
+    if (!autoReload) {
+      releaseSplash()
+      return
+    }
     try {
       sessionStorage.setItem(RELOADED_ONCE_KEY, '1')
     } catch { /* ignore */ }

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, type KeyboardEvent as ReactKeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { useLenis } from 'lenis/react'
+import { useLenis } from '../../lib/lenis'
 import { cn } from '../../lib/utils'
 import { IconButton } from './Button'
 import { Icon } from './Icon'

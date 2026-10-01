@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLenis } from 'lenis/react'
+import { useLenis } from '../../lib/lenis'
 import { MIN_ANSWERED_FOR_BOARD } from '../../lib/ranking'
 import { cn } from '../../lib/utils'
 import { Avatar } from './Avatar'

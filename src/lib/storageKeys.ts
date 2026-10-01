@@ -46,8 +46,6 @@ export const ADMIN_TOKEN_KEY = 'qs-admin-token'
 export const SESSION_KEY = 'quiz-session'
 /** Results snapshot read by the results page. */
 export const ANALYTICS_KEY = 'quiz-analytics'
-/** Set once the splash has played this session. */
-export const PRELOADED_KEY = 'qs-preloaded'
 /** '1' after one automatic reload for a failed chunk load; cleared once the app renders. */
 export const RELOADED_ONCE_KEY = 'qs-reloaded-once'
 /** Set once this session's anonymous visit was counted. */

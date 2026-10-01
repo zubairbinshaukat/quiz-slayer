@@ -43,7 +43,7 @@ function setSecret(next: string): void {
   for (const l of listeners) l()
 }
 
-export function getPlayerSecret(): string | null {
+function getPlayerSecret(): string | null {
   return secret
 }
 

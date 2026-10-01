@@ -2,9 +2,20 @@ import { useCallback, useEffect, useState } from 'react'
 import { clearAllHistory, deleteHistoryEntry, getAllHistory } from '../lib/db'
 import type { HistoryEntry } from '../types'
 
+let snapshot: HistoryEntry[] | null = null
+
+/**
+ * Route loader: reads history while the route chunk downloads, so the page's first render already
+ * has it (no banners or tiles popping in and shifting the layout).
+ */
+export async function primeHistory(): Promise<null> {
+  snapshot = await getAllHistory()
+  return null
+}
+
 export function useQuizHistory() {
-  const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [history, setHistory] = useState<HistoryEntry[]>(() => snapshot ?? [])
+  const [loading, setLoading] = useState(() => snapshot === null)
 
   const load = useCallback(async () => {
     setLoading(true)
