@@ -1,9 +1,11 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import { formatPoints } from '../../lib/ranking'
+import { lsGet, lsSet } from '../../lib/storage'
+import { STATS_PLAYERS_VIEW_KEY } from '../../lib/storageKeys'
 import { cn } from '../../lib/utils'
 import { Avatar } from '../leaderboard/Avatar'
 import { FilterChip, Pill } from '../ui/Chip'
-import { Icon } from '../ui/Icon'
+import { Icon, type IconName } from '../ui/Icon'
 import { Segmented } from '../ui/Segmented'
 import { StatStrip } from '../ui/StatStrip'
 import { timeAgo } from './format'
@@ -11,6 +13,7 @@ import { PlayerSheet, type PlayerSummary } from './PlayerSheet'
 
 type Sort = 'rank' | 'recent' | 'new'
 type Filter = 'all' | 'chosen' | 'random' | 'idle'
+type View = 'list' | 'grid'
 
 const WEEK_MS = 7 * 86_400_000
 
@@ -61,11 +64,90 @@ function PlayerRow({ p, index, onOpen }: { p: PlayerSummary; index: number; onOp
   )
 }
 
+function PlayerCard({ p, index, onOpen }: { p: PlayerSummary; index: number; onOpen: () => void }) {
+  return (
+    <li className="rise cv-row" style={{ '--i': Math.min(index, 12) } as CSSProperties}>
+      <button
+        type="button"
+        onClick={onOpen}
+        className="card press flex h-full w-full flex-col p-3.5 text-left transition-colors duration-150 hover:bg-surface-3"
+      >
+        <span className="flex items-start justify-between gap-2">
+          <Avatar name={p.name} size={44} />
+          <span className={cn('font-mono text-sm font-bold', p.rank && p.rank <= 3 ? 'text-accent' : 'text-muted')}>
+            {p.rank ? `#${p.rank}` : '—'}
+          </span>
+        </span>
+        <span className="mt-3 truncate text-[15px] font-semibold">{p.name}</span>
+        <span className="mt-1 flex h-5 items-center">
+          {p.nameChosen && <Pill className="bg-accent/15 py-0 text-[11px] text-accent">Named</Pill>}
+        </span>
+        <span className="mt-auto pt-3">
+          <span className="block font-mono text-2xl font-bold leading-none">{formatPoints(p.points)}</span>
+          <span className="mt-0.5 block text-[11px] text-muted">points</span>
+        </span>
+        <span className="mt-3 grid grid-cols-2 gap-2 border-t border-line pt-2.5 font-mono text-xs">
+          <span>
+            <span className="block text-fg">{p.answered > 0 ? `${Math.round(p.accuracy)}%` : '—'}</span>
+            <span className="block font-sans text-[11px] text-muted">{p.answered > 0 ? `${p.correct}/${p.answered}` : 'no answers'}</span>
+          </span>
+          <span>
+            <span className="block text-fg">{p.attempts}</span>
+            <span className="block font-sans text-[11px] text-muted">quiz{p.attempts === 1 ? '' : 'zes'}</span>
+          </span>
+        </span>
+        <span className="mt-2 truncate text-[11px] text-muted">
+          {timeAgo(p.lastActiveAt)}
+          {p.deviceCount > 1 && ` · ${p.deviceCount} devices`}
+        </span>
+      </button>
+    </li>
+  )
+}
+
+const VIEWS: { value: View; label: string; icon: IconName }[] = [
+  { value: 'list', label: 'List view', icon: 'list' },
+  { value: 'grid', label: 'Grid view', icon: 'grid' },
+]
+
+function ViewToggle({ value, onChange }: { value: View; onChange: (v: View) => void }) {
+  return (
+    <div role="radiogroup" aria-label="Players layout" className="flex shrink-0 gap-1 rounded-full border border-line bg-surface-2 p-1 shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)]">
+      {VIEWS.map((v) => {
+        const active = v.value === value
+        return (
+          <button
+            key={v.value}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            aria-label={v.label}
+            title={v.label}
+            onClick={() => onChange(v.value)}
+            className={cn(
+              'press grid size-10 place-items-center rounded-full',
+              active ? 'bg-accent text-accent-ink shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_2px_8px_-2px_rgb(0_0_0/0.4)]' : 'text-muted hover:bg-surface-3 hover:text-fg',
+            )}
+          >
+            <Icon name={v.icon} size={18} />
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 /** Every player on the server: totals, search, sort, filter; tap one for the full picture. */
 export function PlayersPanel({ token, players }: { token: string; players: PlayerSummary[] }) {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<Sort>('rank')
   const [filter, setFilter] = useState<Filter>('all')
+  const [view, setView] = useState<View>(() => (lsGet(STATS_PLAYERS_VIEW_KEY) === 'grid' ? 'grid' : 'list'))
+
+  function changeView(v: View) {
+    lsSet(STATS_PLAYERS_VIEW_KEY, v)
+    setView(v)
+  }
   const [openId, setOpenId] = useState<string | null>(null)
   const [now] = useState(() => Date.now())
 
@@ -131,17 +213,20 @@ export function PlayersPanel({ token, players }: { token: string; players: Playe
             className="min-h-11 w-full rounded-full border border-line bg-surface-2 px-4 text-base text-fg placeholder:text-muted focus:border-accent focus:outline-none md:text-sm"
           />
         </label>
-        <Segmented
-          label="Sort players"
-          value={sort}
-          onChange={setSort}
-          className="md:w-[300px]"
-          options={[
-            { value: 'rank', label: 'Rank' },
-            { value: 'recent', label: 'Active' },
-            { value: 'new', label: 'Newest' },
-          ]}
-        />
+        <div className="flex gap-2">
+          <Segmented
+            label="Sort players"
+            value={sort}
+            onChange={setSort}
+            className="min-w-0 flex-1 md:w-75 md:flex-none"
+            options={[
+              { value: 'rank', label: 'Rank' },
+              { value: 'recent', label: 'Active' },
+              { value: 'new', label: 'Newest' },
+            ]}
+          />
+          <ViewToggle value={view} onChange={changeView} />
+        </div>
       </div>
       <div className="no-scrollbar -mx-4 mt-3 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0" role="group" aria-label="Filter players">
         {(Object.keys(FILTERS) as Filter[]).map((f) => (
@@ -158,6 +243,10 @@ export function PlayersPanel({ token, players }: { token: string; players: Playe
         <div className="card mt-2 p-6 text-center text-sm text-muted">
           {players.length === 0 ? 'No players yet. They appear after their first finished quiz or leaderboard visit.' : 'No players match.'}
         </div>
+      ) : view === 'grid' ? (
+        <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {shown.map((p, i) => <PlayerCard key={p.id} p={p} index={i} onOpen={() => setOpenId(p.id)} />)}
+        </ul>
       ) : (
         <ul className="mt-2 space-y-2">
           {shown.map((p, i) => <PlayerRow key={p.id} p={p} index={i} onOpen={() => setOpenId(p.id)} />)}

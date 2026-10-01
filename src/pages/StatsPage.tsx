@@ -91,11 +91,11 @@ function TrafficPanel({ data }: { data: Stats }) {
       </div>
 
       <div className="mt-5">
-        <SplitTable caption={`Unique devices · last ${CHART_DAYS} days`} groups={split} />
+        <SplitTable caption={`Devices · last ${CHART_DAYS} days`} note="Each device counted once per day it visited" groups={split} />
       </div>
 
       <p className="mt-4 text-xs text-muted">
-        Anonymous counts · {data.dayCount} day{data.dayCount === 1 ? '' : 's'} recorded. Splits count each device once per day.
+        Anonymous counts · {data.dayCount} day{data.dayCount === 1 ? '' : 's'} recorded.
         Installed-app sessions: {t.installedSessions ?? 0}. Totals are all-time.
       </p>
     </div>

@@ -43,6 +43,8 @@ export const INSTALL_COUNTED_KEY = 'qs-install-counted'
 export const XP_KEY = 'qs-xp'
 /** Owner stats session token (hidden /stats page). */
 export const ADMIN_TOKEN_KEY = 'qs-admin-token'
+/** 'list' | 'grid': layout of the players list on the stats page. */
+export const STATS_PLAYERS_VIEW_KEY = 'qs-stats-players-view'
 
 // ─── sessionStorage ──────────────────────────────────────────────────────────
 
