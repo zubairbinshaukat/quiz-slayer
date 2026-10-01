@@ -3,6 +3,7 @@ import { AddSubjectCard } from '../components/landing/AddSubjectCard'
 import { DevCredit } from '../components/landing/DevCredit'
 import { GreetingRow } from '../components/landing/GreetingRow'
 import { InstallCard } from '../components/landing/InstallCard'
+import { LinkBanner } from '../components/landing/LinkBanner'
 import { SubjectCard } from '../components/landing/SubjectCard'
 import { Page } from '../components/layout/Page'
 import { QuizSetupSheet } from '../components/quiz/QuizSetupSheet'
@@ -12,6 +13,7 @@ import { useQuiz } from '../hooks/useQuiz'
 import { useQuizHistory } from '../hooks/useQuizHistory'
 import { useSubjectData } from '../hooks/useSubjectData'
 import { ROUTES } from '../lib/constants'
+import { convexEnabled } from '../lib/convex'
 import { getMasteredCount, getTotalMistakes } from '../lib/mastery'
 import { getMistakeIds, getSubjectStats } from '../lib/mistakes'
 import { usePageMeta } from '../lib/seo'
@@ -46,7 +48,7 @@ const CAROUSEL_ITEM = 'w-[74%] max-w-[290px] shrink-0 snap-start md:w-auto md:ma
 export function LandingPage() {
   usePageMeta({ path: '/' })
   const { subjects, quizzes, getSubjectBySlug } = useSubjectData()
-  const { history } = useQuizHistory()
+  const { history, loading: historyLoading } = useQuizHistory()
   const { startQuiz } = useQuiz()
   const nav = useNav()
 
@@ -94,6 +96,8 @@ export function LandingPage() {
   return (
     <Page wide>
       <GreetingRow streak={streak} />
+
+      {convexEnabled && !historyLoading && <LinkBanner attempts={history.length} />}
 
       <InstallCard />
 

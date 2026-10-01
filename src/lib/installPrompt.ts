@@ -24,7 +24,8 @@ function set(next: Partial<InstallState>): void {
   for (const l of listeners) l()
 }
 
-function isStandalone(): boolean {
+/** Running as an installed app (display-mode standalone, or iOS home-screen launch). */
+export function isStandalone(): boolean {
   const nav = navigator as Navigator & { standalone?: boolean }
   return window.matchMedia?.('(display-mode: standalone)').matches === true || nav.standalone === true
 }

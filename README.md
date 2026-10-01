@@ -66,7 +66,35 @@ Other scripts:
 npm run build
 npm run preview
 npm run lint
+npm run banks:push   # upload built-in answer keys to Convex (see below)
 ```
+
+### Running without Convex
+
+The app works fully without a backend: leave `VITE_CONVEX_URL` unset. Quizzes, history,
+mistakes, streaks and custom subjects are local (IndexedDB / localStorage) either way;
+without Convex the global leaderboard, device linking and visit counting are disabled
+(the leaderboard page shows only this device's own stats).
+
+With Convex (`VITE_CONVEX_URL` set, see `.env.example`):
+
+- Run `npx convex dev --once` after any change in `convex/`.
+- Set `BANKS_ADMIN_KEY` in the Convex dashboard (Settings → Environment Variables) and the
+  same value in `.env.local`, then run `npm run banks:push` whenever a built-in subject in
+  `src/data` changes. The server grades attempts against these answer keys; subjects without
+  a bank (custom uploads) are stored as practice only and never ranked.
+- Set `ADMIN_PIN` (6 digits) in the dashboard to enable the owner's hidden stats page.
+
+## Privacy
+
+- **Anonymous visit counts only.** Once per session the app sends coarse categories
+  (mobile/tablet/desktop, OS family, browser family, installed or not) and a truncated
+  SHA-256 hash of a random device id, used only to count unique visitors per day and
+  deleted after 30 days. No IP address, location, user-agent string or personal data is
+  stored, and nothing is shown in the app.
+- **No accounts.** The leaderboard identifies you by a random secret stored on your device.
+- **Device linking is optional.** Linking shares one player between at most two of your
+  devices; it is permanent and never merges or transfers points.
 
 ## Exact route behavior
 
@@ -75,7 +103,9 @@ npm run lint
 - `/analytics` → Last completed quiz analytics.
 - `/history` → Stored quiz attempts.
 - `/upload` → JSON upload for custom subjects.
-- Any unknown route (`*`) → redirects to landing UI (renders landing page component).
+- `/leaderboard` → Global leaderboard (needs a connection when Convex is enabled).
+- `/link?c=123456` → Opens the "link a new device" approval with the code filled in.
+- Any unknown route (`*`) → "Page not found".
 
 ## Exact quiz lifecycle
 

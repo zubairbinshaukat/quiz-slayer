@@ -15,7 +15,10 @@ export const router = createBrowserRouter([
       { path: 'history', lazy: async () => ({ Component: (await import('./pages/HistoryPage')).HistoryPage }) },
       { path: 'leaderboard', lazy: async () => ({ Component: (await import('./pages/LeaderboardPage')).LeaderboardPage }) },
       { path: 'upload', lazy: async () => ({ Component: (await import('./pages/UploadPage')).UploadPage }) },
-      { path: '*', lazy: landing },
+      { path: 'link', lazy: async () => ({ Component: (await import('./pages/LinkPage')).LinkPage }) },
+      // Owner-only; renders NotFound without a valid session token
+      { path: 'stats', lazy: async () => ({ Component: (await import('./pages/StatsPage')).StatsPage }) },
+      { path: '*', lazy: async () => ({ Component: (await import('./pages/NotFoundPage')).NotFoundPage }) },
     ],
   },
 ])

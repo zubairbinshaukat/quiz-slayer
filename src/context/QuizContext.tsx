@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react'
 import { ANALYTICS_KEY, SESSION_KEY } from '../lib/storageKeys'
 import { saveQuizResult } from '../lib/db'
 import { recordAttempt } from '../lib/attemptSink'
-import { getDeviceId } from '../lib/deviceId'
 import { recordExamResult } from '../lib/examState'
 import { clearProgress, writeProgress } from '../lib/quizProgress'
 import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
@@ -182,7 +181,7 @@ export function QuizProvider({ children }: { children: ReactNode }) {
           wrongIds: getWrongQuestions(prev.questions, prev.answers).map((q) => String(q.id)),
           optionsCount: getOptionsCount(prev.questions),
         }).then((saved) => {
-          if (saved) void recordAttempt({ ...saved, deviceId: getDeviceId() })
+          if (saved) void recordAttempt(saved)
         })
       }
 

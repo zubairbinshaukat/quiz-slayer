@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { query } from './_generated/server'
 import type { Doc } from './_generated/dataModel'
+import { getPlayerBySecret, getStats } from './lib/playerStore'
 
 /** Minimum answered questions before a player appears on the leaderboard. */
 export const MIN_ANSWERED = 20
@@ -28,12 +29,9 @@ export const top = query({
 
     const rows = await Promise.all(
       stats.map(async (s) => {
-        const player = await ctx.db
-          .query('players')
-          .withIndex('by_deviceId', (q) => q.eq('deviceId', s.deviceId))
-          .unique()
+        const player = await ctx.db.get(s.playerId)
         return {
-          deviceId: s.deviceId,
+          id: s.playerId as string,
           name: player?.name ?? 'Anonymous',
           points: s.points,
           answered: s.answered,
@@ -45,31 +43,20 @@ export const top = query({
     )
 
     // Tie-break: points desc, then accuracy desc, then fewer attempts first
-    rows.sort(
-      (a, b) =>
-        b.points - a.points ||
-        b.accuracy - a.accuracy ||
-        a.attempts - b.attempts,
-    )
+    rows.sort((a, b) => b.points - a.points || b.accuracy - a.accuracy || a.attempts - b.attempts)
 
     return rows.map(({ attempts: _attempts, ...row }, i) => ({ ...row, rank: i + 1 }))
   },
 })
 
-/** The caller's own stats and rank, or null if they have no recorded attempts. */
+/** The caller's own stats and rank, or null if they have no ranked attempts. */
 export const me = query({
-  args: { deviceId: v.string() },
-  handler: async (ctx, { deviceId }) => {
-    const stats = await ctx.db
-      .query('playerStats')
-      .withIndex('by_deviceId', (q) => q.eq('deviceId', deviceId))
-      .unique()
+  args: { secret: v.string() },
+  handler: async (ctx, { secret }) => {
+    const player = await getPlayerBySecret(ctx, secret)
+    if (!player) return null
+    const stats = await getStats(ctx, player._id)
     if (!stats) return null
-
-    const player = await ctx.db
-      .query('players')
-      .withIndex('by_deviceId', (q) => q.eq('deviceId', deviceId))
-      .unique()
 
     const ahead = await ctx.db
       .query('playerStats')
@@ -78,13 +65,14 @@ export const me = query({
       .collect()
 
     return {
-      deviceId,
-      name: player?.name ?? 'Anonymous',
+      id: player._id as string,
+      name: player.name,
       points: stats.points,
       answered: stats.answered,
       correct: stats.correct,
       wrong: stats.wrong,
       attempts: stats.attempts,
+      mastered: stats.mastered,
       accuracy: accuracyOf(stats),
       /** Whether the player has answered enough questions to appear on the board */
       qualified: stats.answered >= MIN_ANSWERED,

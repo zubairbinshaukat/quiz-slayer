@@ -2,7 +2,9 @@ import type { ReactNode } from 'react'
 import { useLiteMode } from '../../hooks/useLiteMode'
 import { useSound } from '../../hooks/useSound'
 import { useTheme } from '../../hooks/useTheme'
+import { convexEnabled } from '../../lib/convex'
 import type { LitePref } from '../../lib/liteMode'
+import { DevicesSetting } from '../devices/DevicesSetting'
 import { Segmented } from '../ui/Segmented'
 import { Sheet } from '../ui/Sheet'
 
@@ -16,7 +18,7 @@ function SettingRow({ title, hint, children }: { title: string; hint?: string; c
   )
 }
 
-/** Appearance, sound and lite mode in one lightweight sheet (opened from the navbar gear). */
+/** Appearance, sound, lite mode and device linking in one lightweight sheet (opened from the navbar gear). */
 export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { theme, toggleTheme } = useTheme()
   const { soundEnabled, toggleSound } = useSound()
@@ -64,6 +66,8 @@ export function SettingsSheet({ open, onClose }: { open: boolean; onClose: () =>
             ]}
           />
         </SettingRow>
+
+        {convexEnabled && <DevicesSetting onNavigate={onClose} />}
       </div>
     </Sheet>
   )

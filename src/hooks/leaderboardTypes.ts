@@ -1,7 +1,8 @@
 /** Public leaderboard shapes (mirrors convex/leaderboard.ts query results). */
 
 export interface Row {
-  deviceId: string
+  /** Stable public player id (never the secret or a device id) */
+  id: string
   name: string
   points: number
   answered: number
@@ -30,10 +31,8 @@ export interface UseLeaderboardResult {
   /** True when backed by the global (Convex) board */
   enabled: boolean
   loading: boolean
-  /** Browser reports no connection */
-  offline: boolean
-  /** Showing the cached payload rather than live data */
-  stale: boolean
+  /** No connection, or the board did not load: show the 'needs a connection' state */
+  unavailable: boolean
   top: Row[]
   me: MeRow | null
   player: PlayerInfo | null

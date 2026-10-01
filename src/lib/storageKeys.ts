@@ -23,8 +23,20 @@ export const PLAYER_NAME_KEY = 'qs-player-name'
 export const LITE_MODE_KEY = 'qs-lite-mode'
 /** Epoch ms when the install card was dismissed. */
 export const INSTALL_DISMISSED_KEY = 'qs-install-dismissed'
-/** Last known leaderboard payload, for offline rendering. */
-export const LEADERBOARD_CACHE_KEY = 'qs-leaderboard-cache'
+/** Removed: the leaderboard no longer renders a cached board offline. Deleted on startup. */
+export const RETIRED_LEADERBOARD_CACHE_KEY = 'qs-leaderboard-cache'
+/** 32-hex player secret: identifies this device's player on the server. Never shown. */
+export const PLAYER_SECRET_KEY = 'qs-player-secret'
+/** '1' while a device-id era player still needs players.claimLegacy. */
+export const LEGACY_CLAIM_KEY = 'qs-legacy-claim'
+/** '2' once identity has been initialised under the secret model. */
+export const IDENTITY_VERSION_KEY = 'qs-identity-v'
+/** '1' once the landing 'continue on this device' banner was dismissed. */
+export const LINK_BANNER_DISMISSED_KEY = 'qs-link-banner-dismissed'
+/** '1' once this install has been counted (iOS standalone launch / appinstalled). */
+export const INSTALL_COUNTED_KEY = 'qs-install-counted'
+/** Owner stats session token (hidden /stats page). */
+export const ADMIN_TOKEN_KEY = 'qs-admin-token'
 
 // ─── sessionStorage ──────────────────────────────────────────────────────────
 
@@ -34,6 +46,8 @@ export const SESSION_KEY = 'quiz-session'
 export const ANALYTICS_KEY = 'quiz-analytics'
 /** Set once the splash has played this session. */
 export const PRELOADED_KEY = 'qs-preloaded'
+/** Set once this session's anonymous visit was counted. */
+export const VISIT_TRACKED_KEY = 'qs-visit-tracked'
 
 // ─── IndexedDB ───────────────────────────────────────────────────────────────
 

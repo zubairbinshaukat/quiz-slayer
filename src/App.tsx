@@ -1,11 +1,13 @@
 import { Outlet, ScrollRestoration, useLocation } from 'react-router-dom'
 import { Preloader } from './components/brand/Preloader'
+import { DeviceLinkHost } from './components/devices/DeviceLinkHost'
 import { Navbar } from './components/layout/Navbar'
 import { TabBar } from './components/layout/TabBar'
 import { UpdatePrompt } from './components/pwa/UpdatePrompt'
 import { QuizProvider } from './context/QuizContext'
 import { SoundProvider } from './context/SoundContext'
 import { useLiteMode } from './hooks/useLiteMode'
+import { convexEnabled } from './lib/convex'
 
 /** Root layout: providers + chrome. Quiz routes run in a chrome-less focus mode. */
 export function AppShell() {
@@ -27,6 +29,7 @@ export function AppShell() {
         <Outlet />
         {!focusMode && <TabBar />}
         <UpdatePrompt />
+        {convexEnabled && <DeviceLinkHost />}
         <ScrollRestoration />
       </QuizProvider>
     </SoundProvider>

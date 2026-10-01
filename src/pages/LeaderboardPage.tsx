@@ -5,7 +5,6 @@ import { NameSheet } from '../components/leaderboard/NameSheet'
 import { PlayerNameRow } from '../components/leaderboard/PlayerNameRow'
 import { Podium } from '../components/leaderboard/Podium'
 import { Page, PageHeader } from '../components/layout/Page'
-import { Pill } from '../components/ui/Chip'
 import { Icon } from '../components/ui/Icon'
 import { useLeaderboard } from '../hooks/useLeaderboard'
 import { ROUTES } from '../lib/constants'
@@ -33,10 +32,10 @@ export function LeaderboardPage() {
     description: 'Top Quiz Slayer players by points: correct answers minus a penalty for wrong ones.',
     path: ROUTES.LEADERBOARD,
   })
-  const { enabled, loading, offline, top, me, player, setName, ensurePlayer } = useLeaderboard()
+  const { enabled, loading, unavailable, top, me, player, setName, ensurePlayer } = useLeaderboard()
   // 'auto' = first-visit prompt (skipped if a name is already chosen); 'manual' = opened from the name row
   const [nameSheet, setNameSheet] = useState<'auto' | 'manual' | null>(() => (wasPrompted() ? null : 'auto'))
-  const sheetOpen = nameSheet === 'manual' || (nameSheet === 'auto' && !loading && !player?.nameChosen)
+  const sheetOpen = !unavailable && (nameSheet === 'manual' || (nameSheet === 'auto' && !loading && !player?.nameChosen))
 
   useEffect(() => {
     ensurePlayer()
@@ -57,12 +56,6 @@ export function LeaderboardPage() {
         subtitle={`Points = correct − wrong ÷ (options − 1). Answer ${MIN_ANSWERED_FOR_BOARD}+ questions to rank.`}
       />
 
-      {offline && enabled && (
-        <Pill className="mb-4 bg-surface-2 py-1 text-muted">
-          <Icon name="wifiOff" size={14} />
-          Offline — showing last known
-        </Pill>
-      )}
 
       {!enabled && (
         <p className="card mb-6 flex items-start gap-3 p-3.5 text-sm text-muted" role="note">
@@ -71,17 +64,23 @@ export function LeaderboardPage() {
         </p>
       )}
 
-      {player && <PlayerNameRow player={player} onEdit={() => setNameSheet('manual')} />}
-
-      {loading && offline && (
-        <p className="card px-4 py-8 text-center text-sm text-muted">
-          You're offline and the board hasn't loaded on this device yet. It will appear once you reconnect.
-        </p>
+      {unavailable ? (
+        <div className="card flex flex-col items-center px-5 py-10 text-center" role="status">
+          <span className="flex size-14 items-center justify-center rounded-full bg-surface-2 text-muted" aria-hidden="true">
+            <Icon name="wifiOff" size={26} />
+          </span>
+          <h2 className="mt-4 text-lg">Leaderboard needs a connection</h2>
+          <p className="mt-1.5 max-w-[34ch] text-sm text-muted">
+            Your quizzes still count: they're saved on this device and sent when you're back online.
+          </p>
+        </div>
+      ) : (
+        player && <PlayerNameRow player={player} onEdit={() => setNameSheet('manual')} />
       )}
 
-      {!loading && (
+      {!loading && !unavailable && (
         <>
-          <Podium rows={top.slice(0, 3)} meId={me?.deviceId} />
+          <Podium rows={top.slice(0, 3)} meId={me?.id} />
 
           {top.length === 0 && (
             <p className="mt-6 text-center text-sm text-muted">
@@ -93,7 +92,7 @@ export function LeaderboardPage() {
             <ol className="mt-6 space-y-2" aria-label="Rankings">
               {rest.map((row, i) => (
                 <LeaderRow
-                  key={row.deviceId}
+                  key={row.id}
                   index={i}
                   rank={row.rank}
                   name={row.name}
@@ -101,7 +100,7 @@ export function LeaderboardPage() {
                   correct={row.correct}
                   answered={row.answered}
                   accuracy={row.accuracy}
-                  highlight={row.deviceId === me?.deviceId}
+                  highlight={row.id === me?.id}
                   className="cv-row"
                 />
               ))}

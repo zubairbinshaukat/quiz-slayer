@@ -2,72 +2,69 @@ import { ConvexError } from 'convex/values'
 import type { FunctionArgs } from 'convex/server'
 import { api } from '../../convex/_generated/api'
 import { convexClient } from './convex'
-import { addToOutbox, deleteOutboxItem, getOutbox } from './db'
+import { addToOutbox, clearOutbox, deleteOutboxItem, getOutbox } from './db'
 import { getDeviceId } from './deviceId'
-import type { HistoryEntry } from '../types'
+import { ensurePlayer } from './identity'
+import { isRecord, type HistoryEntry } from '../types'
 
-export type AttemptRecord = HistoryEntry & { deviceId: string }
-export type RecordAttemptArgs = FunctionArgs<typeof api.attempts.recordAttempt>
+/** Queued without the secret: it is attached at send time (a link may change it). */
+export type RecordAttemptArgs = Omit<FunctionArgs<typeof api.attempts.recordAttempt>, 'secret'>
 
 const MAX_ANSWERS = 500
 
+function newAttemptId(): string {
+  try {
+    if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
+  } catch { /* fall through */ }
+  return `${Date.now().toString(16)}-${Math.random().toString(16).slice(2, 14)}`
+}
+
 /**
- * Maps a saved history entry to the backend's recordAttempt args. Only answered
- * questions are graded (skips carry no penalty), matching the local leaderboard.
- * Returns null for entries the server would reject.
+ * Maps a saved history entry to the backend's recordAttempt args: raw answers
+ * plus question ids; the server grades them. Null for entries it would reject.
  */
-export function buildAttemptArgs(entry: AttemptRecord): RecordAttemptArgs | null {
+export function buildAttemptArgs(entry: HistoryEntry, deviceId: string): RecordAttemptArgs | null {
   const { questionIds, answers } = entry
-  const optionsCount = entry.optionsCount ?? 4
   if (!questionIds || questionIds.length !== answers.length) return null
   if (answers.length === 0 || answers.length > MAX_ANSWERS) return null
-  if (!Number.isInteger(optionsCount) || optionsCount < 2 || optionsCount > 10) return null
-
-  const wrongSet = new Set(entry.wrongIds ?? [])
-  const correctIds: string[] = []
-  const wrongIds: string[] = []
-  questionIds.forEach((id, i) => {
-    if (answers[i] === null) return
-    if (wrongSet.has(id)) wrongIds.push(id)
-    else correctIds.push(id)
-  })
-
   return {
-    deviceId: entry.deviceId,
+    deviceId,
+    attemptId: newAttemptId(),
     slug: entry.slug,
     subject: entry.subject,
     mode: entry.mode ?? 'quiz',
     answers,
-    correctIds,
-    wrongIds,
-    optionsCount,
+    questionIds,
     timeTaken: Math.max(0, Math.round(entry.timeTaken)),
+    createdAt: Date.parse(entry.dateTaken) || Date.now(),
   }
+}
+
+/** Items queued by older versions (client-graded, no attemptId) can't be graded and are dropped. */
+function isCurrentShape(args: unknown): args is RecordAttemptArgs {
+  return isRecord(args) && typeof args.attemptId === 'string' && Array.isArray(args.questionIds)
 }
 
 let flushing: Promise<void> | null = null
 let flushAgain = false
-let playerEnsured = false
 
 async function flushOnce(): Promise<void> {
   const client = convexClient
   if (!client || !navigator.onLine) return
-  const items = await getOutbox<RecordAttemptArgs>()
+  const items = await getOutbox<unknown>()
   if (items.length === 0) return
 
-  // The player row must exist before stats are attached to the device (idempotent).
-  if (!playerEnsured) {
-    try {
-      await client.mutation(api.players.ensurePlayer, { deviceId: getDeviceId() })
-      playerEnsured = true
-    } catch {
-      return // offline or server error: keep everything queued
-    }
-  }
+  // Creates (or claims) the player on the first finished quiz
+  const secret = await ensurePlayer()
+  if (!secret) return // offline or server error: keep everything queued
 
   for (const item of items) {
+    if (!isCurrentShape(item.args)) {
+      await deleteOutboxItem(item.id)
+      continue
+    }
     try {
-      await client.mutation(api.attempts.recordAttempt, item.args)
+      await client.mutation(api.attempts.recordAttempt, { ...item.args, secret })
       await deleteOutboxItem(item.id)
     } catch (err) {
       // The server rejected this attempt as invalid: retrying can never succeed.
@@ -105,15 +102,20 @@ export function flushOutbox(): Promise<void> {
 }
 
 /**
- * Queues a finished attempt for the global leaderboard and tries to send it.
- * With Convex disabled attempts stay local only (nothing is queued).
+ * Queues a finished attempt for the server and tries to send it. Custom subjects
+ * are sent too (stored unranked). With Convex disabled nothing is queued.
  */
-export async function recordAttempt(entry: AttemptRecord): Promise<void> {
+export async function recordAttempt(entry: HistoryEntry): Promise<void> {
   if (!convexClient) return
-  const args = buildAttemptArgs(entry)
+  const args = buildAttemptArgs(entry, getDeviceId())
   if (!args) return
   await addToOutbox(args)
   void flushOutbox()
+}
+
+/** Linking with "replace my progress": unsent attempts belong to the discarded progress. */
+export function discardQueuedAttempts(): Promise<void> {
+  return clearOutbox()
 }
 
 let started = false

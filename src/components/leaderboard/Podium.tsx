@@ -26,7 +26,7 @@ export function Podium({ rows, meId }: { rows: Row[]; meId?: string }) {
                   <Avatar name={row.name} size={first ? 48 : 40} className={cn(first && 'ring-2 ring-accent ring-offset-2 ring-offset-bg')} />
                   <p className="mt-1.5 w-full truncate text-sm font-semibold">
                     {row.name}
-                    {row.deviceId === meId && <span className="text-muted"> (you)</span>}
+                    {row.id === meId && <span className="text-muted"> (you)</span>}
                   </p>
                   <p className={cn('font-mono text-sm font-bold', first ? 'text-accent-fg' : 'text-muted')}>{formatPoints(row.points)} pts</p>
                 </>

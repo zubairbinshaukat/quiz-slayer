@@ -5,12 +5,15 @@ import { ShareCard } from '../components/analytics/ShareCard'
 import { Page } from '../components/layout/Page'
 import { Button } from '../components/ui/Button'
 import { Confetti } from '../components/ui/Confetti'
+import { Pill } from '../components/ui/Chip'
 import { Icon } from '../components/ui/Icon'
 import { StatStrip } from '../components/ui/StatStrip'
 import { useNav } from '../hooks/useNav'
 import { useQuiz } from '../hooks/useQuiz'
+import { useSubjectData } from '../hooks/useSubjectData'
 import { readAnalyticsSnapshot } from '../lib/analyticsSnapshot'
 import { ROUTES } from '../lib/constants'
+import { convexEnabled } from '../lib/convex'
 import { EXAM_PASS_THRESHOLD } from '../lib/examState'
 import { computePoints, formatPoints } from '../lib/ranking'
 import { getOptionsCount, getWrongQuestions } from '../lib/quizStats'
@@ -22,6 +25,7 @@ export function AnalyticsPage() {
   usePageMeta({ title: 'Results', path: ROUTES.ANALYTICS })
   const nav = useNav()
   const { status, subject, slug, mode, questions, answers, result, resetQuiz, startRetry } = useQuiz()
+  const { getSubjectBySlug } = useSubjectData()
 
   // Prefer live context data; fall back to sessionStorage for refresh / back-navigation.
   // Frozen at mount so starting a retry (which clears both) can't blank the page mid-navigation.
@@ -45,6 +49,8 @@ export function AnalyticsPage() {
   const cleared = data.mode === 'retry' && wrongCount === 0
   const exam = data.mode === 'exam'
   const passed = exam && r.score >= EXAM_PASS_THRESHOLD
+  // Uploaded subjects have no server answer key: their attempts are stored unranked
+  const practiceOnly = convexEnabled && !!data.slug && getSubjectBySlug(data.slug)?.isCustom === true
 
   function handleRetryWrong() {
     const started = startRetry()
@@ -67,6 +73,15 @@ export function AnalyticsPage() {
         eyebrow={data.mode === 'retry' ? 'Retry round' : exam ? 'Timed exam' : 'Quiz complete'}
         headline={exam ? (passed ? 'Passed' : 'Keep going') : cleared ? 'Cleared!' : undefined}
       />
+
+      {practiceOnly && (
+        <div className="mt-3 flex justify-center">
+          <Pill className="border border-line bg-surface-2 px-2.5 py-1 text-muted">
+            <Icon name="info" size={14} />
+            Practice only · not ranked
+          </Pill>
+        </div>
+      )}
 
       {exam && (
         <div

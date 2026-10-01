@@ -179,6 +179,15 @@ export async function getOutbox<TArgs>(): Promise<OutboxItem<TArgs>[]> {
   }
 }
 
+export async function clearOutbox(): Promise<void> {
+  try {
+    const db = await getDB()
+    await db.clear(OUTBOX_STORE)
+  } catch (err) {
+    console.warn('IndexedDB: failed to clear outbox', err)
+  }
+}
+
 export async function deleteOutboxItem(id: number): Promise<void> {
   try {
     const db = await getDB()

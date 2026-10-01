@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLiteMode } from '../../hooks/useLiteMode'
 import { useSound } from '../../hooks/useSound'
 import { useTheme } from '../../hooks/useTheme'
 import { ROUTES } from '../../lib/constants'
+import { convexEnabled } from '../../lib/convex'
 import { cn } from '../../lib/utils'
 import { Logo, LogoWordmark } from '../brand/Logo'
 import { IconButton } from '../ui/Button'
 import { Icon, type IconName } from '../ui/Icon'
 import { SettingsSheet } from './SettingsSheet'
+
+const AdminPinSheet = lazy(() => import('../admin/AdminPinSheet').then((m) => ({ default: m.AdminPinSheet })))
+
+const SECRET_TAPS = 7
+const SECRET_WINDOW_MS = 4000
 
 function NavIconLink({ to, label, icon, className }: { to: string; label: string; icon: IconName; className?: string }) {
   const { pathname } = useLocation()
@@ -38,11 +44,24 @@ export function Navbar() {
   const { theme, toggleTheme } = useTheme()
   const { lite } = useLiteMode()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [pinOpen, setPinOpen] = useState(false)
+  const taps = useRef<number[]>([])
+
+  // Owner entry: 7 taps on the logo within 4 s opens the stats PIN prompt
+  function onLogoTap() {
+    if (!convexEnabled) return
+    const now = Date.now()
+    taps.current = [...taps.current.filter((t) => now - t < SECRET_WINDOW_MS), now]
+    if (taps.current.length >= SECRET_TAPS) {
+      taps.current = []
+      setPinOpen(true)
+    }
+  }
 
   return (
     <header className="pt-safe sticky top-0 z-40 border-b border-line bg-bg [view-transition-name:navbar]">
       <div className="mx-auto flex h-14 max-w-[760px] items-center justify-between gap-2 px-4">
-        <Link to={ROUTES.HOME} viewTransition={!lite} className="press -ml-1 flex items-center rounded-btn p-1 text-fg" aria-label="Quiz Slayer home">
+        <Link to={ROUTES.HOME} viewTransition={!lite} className="press -ml-1 flex items-center rounded-btn p-1 text-fg" aria-label="Quiz Slayer home" onClick={onLogoTap}>
           <Logo size={28} title="" className="text-accent min-[400px]:hidden" />
           <LogoWordmark size={24} title="" markClassName="text-accent" className="max-[399px]:hidden" />
         </Link>
@@ -63,6 +82,11 @@ export function Navbar() {
         </nav>
       </div>
       <SettingsSheet open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+      {pinOpen && (
+        <Suspense fallback={null}>
+          <AdminPinSheet onClose={() => setPinOpen(false)} />
+        </Suspense>
+      )}
     </header>
   )
 }
